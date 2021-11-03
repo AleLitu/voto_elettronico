@@ -1,5 +1,5 @@
 public class Elettore{
 	public Elettore() {
-		//added
+		//added a comment
 	}
 }
