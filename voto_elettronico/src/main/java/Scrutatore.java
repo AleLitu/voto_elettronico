@@ -6,6 +6,7 @@ public class Scrutatore{
 		this.id = id;
 		this.pwd = pwd;
 	}
+	
 	public void configuraSessione() {}
 	public void avviaSessione() {}
 	public void terminaSessione() {}

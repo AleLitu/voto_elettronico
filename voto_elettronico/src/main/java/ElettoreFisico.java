@@ -3,5 +3,6 @@ public class ElettoreFisico extends Elettore{
 		super(nome, cognome, tessera_elettorale);
 	}
 	
+	
 	public void vota() {}
 }

@@ -5,5 +5,6 @@ public class ElettoreOnline extends Elettore{
 		this.pwd = pwd;
 	}
 	
+	
 	public void vota() {}
 }
