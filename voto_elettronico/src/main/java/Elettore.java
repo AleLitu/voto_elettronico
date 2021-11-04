@@ -6,6 +6,5 @@ public abstract class Elettore{
 		this.cognome = cognome;
 		this.tessera_elettorale = tessera_elettorale;
 	}
-	
 	abstract void vota();
 }
