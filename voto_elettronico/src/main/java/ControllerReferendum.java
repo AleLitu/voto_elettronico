@@ -18,6 +18,9 @@ public class ControllerReferendum{
 
     @FXML
     private Button btnConfermaR;
+    
+    @FXML
+    private Button btnIndietro;
 
     @FXML
     private TextArea txtDomanda;
@@ -43,7 +46,15 @@ public class ControllerReferendum{
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
         actual.setScene(new Scene(root));
-        actual.setTitle("Login");
+        actual.setTitle("Gestore");
     }
 
+    @FXML
+    void handleIndietro(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Gestore");
+    }
 }

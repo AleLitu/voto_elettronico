@@ -28,10 +28,19 @@
       </VBox>
    </center>
    <bottom>
-      <Button fx:id="btnConfermaR" mnemonicParsing="false" onAction="#handleConfermaR" text="Conferma" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="20.0" />
-         </BorderPane.margin>
-      </Button>
+      <VBox prefHeight="100.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnConfermaR" mnemonicParsing="false" onAction="#handleConfermaR" text="Aggiungi lista">
+               <VBox.margin>
+                  <Insets bottom="15.0" left="20.0" right="20.0" top="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="btnIndietro" mnemonicParsing="false" onAction="#handleIndietro" text="Indietro">
+               <VBox.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="15.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
    </bottom>
 </BorderPane>

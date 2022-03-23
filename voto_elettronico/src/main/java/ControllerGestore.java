@@ -135,5 +135,10 @@ public class ControllerGestore {
     void handleRisultati(ActionEvent event) {
 
     }
+    
+    @FXML
+    public void initialize() {
+    	lblNome.setText("Benvenuto, " + ControllerLogin.getUser().getUsername());
+    }
 
 }

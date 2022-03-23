@@ -10,6 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ControllerLogin {
+	
+	private static User user;
 
     @FXML
     private Button btnSend;
@@ -27,6 +29,10 @@ public class ControllerLogin {
     void handlePassword(ActionEvent event) {
 
     }
+    
+    public static User getUser() {
+    	return user;
+    }
 
     @FXML
     void handleSend(ActionEvent event) {
@@ -36,7 +42,7 @@ public class ControllerLogin {
     	String pwd = lblPassword.getText();
     	
     	UserDao userdao = new UserDaoImpl();
-    	User user = userdao.getUser(usr, pwd);
+    	user = userdao.getUser(usr, pwd);
     	String messaggio;
     	if(user != null) {
     		Node node = (Node) event.getSource();
@@ -45,28 +51,13 @@ public class ControllerLogin {
     		try {
     			if(user.getType().equals("gestore")) {
     				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
-                    ControllerGestore gestore = new ControllerGestore();
                     actual.setScene(new Scene(root));
                     actual.setTitle("Logged");
     			} else {
-    				
-    			Parent root = FXMLLoader.load(getClass().getResource("benvenuto.fxml"));
-                ControllerB benvenuto = new ControllerB();
-                //benvenuto.setUser(user);
-                benvenuto.transferMessage(user.getUsername());
-                //FXMLLoader loader = new FXMLLoader (getClass().getResource("benvenuto.fxml"));
-                //Parent root = loader.load();
-                //ControllerB benvenuto = loader.getController();
-                
-    			//benvenuto.transferMessage(user.getUsername());
-    			//System.out.println("dio");
-
-                /*Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.setTitle("Logged");
-                stage.show();*/
-                actual.setScene(new Scene(root));
-                actual.setTitle("Logged");
+    				//votante
+	    			Parent root = FXMLLoader.load(getClass().getResource("benvenuto.fxml"));
+	                actual.setScene(new Scene(root));
+	                actual.setTitle("Logged");
     			}
     		} catch(Exception e) {
     			System.out.println(e);
