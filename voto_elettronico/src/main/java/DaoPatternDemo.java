@@ -15,7 +15,7 @@ public class DaoPatternDemo extends Application {
         primaryStage.setScene(new Scene(root, 400, 500));
         primaryStage.show();
     }
-    // comment
+
     public static void main(String[] args) {
     	launch(args);
     }
