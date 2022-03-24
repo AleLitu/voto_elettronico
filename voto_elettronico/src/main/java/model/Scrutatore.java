@@ -1,3 +1,4 @@
+package model;
 public class Scrutatore{
 	//nome, cognome, id e password dello scrutatore
 	private String nome, cognome, id, pwd;

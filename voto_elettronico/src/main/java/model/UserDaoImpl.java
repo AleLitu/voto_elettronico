@@ -1,3 +1,4 @@
+package model;
 import java.sql.*;
 import java.security.SecureRandom;
 import java.nio.charset.StandardCharsets;

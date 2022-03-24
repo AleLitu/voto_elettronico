@@ -1,3 +1,4 @@
+package model;
 public class ElettoreOnline extends Elettore{
 	//password dell'elettore online
 	private String pwd;

@@ -1,3 +1,4 @@
+package model;
 public abstract class Elettore{
 	//nome e cognome dell'elettore
 	private String nome, cognome;

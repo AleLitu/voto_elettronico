@@ -1,3 +1,5 @@
+package client;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,6 +11,7 @@ public class DaoPatternDemo extends Application {
 	
     @Override
     public void start(Stage primaryStage) throws Exception{
+    	//FXMLLoader fxmlLoader = new FXMLLoader(DaoPatternDemo.class.getResource("login.fxml"));
         Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
         
         primaryStage.setTitle("Login");

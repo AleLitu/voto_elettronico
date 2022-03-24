@@ -1,3 +1,4 @@
+package model;
 import java.security.SecureRandom;
 import java.util.Random;
 import java.nio.charset.StandardCharsets;
