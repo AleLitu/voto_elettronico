@@ -61,6 +61,10 @@ public class ControllerLogin {
     public static User getUser() {
     	return user;
     }
+    
+    public static Socket getSocket() {
+    	return so;
+    }
 
     @FXML
     void handleSend(ActionEvent event) throws Exception {

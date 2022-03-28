@@ -12,7 +12,8 @@ public class Server{
 			while(true) {
 				toClient = sSrv.accept();
 				System.out.println("Indirizzo client: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
-				Thread t = new GestisciClient(toClient);
+				GestisciClient client = new GestisciClient(toClient);
+				new Thread(client).start();
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

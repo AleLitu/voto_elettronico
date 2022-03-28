@@ -12,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -36,7 +37,8 @@ public class ControllerListe{
     private Label lblDuplicati;
     
     @FXML
-    void handleAggiungi(ActionEvent event) {    	
+    void handleAggiungi(ActionEvent event) {    
+    	Socket so = ControllerLogin.getSocket();
     	String[] c = txtCandidati.getText().split(", ");
     	
     	//Connessione al database

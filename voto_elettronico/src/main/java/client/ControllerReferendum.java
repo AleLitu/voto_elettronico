@@ -1,5 +1,8 @@
 package client;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -28,26 +31,33 @@ public class ControllerReferendum{
 
     @FXML
     void handleConfermaR(ActionEvent event) throws IOException {
-    	//Connessione al server
-    	String url = "jdbc:mysql://localhost:3306/votazioni?";
-    	String usr = "root";
-    	String pwd = "";
-    	try {
-    		Connection conn = DriverManager.getConnection(url, usr, pwd);
-    	
-	    	//Query per inserire il referendum
-	    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo) VALUES (?);");
-	    	stmt.setString(1, txtDomanda.getText());
-	    	stmt.execute();
-    	}catch (Exception e) {
-    		System.out.println(e.getMessage());
-    	}
-    	
-    	Node node = (Node) event.getSource();
-		Stage actual = (Stage) node.getScene().getWindow();
-		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
-        actual.setScene(new Scene(root));
-        actual.setTitle("Gestore");
+		int dim_buffer = 100;
+		int letti;
+		String ok;
+		byte buffer[] = new byte[dim_buffer];
+    	Socket so = ControllerLogin.getSocket();
+        OutputStream outputStream = so.getOutputStream();
+        InputStream inputStream = so.getInputStream();
+        outputStream.write("a".getBytes(), 0, "a".length());
+        letti = inputStream.read(buffer);
+		ok = new String(buffer, 0, letti);
+
+		if(ok.equals("ok")) {
+	        String testo = txtDomanda.getText();
+	    	outputStream.write(testo.getBytes(), 0, testo.length());
+			letti = inputStream.read(buffer);
+			ok = new String(buffer, 0, letti);
+			
+			if(ok.equals("ok")) {
+				Node node = (Node) event.getSource();
+				Stage actual = (Stage) node.getScene().getWindow();
+				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+		        actual.setScene(new Scene(root));
+		        actual.setTitle("Gestore");
+			} else {
+				System.out.println("Errore");
+			}
+		}
     }
 
     @FXML
