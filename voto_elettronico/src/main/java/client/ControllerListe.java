@@ -12,6 +12,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -37,57 +39,34 @@ public class ControllerListe{
     private Label lblDuplicati;
     
     @FXML
-    void handleAggiungi(ActionEvent event) {    
-    	Socket so = ControllerLogin.getSocket();
-    	String[] c = txtCandidati.getText().split(", ");
-    	
-    	//Connessione al database
-    	String url = "jdbc:mysql://localhost:3306/votazioni?";
-    	String usr = "root";
-    	String pwd = "";
-    	int id, count = 0;
-    	try {
-    		Connection conn = DriverManager.getConnection(url, usr, pwd);
-    		
-    		//Query per inserire il partito
-    		PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti WHERE partito = ?");
-    		stmt.setString(1, txtPartito.getText());
-    		ResultSet rs = stmt.executeQuery();
-    		if(rs.next()) {
-    			System.out.println("1");
-    			//rs.next();
-    			id = rs.getInt("idPartito");
-    			System.out.println(id);
-    		} else {
-    			System.out.println("2");
-    			stmt = conn.prepareStatement("INSERT INTO Partiti (partito) VALUES (?)");
-        		stmt.setString(1, txtPartito.getText());
-        		stmt.execute();
-        		
-        		//Query per prendere l'id del partito appena inserito
-        		stmt = conn.prepareStatement("SELECT idPartito FROM Partiti WHERE partito = ?");
-        		stmt.setString(1, txtPartito.getText());
-        		rs = stmt.executeQuery();
-        		rs.next();
-        		id = rs.getInt("idPartito");
-    		}
-        		//Ciclo con query per inserire i vari candidati di quel partito
-        		for(int i = 0; i < c.length; i++) {
-        			stmt = conn.prepareStatement("SELECT idCandidato FROM candidati WHERE candidato = ?");
-            		stmt.setString(1, c[i]);
-            		rs = stmt.executeQuery();
-            		if(!rs.next()) {
-            			stmt = conn.prepareStatement("INSERT INTO Candidati (candidato, idPartito) VALUES (?, ?)");
-                		stmt.setString(1, c[i]);
-                		stmt.setInt(2, id);
-                		stmt.execute();
-            		} else {
-            			count++;
-            		}
-        		}    		
-    	}catch (Exception e) {
-    		System.out.println(e.getMessage());
-    	}
+    void handleAggiungi(ActionEvent event) throws IOException {    
+    	Socket so = ControllerLogin.getSocket();    	
+    	int dim_buffer = 100;
+		int letti, count = 0;
+		String ok;
+		byte buffer[] = new byte[dim_buffer];
+        OutputStream outputStream = so.getOutputStream();
+        InputStream inputStream = so.getInputStream();
+        outputStream.write("b".getBytes(), 0, "b".length());
+        letti = inputStream.read(buffer);
+		ok = new String(buffer, 0, letti);
+
+		if(ok.equals("ok")) {
+	        String partito = txtPartito.getText();
+	    	outputStream.write(partito.getBytes(), 0, partito.length());
+			letti = inputStream.read(buffer);
+			ok = new String(buffer, 0, letti);
+			
+			if(ok.equals("ok")) {
+				String candidati = txtCandidati.getText();
+		    	outputStream.write(candidati.getBytes(), 0, candidati.length());
+				letti = inputStream.read(buffer);
+				ok = new String(buffer, 0, letti);
+				count = Integer.parseInt(ok);
+			} else {
+				System.out.println("Errore");
+			}
+		}
     	
     	//Testo vuoto per un nuovo inserimento
     	if(count == 1)

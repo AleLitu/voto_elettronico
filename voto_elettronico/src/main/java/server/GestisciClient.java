@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class GestisciClient implements Runnable{
 	private Socket so;
@@ -52,6 +53,10 @@ public class GestisciClient implements Runnable{
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					case "b":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String partito = new String(buffer, 0, letti);
+						inserisciPartito(partito);
 						break;
 					}
 									
@@ -76,11 +81,59 @@ public class GestisciClient implements Runnable{
     	}
 	}
 	
-	public void inserisciPartito() {
-		
+	public void inserisciPartito(String partito) {
+		int dim_buffer = 500;
+		byte buffer[] = new byte[dim_buffer];
+		int id;
+    	try {    		
+    		//Query per inserire il partito
+    		PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti WHERE partito = ?");
+    		stmt.setString(1, partito);
+    		ResultSet rs = stmt.executeQuery();
+    		if(rs.next()) {
+    			id = rs.getInt("idPartito");
+    		} else {
+    			stmt = conn.prepareStatement("INSERT INTO Partiti (partito) VALUES (?)");
+        		stmt.setString(1, partito);
+        		stmt.execute();
+        		
+        		//Query per prendere l'id del partito appena inserito
+        		stmt = conn.prepareStatement("SELECT idPartito FROM Partiti WHERE partito = ?");
+        		stmt.setString(1, partito);
+        		rs = stmt.executeQuery();
+        		rs.next();
+        		id = rs.getInt("idPartito");
+    		}
+    		outputStream.write("ok".getBytes(), 0, "ok".length());
+			int letti = inputStream.read(buffer);
+			String candidati = new String(buffer, 0, letti);
+			inserisciCandidati(id, candidati);
+    	}catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}		
 	}
 	
-	public void inserisciCandidati() {
-		
+	public void inserisciCandidati(int id, String candidati) {
+		try {
+    	String[] c = candidati.split(", ");
+    	int count = 0;
+		//Ciclo con query per inserire i vari candidati di quel partito
+		for(int i = 0; i < c.length; i++) {
+			PreparedStatement stmt = conn.prepareStatement("SELECT idCandidato FROM candidati WHERE candidato = ?");
+    		stmt.setString(1, c[i]);
+    		ResultSet rs = stmt.executeQuery();
+    		if(!rs.next()) {
+    			stmt = conn.prepareStatement("INSERT INTO Candidati (candidato, idPartito) VALUES (?, ?)");
+        		stmt.setString(1, c[i]);
+        		stmt.setInt(2, id);
+        		stmt.execute();
+    		} else {
+    			count++;
+    		}
+		}
+		outputStream.write(Integer.toString(count).getBytes(), 0, Integer.toString(count).length());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
