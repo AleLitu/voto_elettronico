@@ -13,7 +13,8 @@ public class Server{
 				toClient = sSrv.accept();
 				System.out.println("Indirizzo client: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
 				GestisciClient client = new GestisciClient(toClient);
-				new Thread(client).start();
+				Thread t = new Thread(client);
+				t.start();
 			}
 		}catch(Exception e) {
 			e.printStackTrace();

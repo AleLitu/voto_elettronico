@@ -40,6 +40,8 @@ public class GestisciClient implements Runnable{
 		
 		while(true) {
 			try {
+				if(so.isInputShutdown()) {
+
 				int letti = inputStream.read(buffer);
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
@@ -60,6 +62,10 @@ public class GestisciClient implements Runnable{
 						break;
 					}
 									
+				}else {
+					so.close();
+					return;
+				}
 				}else {
 					so.close();
 					return;
