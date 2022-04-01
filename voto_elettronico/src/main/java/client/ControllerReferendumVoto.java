@@ -29,27 +29,31 @@ public class ControllerReferendumVoto{
     	if(!radioNo.isSelected() && !radioSi.isSelected()) {
     		System.out.println("Errore");
     	}
-    	
-    	//Connessione al server
-    	String url = "jdbc:mysql://localhost:3306/votazioni?";
-    	String usr = "root";
-    	String pwd = "";
-    	try {
-    		Connection conn = DriverManager.getConnection(url, usr, pwd);
-    	
-	    	if(radioSi.isSelected()) {
-	    		//Query per inserire il si al referendum
-	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
-	    		stmt.setString(1, "Si");
-	    		ResultSet rs = stmt.executeQuery();
-	    	}else {
-	    		//Query per inserire il no al referendum
-	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
-	    		stmt.setString(1, "No");
-	    		ResultSet rs = stmt.executeQuery();
-	    	}
-    	}catch (Exception e) {
-    		System.out.println(e.getMessage());
+		Socket so = ControllerLogin.getSocket();    	
+    	int dim_buffer = 100;
+		int letti, count = 0;
+		String ok;
+		byte buffer[] = new byte[dim_buffer];
+        OutputStream outputStream = so.getOutputStream();
+        InputStream inputStream = so.getInputStream();
+        outputStream.write("c".getBytes(), 0, "b".length());
+        letti = inputStream.read(buffer);
+		ok = new String(buffer, 0, letti);
+		if(ok.equals("ok")) {
+			if(radioSi.isSelected()) {
+    	        String voto = "si";
+    	    	outputStream.write(voto.getBytes(), 0, partito.length());
+    			letti = inputStream.read(buffer);
+    			ok = new String(buffer, 0, letti);
+    		}else {	    		
+    			String voto = "no";
+    			outputStream.write(voto.getBytes(), 0, partito.length());
+    			letti = inputStream.read(buffer);
+    			ok = new String(buffer, 0, letti);
+    		}
+		}
+		else {
+    		System.out.println("Errore");
     	}
     	
     	//parte per cambiare pagina

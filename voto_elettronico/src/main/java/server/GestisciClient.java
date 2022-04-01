@@ -60,6 +60,12 @@ public class GestisciClient implements Runnable{
 						String partito = new String(buffer, 0, letti);
 						inserisciPartito(partito);
 						break;
+					case "c":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String voto = new String(buffer, 0, letti);
+						inserisciRefVoto(voto);
+						break;
 					}
 									
 				}else {
@@ -82,6 +88,25 @@ public class GestisciClient implements Runnable{
 	    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo) VALUES (?);");
 	    	stmt.setString(1, testo);
 	    	stmt.execute();
+    	}catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
+	}
+	
+	public void inserisciRefVoto(String voto) {
+		try {
+			if(voto.equals("no")) {
+				//Query per inserire il no al referendum
+	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
+	    		stmt.setString(1, "No");
+	    		ResultSet rs = stmt.executeQuery();
+			}
+			else {
+				//Query per inserire il si al referendum
+	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
+	    		stmt.setString(1, "Si");
+	    		ResultSet rs = stmt.executeQuery();
+			}
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
     	}
