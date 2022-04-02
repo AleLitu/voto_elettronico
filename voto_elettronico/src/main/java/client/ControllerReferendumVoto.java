@@ -39,41 +39,39 @@ public class ControllerReferendumVoto{
 
     @FXML
     void handleInvia(ActionEvent event) {
-    	do{
-    		if(!radioNo.isSelected() && !radioSi.isSelected())
-    			lblVoto.setText("Selezionare una scelta");
-    		else
-    			break;
-    	}while(1);
-		Socket so = ControllerLogin.getSocket();    	
-    	int dim_buffer = 100;
-		int letti, count = 0;
-		String ok;
-		byte buffer[] = new byte[dim_buffer];
-        OutputStream outputStream = so.getOutputStream();
-        InputStream inputStream = so.getInputStream();
-        outputStream.write("c".getBytes(), 0, "c".length());
-        letti = inputStream.read(buffer);
-		ok = new String(buffer, 0, letti);
-		if(ok.equals("ok")) {
-			if(radioSi.isSelected()) {
-    	    	outputStream.write("si".getBytes(), 0, "si".length());
-    			letti = inputStream.read(buffer);
-    			ok = new String(buffer, 0, letti);
-    		}else {	    		
-    			outputStream.write("no".getBytes(), 0, "no".length());
-    			letti = inputStream.read(buffer);
-    			ok = new String(buffer, 0, letti);
-    		}
-		}
-		else {
-    		System.out.println("Errore");
-    	}
-    	
-		Node node = (Node) event.getSource();
-		Stage actual = (Stage) node.getScene().getWindow();
-		Parent root = FXMLLoader.load(getClass().getResource("Votato.fxml"));
-        actual.setScene(new Scene(root));
-        actual.setTitle("Votato");
+   		if(!radioNo.isSelected() && !radioSi.isSelected())
+   			lblVoto.setText("Selezionare una scelta");
+   		else {
+			Socket so = ControllerLogin.getSocket();    	
+	    	int dim_buffer = 100;
+			int letti, count = 0;
+			String ok;
+			byte buffer[] = new byte[dim_buffer];
+	        OutputStream outputStream = so.getOutputStream();
+	        InputStream inputStream = so.getInputStream();
+	        outputStream.write("c".getBytes(), 0, "c".length());
+	        letti = inputStream.read(buffer);
+			ok = new String(buffer, 0, letti);
+			if(ok.equals("ok")) {
+				if(radioSi.isSelected()) {
+	    	    	outputStream.write("si".getBytes(), 0, "si".length());
+	    			letti = inputStream.read(buffer);
+	    			ok = new String(buffer, 0, letti);
+	    		}else {	    		
+	    			outputStream.write("no".getBytes(), 0, "no".length());
+	    			letti = inputStream.read(buffer);
+	    			ok = new String(buffer, 0, letti);
+	    		}
+			}
+			else {
+	    		System.out.println("Errore");
+	    	}
+	    	
+			Node node = (Node) event.getSource();
+			Stage actual = (Stage) node.getScene().getWindow();
+			Parent root = FXMLLoader.load(getClass().getResource("Votato.fxml"));
+	        actual.setScene(new Scene(root));
+	        actual.setTitle("Votato");
+   		}
     }
 }
