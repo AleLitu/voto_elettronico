@@ -99,13 +99,13 @@ public class GestisciClient implements Runnable{
 				//Query per inserire il no al referendum
 	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
 	    		stmt.setString(1, "No");
-	    		ResultSet rs = stmt.executeQuery();
+		    	stmt.execute();
 			}
 			else {
 				//Query per inserire il si al referendum
 	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
 	    		stmt.setString(1, "Si");
-	    		ResultSet rs = stmt.executeQuery();
+		    	stmt.execute();
 			}
     	}catch (Exception e) {
     		System.out.println(e.getMessage());

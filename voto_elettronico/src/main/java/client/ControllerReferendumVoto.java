@@ -4,11 +4,21 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 public class ControllerReferendumVoto{
 
@@ -23,12 +33,18 @@ public class ControllerReferendumVoto{
 
     @FXML
     private RadioButton radioSi;
+    
+    @FXML
+    private Label lblVoto;
 
     @FXML
     void handleInvia(ActionEvent event) {
-    	if(!radioNo.isSelected() && !radioSi.isSelected()) {
-    		System.out.println("Errore");
-    	}
+    	do{
+    		if(!radioNo.isSelected() && !radioSi.isSelected())
+    			lblVoto.setText("Selezionare una scelta");
+    		else
+    			break;
+    	}while(1);
 		Socket so = ControllerLogin.getSocket();    	
     	int dim_buffer = 100;
 		int letti, count = 0;
@@ -36,18 +52,16 @@ public class ControllerReferendumVoto{
 		byte buffer[] = new byte[dim_buffer];
         OutputStream outputStream = so.getOutputStream();
         InputStream inputStream = so.getInputStream();
-        outputStream.write("c".getBytes(), 0, "b".length());
+        outputStream.write("c".getBytes(), 0, "c".length());
         letti = inputStream.read(buffer);
 		ok = new String(buffer, 0, letti);
 		if(ok.equals("ok")) {
 			if(radioSi.isSelected()) {
-    	        String voto = "si";
-    	    	outputStream.write(voto.getBytes(), 0, partito.length());
+    	    	outputStream.write("si".getBytes(), 0, "si".length());
     			letti = inputStream.read(buffer);
     			ok = new String(buffer, 0, letti);
     		}else {	    		
-    			String voto = "no";
-    			outputStream.write(voto.getBytes(), 0, partito.length());
+    			outputStream.write("no".getBytes(), 0, "no".length());
     			letti = inputStream.read(buffer);
     			ok = new String(buffer, 0, letti);
     		}
@@ -56,6 +70,10 @@ public class ControllerReferendumVoto{
     		System.out.println("Errore");
     	}
     	
-    	//parte per cambiare pagina
+		Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("Votato.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Votato");
     }
 }
