@@ -11,11 +11,13 @@ import javafx.stage.Stage;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -38,7 +40,7 @@ public class ControllerReferendumVoto{
     private Label lblVoto;
 
     @FXML
-    void handleInvia(ActionEvent event) {
+    void handleInvia(ActionEvent event) throws IOException {
    		if(!radioNo.isSelected() && !radioSi.isSelected())
    			lblVoto.setText("Selezionare una scelta");
    		else {
