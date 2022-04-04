@@ -20,16 +20,7 @@ public class ControllerGestore {
 	private BorderPane gestoreBorderPane;
 
     @FXML
-    private MenuButton btnAvvia;
-
-    @FXML
-    private MenuItem btnAvviaReferendum;
-
-    @FXML
-    private MenuItem btnCategorico;
-
-    @FXML
-    private MenuItem btnCategoricoPr;
+    private Button btnAvvia;
 
     @FXML
     private MenuButton btnInserimento;
@@ -73,8 +64,12 @@ public class ControllerGestore {
     }
 
     @FXML
-    void handleAvviaReferendum(ActionEvent event) {
-
+    void handleAvvia(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("avvio.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Avvia votazione");
     }
 
     @FXML

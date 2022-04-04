@@ -25,7 +25,6 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void run() {
-		System.out.println("0");
 		int dim_buffer = 100;
 		byte buffer[] = new byte[dim_buffer];
 		
@@ -66,6 +65,13 @@ public class GestisciClient implements Runnable{
 						String voto = new String(buffer, 0, letti);
 						inserisciRefVoto(voto);
 						break;
+					case "d":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String votazione = new String(buffer, 0, letti);
+						avviaVotazione(votazione);
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						break;
 					}
 									
 				}else {
@@ -80,6 +86,16 @@ public class GestisciClient implements Runnable{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void avviaVotazione(String votazione) {
+		if(Server.getVotazione().equals("")) {
+			Server.setVotazione(votazione);
+		} else {
+			//TODO
+			return;
+		}
+		return;
 	}
 	
 	public void inserisciRef(String testo) {

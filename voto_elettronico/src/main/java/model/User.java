@@ -9,6 +9,7 @@ public class User {
 	private String username;
 	private String password;
 	private String type;
+	static Random _rnd;
 
 	public String getType() {
 		return type;
@@ -43,10 +44,9 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = create(password);
-		}   
-   
-	static Random _rnd;
-	public String create(String passwd) {
+	}
+	
+	public static String create(String passwd) {
 		StringBuffer saltBuf = new StringBuffer();
 		if (_rnd==null) _rnd=new SecureRandom();
 		for (int i=0; i<32; i++) {
@@ -56,7 +56,7 @@ public class User {
 		return md5(passwd+salt)+":"+salt;
 	}
 
-	private String md5(String data) {
+	private static String md5(String data) {
 		byte[] bdata = new byte[data.length()]; int i; byte[] hash;
 		for (i=0;i<data.length();i++) bdata[i]=(byte)(data.charAt(i)&0xff );
 		try {

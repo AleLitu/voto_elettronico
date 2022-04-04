@@ -87,10 +87,10 @@ public class ControllerLogin {
                     actual.setScene(new Scene(root));
                     actual.setTitle("Logged");
     			} else {
-    				//votante
-	    			Parent root = FXMLLoader.load(getClass().getResource("benvenuto.fxml"));
+    				System.out.println("elettore");
+	    			/*Parent root = FXMLLoader.load(getClass().getResource(".fxml"));
 	                actual.setScene(new Scene(root));
-	                actual.setTitle("Logged");
+	                actual.setTitle("Logged");*/
     			}
     		} catch(Exception e) {
     			System.out.println(e);

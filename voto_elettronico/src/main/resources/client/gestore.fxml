@@ -24,17 +24,11 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </MenuButton>
-            <MenuButton fx:id="btnAvvia" mnemonicParsing="false" text="Avvia votazione">
-              <items>
-                <MenuItem fx:id="btnOrdinale" mnemonicParsing="false" onAction="#handleOrdinale" text="Ordinale" />
-                <MenuItem fx:id="btnCategorico" mnemonicParsing="false" onAction="#handleCategorico" text="Categorico" />
-                  <MenuItem fx:id="btnCategoricoPr" mnemonicParsing="false" onAction="#handleCategoricoPr" text="Categorico preferenze" />
-                  <MenuItem fx:id="btnAvviaReferendum" mnemonicParsing="false" onAction="#handleAvviaReferendum" text="Referendum" />
-              </items>
+            <Button fx:id="btnAvvia" mnemonicParsing="false" onAction="#handleAvvia" text="Avvia votazione">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
-            </MenuButton>
+            </Button>
             <MenuButton fx:id="btnScrutinio" mnemonicParsing="false" text="Scrutinio">
               <items>
                 <MenuItem fx:id="btnMaggioranza" mnemonicParsing="false" onAction="#handleMaggioranza" text="Maggioranza" />
