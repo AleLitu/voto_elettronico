@@ -1,5 +1,8 @@
 package client;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,7 +10,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -51,6 +57,9 @@ public class ControllerGestore {
 
     @FXML
     private Button btnRisultati;
+    
+    @FXML
+    private Button btnTermina;
 
     @FXML
     private MenuButton btnScrutinio;
@@ -70,6 +79,33 @@ public class ControllerGestore {
 		Parent root = FXMLLoader.load(getClass().getResource("avvio.fxml"));
         actual.setScene(new Scene(root));
         actual.setTitle("Avvia votazione");
+    }
+    
+    @FXML
+    void handleTermina(ActionEvent event) throws Exception {
+    	Socket so = ControllerLogin.getSocket();
+    	InputStream in = so.getInputStream();
+    	OutputStream out = so.getOutputStream();
+    	int dim_buffer = 100;
+		int letti;
+		String risposta;
+		byte buffer[] = new byte[dim_buffer];
+		out.write("e".getBytes(), 0, "e".length());
+        letti = in.read(buffer);
+        risposta = new String(buffer, 0, letti);
+    	if(risposta.equals("null")) {
+    		Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive da chiudere", ButtonType.CLOSE);
+    		alert.show();
+    	} else {
+    		out.write("end".getBytes(), 0, "end".length());
+    		letti = in.read(buffer);
+            risposta = new String(buffer, 0, letti);
+            if(risposta.equals("ok")) {
+            	return;
+            } else {
+            	throw new Exception("Errore nella chiusura");
+            }
+    	}
     }
 
     @FXML

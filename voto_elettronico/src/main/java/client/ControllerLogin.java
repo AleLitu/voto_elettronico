@@ -1,7 +1,7 @@
 package client;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -23,8 +23,8 @@ public class ControllerLogin {
 	
 	private static User user;
 	private static Socket so;
-    ObjectOutputStream outputStream;
-    ObjectInputStream inputStream;
+    OutputStream outputStream;
+    InputStream inputStream;
 	
 	@FXML
     private TextField lblFirst;
@@ -87,10 +87,33 @@ public class ControllerLogin {
                     actual.setScene(new Scene(root));
                     actual.setTitle("Logged");
     			} else {
-    				System.out.println("elettore");
-	    			/*Parent root = FXMLLoader.load(getClass().getResource(".fxml"));
-	                actual.setScene(new Scene(root));
-	                actual.setTitle("Logged");*/
+    				int dim_buffer = 100;
+    				int letti;
+    				String risposta;
+    				byte buffer[] = new byte[dim_buffer];
+    				outputStream.write("e".getBytes(), 0, "e".length());
+    		        letti = inputStream.read(buffer);
+    		        risposta = new String(buffer, 0, letti);
+    		        if(risposta.equals("null")) {
+    		        	lblMessage.setText("Non ci sono votazioni aperte al momento");
+    		        	so.close();
+    		        } else if(risposta.equals("Voto categorico")){
+    		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoVoto.fxml"));
+    	                actual.setScene(new Scene(root));
+    	                actual.setTitle("Voto categorico");*/
+    		        } else if(risposta.equals("Voto categorico con preferenze")){
+    		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoPVoto.fxml"));
+    	                actual.setScene(new Scene(root));
+    	                actual.setTitle("Voto categorico con preferenze");*/
+    		        } else if(risposta.equals("Voto ordinale")){
+    		        	/*Parent root = FXMLLoader.load(getClass().getResource("ordinaleVoto.fxml"));
+    	                actual.setScene(new Scene(root));
+    	                actual.setTitle("Voto ordinale");*/
+    		        } else if(risposta.equals("Referendum")){
+    		        	Parent root = FXMLLoader.load(getClass().getResource("referendumVoto.fxml"));
+    	                actual.setScene(new Scene(root));
+    	                actual.setTitle("Referendum");
+    		        }
     			}
     		} catch(Exception e) {
     			System.out.println(e);
@@ -103,8 +126,8 @@ public class ControllerLogin {
     
     public void connection (String address) throws IOException{
     	so = new Socket(address, SOCKET_PORT);
-        /*outputStream = new ObjectOutputStream(so.getOutputStream());
-        inputStream = new ObjectInputStream(so.getInputStream());*/
+        outputStream = so.getOutputStream();
+        inputStream = so.getInputStream();
 		System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
     }
     

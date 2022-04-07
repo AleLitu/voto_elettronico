@@ -7,7 +7,7 @@ public class Server{
 	public static void main(String[] args) {
 		ServerSocket sSrv;
 		Socket toClient;
-		votazione = "";
+		votazione = "null";
 		try {
 			sSrv = new ServerSocket(50000);
 			System.out.println("Indirizzo: " + sSrv.getInetAddress() + "; porta: " + sSrv.getLocalPort());

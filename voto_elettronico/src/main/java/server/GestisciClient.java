@@ -76,6 +76,10 @@ public class GestisciClient implements Runnable{
 						break;
 					case "e":
 						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
+						break;
+					case "end":
+						Server.setVotazione("null");
+						outputStream.write("ok".getBytes(), 0, "ok".length());
 					}
 									
 				}else {
@@ -93,7 +97,7 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void avviaVotazione(String votazione) throws IOException, SQLException {
-		if(Server.getVotazione().equals("")) {
+		if(Server.getVotazione().equals("null")) {
 			if(votazione.equals("Referendum")) {
 				PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum FROM Referendum");
 	    		ResultSet rs = stmt.executeQuery();
