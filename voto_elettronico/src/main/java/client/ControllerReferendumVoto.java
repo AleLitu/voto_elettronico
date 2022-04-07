@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -35,25 +34,24 @@ public class ControllerReferendumVoto{
 
     @FXML
     private RadioButton radioSi;
-    
-    @FXML
-    private Label lblVoto;
 
     @FXML
     void handleInvia(ActionEvent event) throws IOException {
-   		if(!radioNo.isSelected() && !radioSi.isSelected())
-   			lblVoto.setText("Selezionare una scelta");
-   		else {
-			Socket so = ControllerLogin.getSocket();    	
-	    	int dim_buffer = 100;
-			int letti, count = 0;
-			String ok;
-			byte buffer[] = new byte[dim_buffer];
-	        OutputStream outputStream = so.getOutputStream();
-	        InputStream inputStream = so.getInputStream();
-	        outputStream.write("c".getBytes(), 0, "c".length());
-	        letti = inputStream.read(buffer);
-			ok = new String(buffer, 0, letti);
+    	Socket so = ControllerLogin.getSocket();    	
+    	int dim_buffer = 100;
+		int letti, count = 0;
+		String ok;
+		byte buffer[] = new byte[dim_buffer];
+        OutputStream outputStream = so.getOutputStream();
+        InputStream inputStream = so.getInputStream();
+        outputStream.write("c".getBytes(), 0, "c".length());
+        letti = inputStream.read(buffer);
+		ok = new String(buffer, 0, letti);
+   		if(!radioNo.isSelected() && !radioSi.isSelected()) {
+   			outputStream.write("sb".getBytes(), 0, "sb".length());
+   			letti = inputStream.read(buffer);
+   			ok = new String(buffer, 0, letti);
+   		}else {
 			if(ok.equals("ok")) {
 				if(radioSi.isSelected()) {
 	    	    	outputStream.write("si".getBytes(), 0, "si".length());
@@ -68,7 +66,6 @@ public class ControllerReferendumVoto{
 			else {
 	    		System.out.println("Errore");
 	    	}
-	    	
 			Node node = (Node) event.getSource();
 			Stage actual = (Stage) node.getScene().getWindow();
 			Parent root = FXMLLoader.load(getClass().getResource("Votato.fxml"));
