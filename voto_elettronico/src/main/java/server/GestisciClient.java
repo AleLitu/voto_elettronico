@@ -109,18 +109,36 @@ public class GestisciClient implements Runnable{
     	}
 	}
 	
-	public void inserisciRefVoto(String voto) {
+	public void inserisciRefVoto(String voto) {		
 		try {
 			if(voto.equals("no")) {
+				PreparedStatement stmt = conn.prepareStatement("SELECT no FROM Referendum");
+				ResultSet rs = stmt.executeQuery();
+				rs.next();
+				String no = rs.getString("no");
 				//Query per inserire il no al referendum
-	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
-	    		stmt.setString(1, "No");
+	    		stmt = conn.prepareStatement("INSERT INTO Referendum (no) (?);");
+	    		stmt.setString(1, no + 1);
 		    	stmt.execute();
 			}
-			else {
+			else if(voto.equals("si")){
+				PreparedStatement stmt = conn.prepareStatement("SELECT si FROM Referendum");
+				ResultSet rs = stmt.executeQuery();
+				rs.next();
+				String si = rs.getString("si");
 				//Query per inserire il si al referendum
-	    		PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (Voto) (?);");
-	    		stmt.setString(1, "Si");
+	    		stmt = conn.prepareStatement("INSERT INTO Referendum (si) (?);");
+	    		stmt.setString(1, si + 1);
+		    	stmt.execute();
+			}
+			else{
+				PreparedStatement stmt = conn.prepareStatement("SELECT sb FROM Referendum");
+				ResultSet rs = stmt.executeQuery();
+				rs.next();
+				String sb = rs.getString("no");
+				//Query per inserire il sb al referendum
+	    		stmt = conn.prepareStatement("INSERT INTO Referendum (sb) (?);");
+	    		stmt.setString(1, sb + 1);
 		    	stmt.execute();
 			}
     	}catch (Exception e) {
