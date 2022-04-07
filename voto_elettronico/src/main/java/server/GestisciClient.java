@@ -139,35 +139,34 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void inserisciRefVoto(String voto) {	
-		//Commento per prova push simultanee
 		try {
 			if(voto.equals("no")) {
-				PreparedStatement stmt = conn.prepareStatement("SELECT no FROM Referendum");
+				PreparedStatement stmt = conn.prepareStatement("SELECT no FROM referendum");
 				ResultSet rs = stmt.executeQuery();
 				rs.next();
 				String no = rs.getString("no");
 				//Query per inserire il no al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO Referendum (no) (?);");
+	    		stmt = conn.prepareStatement("INSERT INTO referendum (no) VALUES (?);");
 	    		stmt.setString(1, no + 1);
 		    	stmt.execute();
 			}
 			else if(voto.equals("si")){
-				PreparedStatement stmt = conn.prepareStatement("SELECT si FROM Referendum");
+				PreparedStatement stmt = conn.prepareStatement("SELECT si FROM referendum");
 				ResultSet rs = stmt.executeQuery();
 				rs.next();
 				String si = rs.getString("si");
 				//Query per inserire il si al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO Referendum (si) (?);");
+	    		stmt = conn.prepareStatement("INSERT INTO referendum (si) VALUES (?);");
 	    		stmt.setString(1, si + 1);
 		    	stmt.execute();
 			}
 			else{
-				PreparedStatement stmt = conn.prepareStatement("SELECT sb FROM Referendum");
+				PreparedStatement stmt = conn.prepareStatement("SELECT sb FROM referendum");
 				ResultSet rs = stmt.executeQuery();
 				rs.next();
 				String sb = rs.getString("no");
 				//Query per inserire il sb al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO Referendum (sb) (?);");
+	    		stmt = conn.prepareStatement("INSERT INTO referendum (sb) VALUES (?);");
 	    		stmt.setString(1, sb + 1);
 		    	stmt.execute();
 			}
