@@ -49,28 +49,22 @@ public class ControllerReferendumVoto{
 		ok = new String(buffer, 0, letti);
    		if(!radioNo.isSelected() && !radioSi.isSelected()) {
    			outputStream.write("sb".getBytes(), 0, "sb".length());
-   			letti = inputStream.read(buffer);
-   			ok = new String(buffer, 0, letti);
    		}else {
 			if(ok.equals("ok")) {
 				if(radioSi.isSelected()) {
 	    	    	outputStream.write("si".getBytes(), 0, "si".length());
-	    			letti = inputStream.read(buffer);
-	    			ok = new String(buffer, 0, letti);
 	    		}else {	    		
 	    			outputStream.write("no".getBytes(), 0, "no".length());
-	    			letti = inputStream.read(buffer);
-	    			ok = new String(buffer, 0, letti);
 	    		}
 			}
 			else {
 	    		System.out.println("Errore");
 	    	}
-			Node node = (Node) event.getSource();
-			Stage actual = (Stage) node.getScene().getWindow();
-			Parent root = FXMLLoader.load(getClass().getResource("Votato.fxml"));
-	        actual.setScene(new Scene(root));
-	        actual.setTitle("Votato");
    		}
+		Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Votazione");
     }
 }
