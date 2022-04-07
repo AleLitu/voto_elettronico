@@ -74,6 +74,8 @@ public class GestisciClient implements Runnable{
 						String votazione = new String(buffer, 0, letti);
 						avviaVotazione(votazione);
 						break;
+					case "e":
+						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
 					}
 									
 				}else {
