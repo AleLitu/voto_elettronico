@@ -134,7 +134,8 @@ public class GestisciClient implements Runnable{
     	}
 	}
 	
-	public void inserisciRefVoto(String voto) {		
+	public void inserisciRefVoto(String voto) {	
+		//Commento per prova push simultanee
 		try {
 			if(voto.equals("no")) {
 				PreparedStatement stmt = conn.prepareStatement("SELECT no FROM Referendum");
