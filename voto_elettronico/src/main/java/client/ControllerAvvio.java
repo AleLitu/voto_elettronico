@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Stage;
@@ -19,6 +20,9 @@ public class ControllerAvvio {
 
     @FXML
     private Button btnConferma;
+    
+    @FXML
+    private Button btnIndietro;
 
     @FXML
     private RadioButton radioCategorico;
@@ -34,10 +38,12 @@ public class ControllerAvvio {
 
     @FXML
     private ToggleGroup votazione;
+    
+    @FXML
+    private Label lblAvviso;
 
     @FXML
     void handleConferma(ActionEvent event) throws IOException {
-    	//TODO: controlli se dati inseriti in database
     	Socket so = ControllerLogin.getSocket();    	
     	int dim_buffer = 100;
 		int letti, count = 0;
@@ -52,11 +58,13 @@ public class ControllerAvvio {
     		ok = new String(buffer, 0, letti);
 
     		if(ok.equals("ok")) {
-    			outputStream.write("vc".getBytes(), 0, "vc".length());
+    			outputStream.write("Voto categorico".getBytes(), 0, "Voto categorico".length());
                 letti = inputStream.read(buffer);
         		ok = new String(buffer, 0, letti);
         		if(ok.equals("ok")) {
-        			cambia(event);
+        			handleIndietro(event);
+        		} else {
+        			lblAvviso.setText(ok);
         		}
     		}
     	} else if(radioCategoricoP.isSelected()){
@@ -65,11 +73,13 @@ public class ControllerAvvio {
     		ok = new String(buffer, 0, letti);
 
     		if(ok.equals("ok")) {
-    			outputStream.write("vcp".getBytes(), 0, "vcp".length());
+    			outputStream.write("Voto categorico con preferenze".getBytes(), 0, "Voto categorico con preferenze".length());
                 letti = inputStream.read(buffer);
         		ok = new String(buffer, 0, letti);
         		if(ok.equals("ok")) {
-        			cambia(event);
+        			handleIndietro(event);
+        		} else {
+        			lblAvviso.setText(ok);
         		}
     		}
     	} else if(radioOrdinale.isSelected()) {
@@ -78,11 +88,13 @@ public class ControllerAvvio {
     		ok = new String(buffer, 0, letti);
 
     		if(ok.equals("ok")) {
-    			outputStream.write("vo".getBytes(), 0, "vo".length());
+    			outputStream.write("Voto ordinale".getBytes(), 0, "Voto ordinale".length());
                 letti = inputStream.read(buffer);
         		ok = new String(buffer, 0, letti);
         		if(ok.equals("ok")) {
-        			cambia(event);
+        			handleIndietro(event);
+        		} else {
+        			lblAvviso.setText(ok);
         		}
     		}
     	} else if(radioRef.isSelected()) {
@@ -91,19 +103,22 @@ public class ControllerAvvio {
     		ok = new String(buffer, 0, letti);
 
     		if(ok.equals("ok")) {
-    			outputStream.write("ref".getBytes(), 0, "ref".length());
+    			outputStream.write("Referendum".getBytes(), 0, "Referendum".length());
                 letti = inputStream.read(buffer);
         		ok = new String(buffer, 0, letti);
         		if(ok.equals("ok")) {
-        			cambia(event);
+        			handleIndietro(event);
+        		} else {
+        			lblAvviso.setText(ok);
         		}
     		}
     	} else {
-    		return;
+    		lblAvviso.setText("Seleziona un'opzione oppure torna indietro");
     	}
     }
     
-    public void cambia(ActionEvent event) throws IOException {
+    @FXML
+    void handleIndietro(ActionEvent event) throws IOException {
     	Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));

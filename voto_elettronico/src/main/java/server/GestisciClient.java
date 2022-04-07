@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class GestisciClient implements Runnable{
 	private Socket so;
@@ -39,7 +40,9 @@ public class GestisciClient implements Runnable{
 		
 		while(true) {
 			try {
-				if(so.isInputShutdown()) {
+				//System.out.println("0");
+				//if(so.isInputShutdown()) {
+					//System.out.println("1");
 
 				int letti = inputStream.read(buffer);
 				if(letti > 0) {
@@ -70,7 +73,6 @@ public class GestisciClient implements Runnable{
 						letti = inputStream.read(buffer);
 						String votazione = new String(buffer, 0, letti);
 						avviaVotazione(votazione);
-						outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					}
 									
@@ -78,21 +80,42 @@ public class GestisciClient implements Runnable{
 					so.close();
 					return;
 				}
-				}else {
+				/*}else {
 					so.close();
 					return;
-				}
+				}*/
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	public void avviaVotazione(String votazione) {
+	public void avviaVotazione(String votazione) throws IOException, SQLException {
 		if(Server.getVotazione().equals("")) {
-			Server.setVotazione(votazione);
+			if(votazione.equals("Referendum")) {
+				PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum FROM Referendum");
+	    		ResultSet rs = stmt.executeQuery();
+	    		if(!rs.next()) {
+	    			outputStream.write("Inserire prima un referendum".getBytes(), 0, "Inserire prima un referendum".length());
+	    		} else {
+					Server.setVotazione(votazione);
+					outputStream.write("ok".getBytes(), 0, "ok".length());
+	    		}
+			} else if(!votazione.equals("Referendum")) {
+				PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti");
+	    		ResultSet rs = stmt.executeQuery();
+	    		PreparedStatement stmt1 = conn.prepareStatement("SELECT idCandidato FROM Candidati");
+	    		ResultSet rs1 = stmt1.executeQuery();
+	    		if(!rs.next() || !rs1.next()) {
+	    			outputStream.write("Inserire prima partiti e candidati".getBytes(), 0, "Inserire prima partiti e candidati".length());
+	    		} else {
+					Server.setVotazione(votazione);
+					outputStream.write("ok".getBytes(), 0, "ok".length());
+	    		}
+			}
 		} else {
-			//TODO
+			String messaggio = Server.getVotazione() + " già avviato";
+			outputStream.write(messaggio.getBytes(), 0, messaggio.length());
 			return;
 		}
 		return;
