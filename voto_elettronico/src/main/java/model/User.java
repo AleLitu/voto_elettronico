@@ -6,6 +6,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 public class User {
+	private int id;
 	private String username;
 	private String password;
 	private String type;
@@ -19,17 +20,23 @@ public class User {
 		this.type = type;
 	}
 
-	public User(String username, String password, String type){
+	public User(int id, String username, String password, String type){
+		this.id = id;
 		this.username = username;
 		this.password = create(password);
 		this.type = type;
 	}
-	public User(String username, String password, String salt, String type){
+	public User(int id, String username, String password, String salt, String type){
+		this.id = id;
 		this.username = username;
 		this.password = md5(password+salt);
 		this.type = type;
 	}
 
+	public int getId() {
+		return id;
+	}
+	
 	public String getUsername() {
 		return username;
 	}

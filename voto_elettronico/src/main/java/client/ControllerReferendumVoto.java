@@ -8,7 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+import model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,7 +34,7 @@ public class ControllerReferendumVoto{
 
     @FXML
     private RadioButton radioSi;
-
+    
     @FXML
     void handleInvia(ActionEvent event) throws IOException {
     	Socket so = ControllerLogin.getSocket();    	
@@ -47,20 +47,23 @@ public class ControllerReferendumVoto{
         outputStream.write("c".getBytes(), 0, "c".length());
         letti = inputStream.read(buffer);
 		ok = new String(buffer, 0, letti);
-   		if(!radioNo.isSelected() && !radioSi.isSelected()) {
-   			outputStream.write("sb".getBytes(), 0, "sb".length());
-   		}else {
+		if(ok.equals("ok")) {
+			outputStream.write(String.valueOf(ControllerLogin.getUser().getId()).getBytes(), 0, String.valueOf(ControllerLogin.getUser().getId()).length());
 			if(ok.equals("ok")) {
-				if(radioSi.isSelected()) {
-	    	    	outputStream.write("si".getBytes(), 0, "si".length());
-	    		}else {	    		
-	    			outputStream.write("no".getBytes(), 0, "no".length());
-	    		}
+				if(!radioNo.isSelected() && !radioSi.isSelected()) {
+		   			outputStream.write("sb".getBytes(), 0, "sb".length());
+		   		}else{
+					if(radioSi.isSelected())
+			    	   	outputStream.write("si".getBytes(), 0, "si".length());
+			    	else
+			    		outputStream.write("no".getBytes(), 0, "no".length());
+			    	}
+			}else{
+			   		System.out.println("Errore");
 			}
-			else {
-	    		System.out.println("Errore");
-	    	}
-   		}
+		}else{
+	   		System.out.println("Errore");
+		}
 		Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));

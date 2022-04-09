@@ -65,6 +65,10 @@ public class GestisciClient implements Runnable{
 					case "c":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
+						String id = new String(buffer, 0, letti);
+						inserisciVotato(Integer.parseInt(id));
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
 						String voto = new String(buffer, 0, letti);
 						inserisciRefVoto(voto);
 						break;
@@ -132,6 +136,17 @@ public class GestisciClient implements Runnable{
 	    	//Query per inserire il referendum
 	    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo) VALUES (?);");
 	    	stmt.setString(1, testo);
+	    	stmt.execute();
+    	}catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
+	}
+	
+	public void inserisciVotato(int id) {
+		try {    	
+	    	//Query per inserire che un utente ha votato
+	    	PreparedStatement stmt = conn.prepareStatement("UPDATE utenti SET votato = TRUE WHERE id = ?;");
+	    	stmt.setInt(1, id);
 	    	stmt.execute();
     	}catch (Exception e) {
     		System.out.println(e.getMessage());

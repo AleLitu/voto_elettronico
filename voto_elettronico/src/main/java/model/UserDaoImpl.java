@@ -30,10 +30,11 @@ public class UserDaoImpl implements UserDao {
 			stmt.setString(1, username);
 			ResultSet rs = stmt.executeQuery();
 			rs.next();
+			int id = rs.getInt("id");
 			String pwd = rs.getString("password");
 			String salt = rs.getString("salt");
 			String type = rs.getString("type");
-			User u = new User(username, password, salt, type);
+			User u = new User(id, username, password, salt, type);
 			if(u.getPassword().equals(pwd)) {
 				u.setType(rs.getString("type"));
 				return u;
