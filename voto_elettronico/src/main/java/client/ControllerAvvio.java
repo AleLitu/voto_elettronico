@@ -10,10 +10,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class ControllerAvvio {
@@ -38,9 +41,6 @@ public class ControllerAvvio {
 
     @FXML
     private ToggleGroup votazione;
-    
-    @FXML
-    private Label lblAvviso;
 
     @FXML
     void handleConferma(ActionEvent event) throws IOException {
@@ -64,7 +64,8 @@ public class ControllerAvvio {
         		if(ok.equals("ok")) {
         			handleIndietro(event);
         		} else {
-        			lblAvviso.setText(ok);
+        			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
+            		alert.show();
         		}
     		}
     	} else if(radioCategoricoP.isSelected()){
@@ -79,8 +80,9 @@ public class ControllerAvvio {
         		if(ok.equals("ok")) {
         			handleIndietro(event);
         		} else {
-        			lblAvviso.setText(ok);
-        		}
+        			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
+            		alert.show();
+            	}
     		}
     	} else if(radioOrdinale.isSelected()) {
     		outputStream.write("d".getBytes(), 0, "d".length());
@@ -94,8 +96,9 @@ public class ControllerAvvio {
         		if(ok.equals("ok")) {
         			handleIndietro(event);
         		} else {
-        			lblAvviso.setText(ok);
-        		}
+        			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
+            		alert.show();
+            	}
     		}
     	} else if(radioRef.isSelected()) {
     		outputStream.write("d".getBytes(), 0, "d".length());
@@ -109,11 +112,13 @@ public class ControllerAvvio {
         		if(ok.equals("ok")) {
         			handleIndietro(event);
         		} else {
-        			lblAvviso.setText(ok);
-        		}
+        			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
+            		alert.show();
+            	}
     		}
     	} else {
-    		lblAvviso.setText("Seleziona un'opzione oppure torna indietro");
+    		Alert alert = new Alert(AlertType.WARNING, "Seleziona un'opzione oppure torna indietro", ButtonType.CLOSE);
+    		alert.show();
     	}
     }
     

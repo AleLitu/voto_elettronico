@@ -11,9 +11,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import model.User;
 import model.UserDao;
@@ -95,8 +98,9 @@ public class ControllerLogin {
     		        letti = inputStream.read(buffer);
     		        risposta = new String(buffer, 0, letti);
     		        if(risposta.equals("null")) {
-    		        	lblMessage.setText("Non ci sono votazioni aperte al momento");
-    		        	so.close();
+    		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+    		    		alert.show();
+    		    		so.close();
     		        } else if(risposta.equals("Voto categorico")){
     		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoVoto.fxml"));
     	                actual.setScene(new Scene(root));
