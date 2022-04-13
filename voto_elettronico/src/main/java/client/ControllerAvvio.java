@@ -104,19 +104,29 @@ public class ControllerAvvio {
     		outputStream.write("d".getBytes(), 0, "d".length());
             letti = inputStream.read(buffer);
     		ok = new String(buffer, 0, letti);
-
     		if(ok.equals("ok")) {
     			outputStream.write("Referendum".getBytes(), 0, "Referendum".length());
-                letti = inputStream.read(buffer);
-        		ok = new String(buffer, 0, letti);
+    			letti = inputStream.read(buffer);
+    			ok = new String(buffer, 0, letti);
         		if(ok.equals("ok")) {
-        			handleIndietro(event);
+        			Node node = (Node) event.getSource();
+        			Stage actual = (Stage) node.getScene().getWindow();
+        			Parent root = FXMLLoader.load(getClass().getResource("avvioRef.fxml"));
+        	        actual.setScene(new Scene(root));
+        	        actual.setTitle("Avvio referendum");
+        			//handleIndietro(event);
         		} else {
+        			System.out.println("1");
         			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
             		alert.show();
             	}
-    		}
+    		} else {
+    			System.out.println("2");
+    			Alert alert = new Alert(AlertType.WARNING, ok, ButtonType.CLOSE);
+        		alert.show();
+        	}
     	} else {
+    		System.out.println("3");
     		Alert alert = new Alert(AlertType.WARNING, "Seleziona un'opzione oppure torna indietro", ButtonType.CLOSE);
     		alert.show();
     	}

@@ -3,21 +3,25 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Referendum;
 import model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -36,14 +40,20 @@ public class ControllerReferendumVoto{
     private RadioButton radioSi;
     
     @FXML
-    void handleInvia(ActionEvent event) throws IOException {
-    	Socket so = ControllerLogin.getSocket();    	
+    private Label lblReferendum;
+    
+    private Socket so;
+    private OutputStream outputStream;
+    private InputStream inputStream;
+    private ObjectInputStream ois;
+    private Referendum re;
+    
+    @FXML
+    void handleInvia(ActionEvent event) throws IOException {    	
     	int dim_buffer = 100;
 		int letti, count = 0;
 		String ok;
 		byte buffer[] = new byte[dim_buffer];
-        OutputStream outputStream = so.getOutputStream();
-        InputStream inputStream = so.getInputStream();
         outputStream.write("c".getBytes(), 0, "c".length());
         letti = inputStream.read(buffer);
 		ok = new String(buffer, 0, letti);
@@ -69,5 +79,17 @@ public class ControllerReferendumVoto{
 		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
         actual.setScene(new Scene(root));
         actual.setTitle("Votazione");
+    }
+    
+    @FXML
+    private void initialize() throws IOException, ClassNotFoundException {
+    	so = ControllerLogin.getSocket();
+        outputStream = so.getOutputStream();
+        inputStream = so.getInputStream();
+        outputStream.write("domanda".getBytes(), 0, "domanda".length());
+        ois = new ObjectInputStream(inputStream);
+    	re = (Referendum) ois.readObject();
+    	lblReferendum.setText(re.getTesto());
+    	
     }
 }

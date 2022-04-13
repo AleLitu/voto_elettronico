@@ -1,6 +1,7 @@
 package server;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.Connection;
@@ -8,15 +9,24 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import model.Referendum;
 
 public class GestisciClient implements Runnable{
 	private Socket so;
 	InputStream inputStream;
 	OutputStream outputStream;
 	Connection conn;
+	int dim_buffer;
+	byte buffer[];
+	int letti;
 	
 	public GestisciClient(Socket socket) {
 		try {
+			dim_buffer = 100;
+			buffer = new byte[dim_buffer];
 			so = socket;
 			inputStream = so.getInputStream();
 			outputStream = so.getOutputStream();
@@ -26,8 +36,6 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void run() {
-		int dim_buffer = 100;
-		byte buffer[] = new byte[dim_buffer];
 		
 		String url = "jdbc:mysql://localhost:3306/votazioni?";
     	String usr = "root";
@@ -44,7 +52,7 @@ public class GestisciClient implements Runnable{
 				//if(so.isInputShutdown()) {
 					//System.out.println("1");
 
-				int letti = inputStream.read(buffer);
+				letti = inputStream.read(buffer);
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
 					System.out.println(scelta);
@@ -74,12 +82,20 @@ public class GestisciClient implements Runnable{
 						break;
 					case "d":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						letti = inputStream.read(buffer);
-						String votazione = new String(buffer, 0, letti);
-						avviaVotazione(votazione);
+						if(Server.getVotazione().equals("null")) {
+							letti = inputStream.read(buffer);
+							String votazione = new String(buffer, 0, letti);
+							avviaVotazione(votazione);
+						} else {
+							String messaggio = Server.getVotazione() + " già avviato";
+							outputStream.write(messaggio.getBytes(), 0, messaggio.length());
+						}
 						break;
 					case "e":
 						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
+						break;
+					case "domanda":
+						getDomanda();
 						break;
 					case "end":
 						Server.setVotazione("null");
@@ -101,32 +117,39 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void avviaVotazione(String votazione) throws IOException, SQLException {
-		if(Server.getVotazione().equals("null")) {
-			if(votazione.equals("Referendum")) {
-				PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum FROM Referendum");
-	    		ResultSet rs = stmt.executeQuery();
-	    		if(!rs.next()) {
-	    			outputStream.write("Inserire prima un referendum".getBytes(), 0, "Inserire prima un referendum".length());
-	    		} else {
-					Server.setVotazione(votazione);
-					outputStream.write("ok".getBytes(), 0, "ok".length());
-	    		}
-			} else if(!votazione.equals("Referendum")) {
-				PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti");
-	    		ResultSet rs = stmt.executeQuery();
-	    		PreparedStatement stmt1 = conn.prepareStatement("SELECT idCandidato FROM Candidati");
-	    		ResultSet rs1 = stmt1.executeQuery();
-	    		if(!rs.next() || !rs1.next()) {
-	    			outputStream.write("Inserire prima partiti e candidati".getBytes(), 0, "Inserire prima partiti e candidati".length());
-	    		} else {
-					Server.setVotazione(votazione);
-					outputStream.write("ok".getBytes(), 0, "ok".length());
-	    		}
-			}
-		} else {
-			String messaggio = Server.getVotazione() + " già avviato";
-			outputStream.write(messaggio.getBytes(), 0, messaggio.length());
-			return;
+		if(votazione.equals("Referendum")) {
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM Referendum");
+    		ResultSet rs = stmt.executeQuery();
+    		if(!rs.next()) {
+    			outputStream.write("Inserire prima un referendum".getBytes(), 0, "Inserire prima un referendum".length());
+    		} else {
+    			List<Referendum> lista = new ArrayList<>();
+    			ObjectOutputStream out = new ObjectOutputStream(outputStream);
+    			do {
+    				lista.add(new Referendum(rs.getInt("idReferendum"), rs.getString("testo")));
+    			}while(rs.next());
+				out.writeObject(lista);
+				letti = inputStream.read(buffer);
+				int id = Integer.parseInt(new String(buffer, 0, letti));
+				stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
+	    		stmt.setInt(1, 1);
+	    		stmt.setInt(2, id);
+		    	stmt.execute();
+		    	Server.setVotazione(votazione);
+				//outputStream.write("ok".getBytes(), 0, "ok".length());
+    		}
+		} else if(!votazione.equals("Referendum")) {
+			PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti");
+    		ResultSet rs = stmt.executeQuery();
+    		PreparedStatement stmt1 = conn.prepareStatement("SELECT idCandidato FROM Candidati");
+    		ResultSet rs1 = stmt1.executeQuery();
+    		if(!rs.next() || !rs1.next()) {
+    			outputStream.write("Inserire prima partiti e candidati".getBytes(), 0, "Inserire prima partiti e candidati".length());
+    		} else {
+				Server.setVotazione(votazione);
+				outputStream.write("ok".getBytes(), 0, "ok".length());
+    		}
 		}
 		return;
 	}
@@ -243,6 +266,20 @@ public class GestisciClient implements Runnable{
 		outputStream.write(Integer.toString(count).getBytes(), 0, Integer.toString(count).length());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public void getDomanda() throws SQLException, IOException {
+		System.out.println("finally");
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE attivo = ?");
+		stmt.setInt(1, 1);
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			//TODO
+		} else {
+			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("testo"));
+			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+			oos.writeObject(re);
 		}
 	}
 }
