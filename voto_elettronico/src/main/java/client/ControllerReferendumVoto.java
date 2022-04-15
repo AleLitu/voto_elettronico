@@ -90,6 +90,5 @@ public class ControllerReferendumVoto{
         ois = new ObjectInputStream(inputStream);
     	re = (Referendum) ois.readObject();
     	lblReferendum.setText(re.getTesto());
-    	
     }
 }

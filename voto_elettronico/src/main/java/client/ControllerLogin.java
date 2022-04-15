@@ -94,7 +94,7 @@ public class ControllerLogin {
     				int letti;
     				String risposta;
     				byte buffer[] = new byte[dim_buffer];
-    				outputStream.write("e".getBytes(), 0, "e".length());
+    				outputStream.write("type".getBytes(), 0, "type".length());
     		        letti = inputStream.read(buffer);
     		        risposta = new String(buffer, 0, letti);
     		        if(risposta.equals("null")) {
@@ -102,9 +102,9 @@ public class ControllerLogin {
     		    		alert.show();
     		    		so.close();
     		        } else if(risposta.equals("Voto categorico")){
-    		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoVoto.fxml"));
-    	                actual.setScene(new Scene(root));
-    	                actual.setTitle("Voto categorico");*/
+    		        	Parent root = FXMLLoader.load(getClass().getResource("votoCategorico.fxml"));
+    		        	actual.setScene(new Scene(root));
+    	                actual.setTitle("Voto categorico");
     		        } else if(risposta.equals("Voto categorico con preferenze")){
     		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoPVoto.fxml"));
     	                actual.setScene(new Scene(root));

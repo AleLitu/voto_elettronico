@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Partito;
 import model.Referendum;
 
 public class GestisciClient implements Runnable{
@@ -55,7 +56,6 @@ public class GestisciClient implements Runnable{
 				letti = inputStream.read(buffer);
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
-					System.out.println(scelta);
 					switch(scelta) {
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -91,11 +91,14 @@ public class GestisciClient implements Runnable{
 							outputStream.write(messaggio.getBytes(), 0, messaggio.length());
 						}
 						break;
-					case "e":
+					case "type":
 						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
 						break;
 					case "domanda":
 						getDomanda();
+						break;
+					case "partiti":
+						getPartiti();
 						break;
 					case "end":
 						Server.setVotazione("null");
@@ -285,7 +288,6 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void getDomanda() throws SQLException, IOException {
-		System.out.println("finally");
 		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE attivo = ?");
 		stmt.setInt(1, 1);
 		ResultSet rs = stmt.executeQuery();
@@ -295,6 +297,21 @@ public class GestisciClient implements Runnable{
 			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(re);
+		}
+	}
+	public void getPartiti() throws SQLException, IOException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT idPartito, partito FROM partiti");
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			//TODO
+		} else {
+			ArrayList<Partito> partiti = new ArrayList<>();
+			do {
+				Partito pa = new Partito(rs.getInt("idPartito"), rs.getString("partito"), null);
+				partiti.add(pa);
+			}while(rs.next());
+			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+			oos.writeObject(partiti);
 		}
 	}
 }
