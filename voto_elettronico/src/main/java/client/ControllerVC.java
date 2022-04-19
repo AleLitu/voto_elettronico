@@ -10,15 +10,23 @@ import java.util.List;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import model.Candidato;
 import model.Partito;
 import model.Referendum;
+import javafx.beans.value.*;
 
 public class ControllerVC {
 	
@@ -27,17 +35,45 @@ public class ControllerVC {
     OutputStream out;
     
     @FXML
-    private VBox vbox;
+    private VBox vboxPa;
     
     @FXML
-    private ToggleGroup group;
+    private VBox vboxCa;
+    
+    @FXML
+    private ToggleGroup groupPa;
 
     @FXML
     private Button btnConferma;
+    
+    List<Partito> list;
 
     @FXML
-    void handleConferma(ActionEvent event) {
-
+    void handleConferma(ActionEvent event) throws IOException {
+    	RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
+    	boolean trovato = false;
+        if (rb != null) {
+        	for(int i = 0; i < list.size(); i++) {
+        		if(list.get(i).getId() == Integer.parseInt(rb.getId())) {
+        			trovato = true;
+        			break;
+        		}
+        	}
+        	if(trovato) {
+        		out.write("vc".getBytes(), 0, "vc".length());
+        		out.write(("partito,"+rb.getId()).getBytes(), 0, ("partito,"+rb.getId()).length());
+        	} else {
+        		out.write("vc".getBytes(), 0, "vc".length());
+        		out.write(("candidato,"+rb.getId()).getBytes(), 0, ("candidato,"+rb.getId()).length());
+        	}
+        } else {
+        	//TODO: scheda bianca
+        }
+        Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Votazione");
     }
     
     @FXML
@@ -47,12 +83,12 @@ public class ControllerVC {
     	out = so.getOutputStream();
         out.write("partiti".getBytes(), 0, "partiti".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
-    	List<Partito> list = (List<Partito>) oin.readObject();
+    	list = (List<Partito>) oin.readObject();
     	List<HBox> righe = new ArrayList<>();
-    	group = new ToggleGroup();
+    	groupPa = new ToggleGroup();
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
-    		rb.setToggleGroup(group);
+    		rb.setToggleGroup(groupPa);
     		rb.setId(Integer.toString(list.get(i).getId()));
     		rb.setPadding(new Insets(10));
     		Label l = new Label(list.get(i).getNome());
@@ -60,8 +96,33 @@ public class ControllerVC {
     		l.setPadding(new Insets(10));
     		righe.add(new HBox(rb, l));
     	}
-    	vbox.getChildren().clear();
-    	vbox.getChildren().addAll(righe);
+    	vboxPa.getChildren().clear();
+    	vboxPa.getChildren().addAll(righe);
+    	
+    	groupPa.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(ObservableValue<? extends Toggle> ob, Toggle o, Toggle n) {
+                RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
+                if (rb != null) {
+                	for(int i = 0; i < list.size(); i++) {
+                		if(list.get(i).getId() == Integer.parseInt(rb.getId())) {
+                			ArrayList<Candidato> candidati = list.get(i).getCandidati();
+                			List<HBox> righe = new ArrayList<>();
+                	    	for(int j = 0; j < candidati.size(); j++) {
+                	    		RadioButton rb1 = new RadioButton();
+                	    		rb1.setToggleGroup(groupPa);
+                	    		rb1.setId(Integer.toString(candidati.get(j).getId()));
+                	    		rb1.setPadding(new Insets(10));
+                	    		Label l = new Label(candidati.get(j).getNome());
+                	    		l.setWrapText(true);
+                	    		l.setPadding(new Insets(10));
+                	    		righe.add(new HBox(rb1, l));
+                	    	}
+                	    	vboxCa.getChildren().clear();
+                	    	vboxCa.getChildren().addAll(righe);
+                		}
+                	}
+                }
+            }
+        });
     }
-
 }

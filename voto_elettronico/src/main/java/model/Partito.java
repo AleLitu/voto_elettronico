@@ -6,9 +6,9 @@ import java.util.ArrayList;
 public class Partito implements Serializable{
 	int id;
 	String nome;
-	ArrayList<String> candidati;
+	ArrayList<Candidato> candidati;
 	
-	public Partito(int id, String nome, ArrayList<String> candidati) {
+	public Partito(int id, String nome, ArrayList<Candidato> candidati) {
 		this.id = id;
 		this.nome = nome;
 		this.candidati = candidati;
@@ -22,11 +22,11 @@ public class Partito implements Serializable{
 		this.id = id;
 	}
 
-	public ArrayList<String> getCandidati() {
+	public ArrayList<Candidato> getCandidati() {
 		return candidati;
 	}
 
-	public void setCandidati(ArrayList<String> candidati) {
+	public void setCandidati(ArrayList<Candidato> candidati) {
 		this.candidati = candidati;
 	}
 

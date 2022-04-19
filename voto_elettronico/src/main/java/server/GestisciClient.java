@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.Candidato;
 import model.Partito;
 import model.Referendum;
 
@@ -99,6 +100,11 @@ public class GestisciClient implements Runnable{
 						break;
 					case "partiti":
 						getPartiti();
+						break;
+					case "vc":
+						letti = inputStream.read(buffer);
+						String votazione = new String(buffer, 0, letti);
+						votoCategorico(votazione);
 						break;
 					case "end":
 						Server.setVotazione("null");
@@ -300,6 +306,7 @@ public class GestisciClient implements Runnable{
 		}
 	}
 	public void getPartiti() throws SQLException, IOException {
+		int idp;
 		PreparedStatement stmt = conn.prepareStatement("SELECT idPartito, partito FROM partiti");
 		ResultSet rs = stmt.executeQuery();
 		if(!rs.next()) {
@@ -307,11 +314,37 @@ public class GestisciClient implements Runnable{
 		} else {
 			ArrayList<Partito> partiti = new ArrayList<>();
 			do {
-				Partito pa = new Partito(rs.getInt("idPartito"), rs.getString("partito"), null);
-				partiti.add(pa);
+				idp = rs.getInt("idPartito");
+				PreparedStatement stmt1 = conn.prepareStatement("SELECT idCandidato, candidato FROM candidati WHERE idPartito = ?");
+				stmt1.setInt(1, idp);
+				ResultSet rs1 = stmt1.executeQuery();
+				ArrayList<Candidato> candidati = new ArrayList<>();
+				if(!rs1.next()) {
+					//TODO
+				} else {
+					do {
+						candidati.add(new Candidato(rs1.getInt("idCandidato"), rs1.getString("Candidato")));
+					} while(rs1.next());
+				}
+				partiti.add(new Partito(idp, rs.getString("partito"), candidati));
 			}while(rs.next());
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(partiti);
+		}
+	}
+	
+	public void votoCategorico(String votazione) throws SQLException {
+		String[] v = votazione.split(",");
+		if(v[0].equals("partito")) {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
+			stmt.setInt(1, 1);
+			stmt.setInt(2, Integer.parseInt(v[1]));
+	    	stmt.execute();
+		} else if(v[0].equals("candidato")) {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE candidati SET voto = voto + ? WHERE idCandidato = ?");
+			stmt.setInt(1, 1);
+			stmt.setInt(2, Integer.parseInt(v[1]));
+	    	stmt.execute();
 		}
 	}
 }

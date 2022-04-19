@@ -8,10 +8,13 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="454.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerVC">
    <top>
-      <Label text="TODO" BorderPane.alignment="CENTER" />
+      <Label text="Voto Categorico" BorderPane.alignment="CENTER" />
    </top>
    <center>
-      <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <content>
+            <VBox fx:id="vboxCa" prefHeight="408.0" prefWidth="227.0" />
+         </content></ScrollPane>
    </center>
    <bottom>
       <Button fx:id="btnConferma" mnemonicParsing="false" onAction="#handleConferma" text="Conferma" BorderPane.alignment="CENTER" />
@@ -19,7 +22,7 @@
    <left>
       <ScrollPane prefHeight="411.0" prefWidth="236.0" BorderPane.alignment="CENTER">
          <content>
-            <VBox fx:id="vbox" prefHeight="408.0" prefWidth="233.0" />
+            <VBox fx:id="vboxPa" prefHeight="408.0" prefWidth="233.0" />
          </content></ScrollPane>
    </left>
 </BorderPane>

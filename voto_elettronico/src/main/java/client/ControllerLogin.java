@@ -79,6 +79,10 @@ public class ControllerLogin {
     	UserDao userdao = new UserDaoImpl();
     	user = userdao.getUser(usr, pwd);
     	String messaggio;
+    	lblFirst.setText("127");
+    	lblSecond.setText("0");
+    	lblThird.setText("0");
+    	lblFourth.setText("1");
     	checkIntType();
     	if(user != null) {
     		Node node = (Node) event.getSource();
