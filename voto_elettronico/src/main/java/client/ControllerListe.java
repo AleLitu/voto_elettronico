@@ -5,10 +5,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -34,15 +37,13 @@ public class ControllerListe{
 
     @FXML
     private TextField txtPartito;
-    
-    @FXML
-    private Label lblDuplicati;
-    
+        
     @FXML
     void handleAggiungi(ActionEvent event) throws IOException {    
     	Socket so = ControllerLogin.getSocket();    	
     	int dim_buffer = 100;
-		int letti, count = 0;
+		int letti;
+		boolean count = false;
 		String ok;
 		byte buffer[] = new byte[dim_buffer];
         OutputStream outputStream = so.getOutputStream();
@@ -53,28 +54,32 @@ public class ControllerListe{
 
 		if(ok.equals("ok")) {
 	        String partito = txtPartito.getText();
-	    	outputStream.write(partito.getBytes(), 0, partito.length());
-			letti = inputStream.read(buffer);
-			ok = new String(buffer, 0, letti);
-			
-			if(ok.equals("ok")) {
-				String candidati = txtCandidati.getText();
-		    	outputStream.write(candidati.getBytes(), 0, candidati.length());
+	        if(!partito.equals("")) {
+	        	outputStream.write(partito.getBytes(), 0, partito.length());
 				letti = inputStream.read(buffer);
 				ok = new String(buffer, 0, letti);
-				count = Integer.parseInt(ok);
-			} else {
-				System.out.println("Errore");
-			}
+				if(ok.equals("ok")) {
+					String candidati = txtCandidati.getText();
+					if(!candidati.equals("")) {
+						outputStream.write(candidati.getBytes(), 0, candidati.length());
+						letti = inputStream.read(buffer);
+						ok = new String(buffer, 0, letti);
+						if(ok.equals("true"))
+								count = true;
+						} else {
+							System.out.println("Errore");
+						}
+					}
+	        } else {
+	        	Alert alert = new Alert(AlertType.WARNING, "Inserire il nome del partito", ButtonType.CLOSE);
+	    		alert.show();
+	        }
+	    	
 		}
-    	
-    	//Testo vuoto per un nuovo inserimento
-    	if(count == 1)
-    		lblDuplicati.setText("C'è " + count + " candidato duplicato in questo o altri partiti");
-    	else if(count > 1)
-    		lblDuplicati.setText("Ci sono " + count + " candidati duplicati in questo o altri partiti");
-    	else
-    		lblDuplicati.setText("");
+    	if(count) {
+    		Alert alert = new Alert(AlertType.WARNING, "C'è un candidato duplicato in questo o altri partiti", ButtonType.CLOSE);
+    		alert.show();
+    	}
     	txtPartito.setText("");
     	txtCandidati.setText("");
     }

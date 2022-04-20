@@ -272,7 +272,7 @@ public class GestisciClient implements Runnable{
 	public void inserisciCandidati(int id, String candidati) {
 		try {
     	String[] c = candidati.split(", ");
-    	int count = 0;
+    	boolean count = false;
 		//Ciclo con query per inserire i vari candidati di quel partito
 		for(int i = 0; i < c.length; i++) {
 			PreparedStatement stmt = conn.prepareStatement("SELECT idCandidato FROM candidati WHERE candidato = ?");
@@ -284,10 +284,13 @@ public class GestisciClient implements Runnable{
         		stmt.setInt(2, id);
         		stmt.execute();
     		} else {
-    			count++;
+    			count = true;
     		}
 		}
-		outputStream.write(Integer.toString(count).getBytes(), 0, Integer.toString(count).length());
+		if(count)
+			outputStream.write("true".getBytes(), 0, "true".length());
+		else
+			outputStream.write("false".getBytes(), 0, "false".length());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
