@@ -110,9 +110,9 @@ public class ControllerLogin {
     		        	actual.setScene(new Scene(root));
     	                actual.setTitle("Voto categorico");
     		        } else if(risposta.equals("Voto categorico con preferenze")){
-    		        	/*Parent root = FXMLLoader.load(getClass().getResource("categoricoPVoto.fxml"));
+    		        	Parent root = FXMLLoader.load(getClass().getResource("votoCategoricoP.fxml"));
     	                actual.setScene(new Scene(root));
-    	                actual.setTitle("Voto categorico con preferenze");*/
+    	                actual.setTitle("Voto categorico con preferenze");
     		        } else if(risposta.equals("Voto ordinale")){
     		        	/*Parent root = FXMLLoader.load(getClass().getResource("ordinaleVoto.fxml"));
     	                actual.setScene(new Scene(root));

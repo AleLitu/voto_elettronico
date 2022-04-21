@@ -106,6 +106,11 @@ public class GestisciClient implements Runnable{
 						String votazione = new String(buffer, 0, letti);
 						votoCategorico(votazione);
 						break;
+					case "vcp":
+						letti = inputStream.read(buffer);
+						String s = new String(buffer, 0, letti);
+						votoCategoricoPreferenze(s);
+						break;
 					case "end":
 						Server.setVotazione("null");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -348,6 +353,27 @@ public class GestisciClient implements Runnable{
 			stmt.setInt(1, 1);
 			stmt.setInt(2, Integer.parseInt(v[1]));
 	    	stmt.execute();
+		}
+	}
+	
+	public void votoCategoricoPreferenze(String s) throws SQLException {
+		if(!s.contains(",")) {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
+			stmt.setInt(1, 1);
+			stmt.setInt(2, Integer.parseInt(s));
+	    	stmt.execute();
+		} else {
+			String[] v = s.split(",");
+			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
+			stmt.setInt(1, 1);
+			stmt.setInt(2, Integer.parseInt(v[0]));
+	    	stmt.execute();
+    		for(int i = 1; i < v.length; i++) {
+    			stmt = conn.prepareStatement("UPDATE candidati SET voto = voto + ? WHERE idCandidato = ?");
+    			stmt.setInt(1, 1);
+    			stmt.setInt(2, Integer.parseInt(v[i]));
+    	    	stmt.execute();
+    		}
 		}
 	}
 }
