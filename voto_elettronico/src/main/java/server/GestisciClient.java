@@ -1,4 +1,9 @@
 package server;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
@@ -24,6 +29,8 @@ public class GestisciClient implements Runnable{
 	int dim_buffer;
 	byte buffer[];
 	int letti;
+	String votazione_conclusa;
+	int id_ref;			//per sapere quale referendum è stato chiuso e poi per prendere i dati per fare il file dei risultati
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -32,6 +39,8 @@ public class GestisciClient implements Runnable{
 			so = socket;
 			inputStream = so.getInputStream();
 			outputStream = so.getOutputStream();
+			id_ref = -1;
+			votazione_conclusa = "null";
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -111,11 +120,25 @@ public class GestisciClient implements Runnable{
 						String s = new String(buffer, 0, letti);
 						votoCategoricoPreferenze(s);
 						break;
-					case "end":
-						Server.setVotazione("null");
+					case "magg":
+						calcolaRisultati("magg");
+						break;
+					case "maggass":
+						calcolaRisultati("maggass");
+						break;
+					case "noquorum":
+						calcolaRisultati("noquorum");
+						sendFile("noquorum.txt");
+						//outputStream.write("ok".getBytes(), 0, "ok".length());
+						break;
+					case "quorum":
+						calcolaRisultati("quorum");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-					}
-									
+						break;
+					case "end":
+						terminaVotazione(Server.getVotazione());
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+					}				
 				}else {
 					so.close();
 					return;
@@ -128,6 +151,22 @@ public class GestisciClient implements Runnable{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void terminaVotazione(String type) throws SQLException {
+		votazione_conclusa = Server.getVotazione();
+		Server.setVotazione("null");
+		if(type.equals("Referendum")) {
+			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum FROM Referendum WHERE attivo = 1");
+    		ResultSet rs = stmt.executeQuery();
+    		if(rs.next()) {
+    			id_ref = rs.getInt("idReferendum");
+    		}
+    		stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
+    		stmt.setInt(1, 0);
+    		stmt.setInt(2, id_ref);
+	    	stmt.execute();		
+	    }
 	}
 	
 	public void avviaVotazione(String votazione) throws IOException, SQLException {
@@ -197,45 +236,18 @@ public class GestisciClient implements Runnable{
 				stmt.setInt(1, 1);
 				stmt.setInt(2, 1);
 		    	stmt.execute();
-		    	/*
-				PreparedStatement stmt = conn.prepareStatement("SELECT no FROM referendum");
-				ResultSet rs = stmt.executeQuery();
-				rs.next();
-				String no = rs.getString("no");
-				//Query per inserire il no al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO referendum (no) VALUES (?);");
-	    		stmt.setString(1, no + 1);
-		    	stmt.execute();*/
 			}
 			else if(voto.equals("si")){
 				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET si = si + ? WHERE attivo = ?");
 				stmt.setInt(1, 1);
 				stmt.setInt(2, 1);
 		    	stmt.execute();
-		    	/*
-				PreparedStatement stmt = conn.prepareStatement("SELECT si FROM referendum");
-				ResultSet rs = stmt.executeQuery();
-				rs.next();
-				String si = rs.getString("si");
-				//Query per inserire il si al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO referendum (si) VALUES (?);");
-	    		stmt.setString(1, si + 1);
-		    	stmt.execute();*/
 			}
 			else{
 				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET sb = sb + ? WHERE attivo = ?");
 				stmt.setInt(1, 1);
 				stmt.setInt(2, 1);
 		    	stmt.execute();
-		    	/*
-				PreparedStatement stmt = conn.prepareStatement("SELECT sb FROM referendum");
-				ResultSet rs = stmt.executeQuery();
-				rs.next();
-				String sb = rs.getString("no");
-				//Query per inserire il sb al referendum
-	    		stmt = conn.prepareStatement("INSERT INTO referendum (sb) VALUES (?);");
-	    		stmt.setString(1, sb + 1);
-		    	stmt.execute();*/
 			}
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
@@ -375,5 +387,91 @@ public class GestisciClient implements Runnable{
     	    	stmt.execute();
     		}
 		}
+	}
+	
+	public void calcolaRisultati(String type) throws SQLException {
+		switch(type) {
+		case "magg":
+			//TODO
+			break;
+		case "maggass":
+			//TODO
+			break;
+		case "quorum":
+			//TODO
+			break;
+		case "noquorum":
+			createFile("noquorum.txt");
+			PreparedStatement stmt = conn.prepareStatement("SELECT si, no, testo FROM referendum WHERE idReferendum = ?");
+			stmt.setInt(1, id_ref);
+			ResultSet rs = stmt.executeQuery();
+			rs.next();
+			try {
+			      FileWriter myWriter = new FileWriter("noquorum.txt");
+			      myWriter.write(rs.getString("testo") + "\n");
+			      int somma = rs.getInt("si") + rs.getInt("no");
+			      myWriter.write("si: " + rs.getInt("si") + "\t" + (rs.getInt("si")/somma) * 100 + "%\n");
+			      myWriter.write("no: " + rs.getInt("no") + "\t" + (rs.getInt("no")/somma) * 100 + "%\n");
+			      myWriter.close();
+			      System.out.println("Successfully wrote to the file.");
+			 } catch (IOException e) {
+			      System.out.println("An error occurred.");
+			      e.printStackTrace();
+			 }
+			break;
+		}
+	}
+	
+	public void createFile(String name) {
+		try {
+		      File file = new File(name);
+		      if (file.createNewFile()) {
+		        System.out.println("File created: " + file.getName());
+		      } else {
+		        System.out.println("File already exists.");
+		      }
+		} catch (IOException e) {
+		      System.out.println("An error occurred.");
+		      e.printStackTrace();
+		}
+	}
+	/*
+	public void writeFile(String name) {
+		 try {
+		      FileWriter myWriter = new FileWriter(name);
+		      myWriter.write("Files in Java might be tricky, but it is fun enough!");
+		      myWriter.close();
+		      System.out.println("Successfully wrote to the file.");
+		 } catch (IOException e) {
+		      System.out.println("An error occurred.");
+		      e.printStackTrace();
+		 }
+	}*/
+	
+	public void sendFile(String name) throws IOException {
+        //File myFile = new File(name);
+
+		FileInputStream fis =  null;
+        BufferedInputStream bis = null;
+        /*bis.read(buffer,0,buffer.length);
+        System.out.println("Sending files");
+        outputStream.write(buffer,0, buffer.length);
+        outputStream.flush();*/
+		
+        try {
+          // send file
+          File myFile = new File(name);
+          byte [] mybytearray  = new byte [(int)myFile.length()];
+          fis = new FileInputStream(myFile);
+          bis = new BufferedInputStream(fis);
+          bis.read(mybytearray,0,mybytearray.length);
+          System.out.println("Sending " + name + "(" + mybytearray.length + " bytes)");
+          outputStream.write(mybytearray,0,mybytearray.length);
+          outputStream.flush();
+          System.out.println("Done.");
+        } finally {
+        	//if (bis != null) bis.close();
+        	//if (fis != null) fis.close();
+        }
 	}
 }
