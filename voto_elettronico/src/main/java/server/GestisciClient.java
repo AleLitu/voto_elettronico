@@ -128,12 +128,14 @@ public class GestisciClient implements Runnable{
 						break;
 					case "noquorum":
 						calcolaRisultati("noquorum");
-						sendFile("noquorum.txt");
-						//outputStream.write("ok".getBytes(), 0, "ok".length());
+						outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					case "quorum":
 						calcolaRisultati("quorum");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
+						break;
+					case "":
+						mostraRisultati();
 						break;
 					case "end":
 						terminaVotazione(Server.getVotazione());
@@ -401,77 +403,14 @@ public class GestisciClient implements Runnable{
 			//TODO
 			break;
 		case "noquorum":
-			createFile("noquorum.txt");
-			PreparedStatement stmt = conn.prepareStatement("SELECT si, no, testo FROM referendum WHERE idReferendum = ?");
+			PreparedStatement stmt = conn.prepareStatement("CREATE VIEW noquorum AS SELECT si, no, testo FROM referendum WHERE idReferendum = ?;");
 			stmt.setInt(1, id_ref);
-			ResultSet rs = stmt.executeQuery();
-			rs.next();
-			try {
-			      FileWriter myWriter = new FileWriter("noquorum.txt");
-			      myWriter.write(rs.getString("testo") + "\n");
-			      int somma = rs.getInt("si") + rs.getInt("no");
-			      myWriter.write("si: " + rs.getInt("si") + "\t" + (rs.getInt("si")/somma) * 100 + "%\n");
-			      myWriter.write("no: " + rs.getInt("no") + "\t" + (rs.getInt("no")/somma) * 100 + "%\n");
-			      myWriter.close();
-			      System.out.println("Successfully wrote to the file.");
-			 } catch (IOException e) {
-			      System.out.println("An error occurred.");
-			      e.printStackTrace();
-			 }
+			stmt.execute();
 			break;
 		}
 	}
 	
-	public void createFile(String name) {
-		try {
-		      File file = new File(name);
-		      if (file.createNewFile()) {
-		        System.out.println("File created: " + file.getName());
-		      } else {
-		        System.out.println("File already exists.");
-		      }
-		} catch (IOException e) {
-		      System.out.println("An error occurred.");
-		      e.printStackTrace();
-		}
-	}
-	/*
-	public void writeFile(String name) {
-		 try {
-		      FileWriter myWriter = new FileWriter(name);
-		      myWriter.write("Files in Java might be tricky, but it is fun enough!");
-		      myWriter.close();
-		      System.out.println("Successfully wrote to the file.");
-		 } catch (IOException e) {
-		      System.out.println("An error occurred.");
-		      e.printStackTrace();
-		 }
-	}*/
-	
-	public void sendFile(String name) throws IOException {
-        //File myFile = new File(name);
-
-		FileInputStream fis =  null;
-        BufferedInputStream bis = null;
-        /*bis.read(buffer,0,buffer.length);
-        System.out.println("Sending files");
-        outputStream.write(buffer,0, buffer.length);
-        outputStream.flush();*/
+	public void mostraRisultati() {
 		
-        try {
-          // send file
-          File myFile = new File(name);
-          byte [] mybytearray  = new byte [(int)myFile.length()];
-          fis = new FileInputStream(myFile);
-          bis = new BufferedInputStream(fis);
-          bis.read(mybytearray,0,mybytearray.length);
-          System.out.println("Sending " + name + "(" + mybytearray.length + " bytes)");
-          outputStream.write(mybytearray,0,mybytearray.length);
-          outputStream.flush();
-          System.out.println("Done.");
-        } finally {
-        	//if (bis != null) bis.close();
-        	//if (fis != null) fis.close();
-        }
 	}
 }

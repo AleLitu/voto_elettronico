@@ -187,38 +187,16 @@ public class ControllerGestore {
     
     @FXML
     void btnNoQuorum(ActionEvent event) throws IOException {
-    	//byte buffer[] = new byte[100];
+    	byte buffer[] = new byte[100];
     	out.write("noquorum".getBytes(), 0, "noquorum".length());
-    	/*int letti = in.read(buffer);
+    	int letti = in.read(buffer);
     	String risposta = new String(buffer, 0, letti);
     	if(risposta.equals("ok")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Calcoli completati correttamente; aprire il file creato per consultare i risultati", ButtonType.CLOSE);
+    		Alert alert = new Alert(AlertType.WARNING, "Consulta le sezione risultati", ButtonType.CLOSE);
     		alert.show();
     	} else {
-    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolodei risultati", ButtonType.CLOSE);
+    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolo dei risultati", ButtonType.CLOSE);
     		alert.show();
-    	}*/
-    	FileOutputStream fos = null;
-    	BufferedOutputStream bos = null;
-    	try {
-	    	File file = new File("ricevuto.txt");
-	    	file.createNewFile();
-	    	byte[] buffer = new byte[99999999];
-	        fos = new FileOutputStream(file);
-	        bos = new BufferedOutputStream(fos);
-	        int byteread = in.read(buffer, 0, buffer.length);
-	        int current = byteread;
-	        do{
-	            System.out.println("ricevuto");
-	
-	            byteread = in.read(buffer, 0, buffer.length - current);
-	            if (byteread >= 0) current += byteread;
-	        } while (byteread > -1);
-	        bos.write(buffer, 0, current);
-	        bos.flush();
-    	} finally {
-        //fos.close();
-        //bos.close();
     	}
     }
     
