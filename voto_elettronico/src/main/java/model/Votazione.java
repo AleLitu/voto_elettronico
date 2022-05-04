@@ -1,49 +1,31 @@
 package model;
 
-public class Votazione{
-	boolean ref, vo, vc, vcp;
+import java.io.Serializable;
+
+public class Votazione implements Serializable{
+
+	int id;
+	String tipo;
 	
-	public Votazione() {
-		ref = false;
-		vo = false;
-		vc = false;
-		vcp = false;
-	}
-	
-	public boolean isSet() {
-		return ref || vo || vc || vcp;
+	public Votazione(int id, String tipo) {
+		this.id = id;
+		this.tipo = tipo;
 	}
 
-	public boolean isRef() {
-		return ref;
+	public int getId() {
+		return id;
 	}
 
-	public void setRef(boolean ref) {
-		this.ref = ref;
+	public void setId(int id) {
+		this.id = id;
 	}
 
-	public boolean isVo() {
-		return vo;
+	public String getTipo() {
+		return tipo;
 	}
 
-	public void setVo(boolean vo) {
-		this.vo = vo;
-	}
-
-	public boolean isVc() {
-		return vc;
-	}
-
-	public void setVc(boolean vc) {
-		this.vc = vc;
-	}
-
-	public boolean isVcp() {
-		return vcp;
-	}
-
-	public void setVcp(boolean vcp) {
-		this.vcp = vcp;
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 	
 }

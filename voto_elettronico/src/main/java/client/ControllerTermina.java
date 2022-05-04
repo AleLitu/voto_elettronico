@@ -1,7 +1,9 @@
 package client;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -14,77 +16,73 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Referendum;
+import model.Votazione;
 
-public class ControllerAvvioRef {
+public class ControllerTermina {
 
     @FXML
     private Button btnConferma;
-
+    
     @FXML
     private Button btnIndietro;
-    
+
     @FXML
     private VBox vbox;
-    
-    @FXML
-    private ToggleGroup group;
     
     Socket so;
     InputStream in;
     OutputStream out;
-    
+    ObjectInputStream oin;
+    ObjectOutputStream oout;
+    ArrayList<RadioButton> selected;
+
 
     @FXML
     void handleConferma(ActionEvent event) throws IOException {
-    	RadioButton rb = (RadioButton) group.getSelectedToggle();
-    	if(rb == null) {
-    		Alert alert = new Alert(AlertType.WARNING, "Nessun referendum selezionato", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		out.write(rb.getId().getBytes(), 0, rb.getId().length());
-    		Node node = (Node) event.getSource();
-    		Stage actual = (Stage) node.getScene().getWindow();
-    		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
-            actual.setScene(new Scene(root));
-            actual.setTitle("Avvio");
-    	}
+    	ArrayList<Votazione> votazioni = new ArrayList<>();
+        if (!selected.isEmpty()) {
+    		for(int i = 0; i < selected.size(); i++) {
+    			if(selected.get(i).isSelected()) {
+    				votazioni.add(new Votazione(Integer.parseInt(selected.get(i).getId()), "referendum"));
+    			}
+    		}
+        }
+    	oout = new ObjectOutputStream(out);
+		oout.writeObject(votazioni);
+        handleIndietro(event);
     }
-
+    
     @FXML
     void handleIndietro(ActionEvent event) throws IOException {
-		out.write("esc".getBytes(), 0, "esc".length());
     	Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
-		Parent root = FXMLLoader.load(getClass().getResource("avvio.fxml"));
+		Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
         actual.setScene(new Scene(root));
-        actual.setTitle("Avvio");
+        actual.setTitle("Gestore");
     }
-
+    
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
     	so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
     	ObjectInputStream oin = new ObjectInputStream(in);
-    	List<Referendum> list = (List<Referendum>) oin.readObject();
+    	ArrayList<Referendum> list = (ArrayList<Referendum>) oin.readObject();
     	List<HBox> righe = new ArrayList<>();
-    	group = new ToggleGroup();
+		selected = new ArrayList<>();
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
-    		rb.setToggleGroup(group);
     		rb.setId(Integer.toString(list.get(i).getId()));
     		rb.setPadding(new Insets(10));
+    		selected.add(rb);
     		Label l = new Label(list.get(i).getTesto());
     		l.setWrapText(true);
     		l.setPadding(new Insets(10));
@@ -93,4 +91,5 @@ public class ControllerAvvioRef {
     	vbox.getChildren().clear();
     	vbox.getChildren().addAll(righe);
     }
+
 }

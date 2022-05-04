@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -20,6 +21,7 @@ import java.util.List;
 import model.Candidato;
 import model.Partito;
 import model.Referendum;
+import model.Votazione;
 
 public class GestisciClient implements Runnable{
 	private Socket so;
@@ -29,7 +31,7 @@ public class GestisciClient implements Runnable{
 	int dim_buffer;
 	byte buffer[];
 	int letti;
-	String votazione_conclusa;
+	//String votazione_conclusa;
 	int id_ref;			//per sapere quale referendum è stato chiuso e poi per prendere i dati per fare il file dei risultati
 	
 	public GestisciClient(Socket socket) {
@@ -40,7 +42,7 @@ public class GestisciClient implements Runnable{
 			inputStream = so.getInputStream();
 			outputStream = so.getOutputStream();
 			id_ref = -1;
-			votazione_conclusa = "null";
+			//votazione_conclusa = "null";
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -90,20 +92,20 @@ public class GestisciClient implements Runnable{
 						String voto = new String(buffer, 0, letti);
 						inserisciRefVoto(voto);
 						break;
-					case "d":
+					case "avvio":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						if(Server.getVotazione().equals("null")) {
+						//if(Server.getVotazione().equals("null")) {
 							letti = inputStream.read(buffer);
 							String votazione = new String(buffer, 0, letti);
 							avviaVotazione(votazione);
-						} else {
+						/*} else {
 							String messaggio = Server.getVotazione() + " già avviato";
 							outputStream.write(messaggio.getBytes(), 0, messaggio.length());
-						}
+						}*/
 						break;
-					case "type":
+					/*case "type":
 						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
-						break;
+						break;*/
 					case "domanda":
 						getDomanda();
 						break;
@@ -112,8 +114,7 @@ public class GestisciClient implements Runnable{
 						break;
 					case "vc":
 						letti = inputStream.read(buffer);
-						String votazione = new String(buffer, 0, letti);
-						votoCategorico(votazione);
+						votoCategorico(new String(buffer, 0, letti));
 						break;
 					case "vcp":
 						letti = inputStream.read(buffer);
@@ -134,12 +135,12 @@ public class GestisciClient implements Runnable{
 						calcolaRisultati("quorum");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
-					case "":
+					case "risultati":
 						mostraRisultati();
 						break;
 					case "end":
-						terminaVotazione(Server.getVotazione());
-						outputStream.write("ok".getBytes(), 0, "ok".length());
+						terminaVotazione();
+						//outputStream.write("ok".getBytes(), 0, "ok".length());
 					}				
 				}else {
 					so.close();
@@ -155,30 +156,57 @@ public class GestisciClient implements Runnable{
 		}
 	}
 	
-	public void terminaVotazione(String type) throws SQLException {
-		votazione_conclusa = Server.getVotazione();
-		Server.setVotazione("null");
-		if(type.equals("Referendum")) {
-			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum FROM Referendum WHERE attivo = 1");
-    		ResultSet rs = stmt.executeQuery();
-    		if(rs.next()) {
-    			id_ref = rs.getInt("idReferendum");
-    		}
-    		stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
-    		stmt.setInt(1, 0);
-    		stmt.setInt(2, id_ref);
-	    	stmt.execute();		
-	    }
+	//da mergiare con getDomanda()
+	public ArrayList<Referendum> getReferendumAttivi() throws SQLException{
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE attivo = ?");
+		stmt.setInt(1, 1);
+		ResultSet rs = stmt.executeQuery();
+		ArrayList<Referendum> ref = new ArrayList<>();
+		if(!rs.next()) {
+			return null;
+		} else {
+			do {
+				ref.add(new Referendum(rs.getInt("idReferendum"), rs.getString("testo")));
+			} while(rs.next());
+		}
+		return ref;
+	}
+	
+	public void terminaVotazione() throws SQLException, IOException, ClassNotFoundException {
+		ArrayList<Referendum> ref = getReferendumAttivi();
+		if(ref == null) {
+			System.out.println("nessun ref attivo");
+			outputStream.write("no".getBytes(), 0, "no".length());
+		} else {
+			System.out.println("ref attivi");
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+			oout.writeObject(ref);
+			ObjectInputStream oin = new ObjectInputStream(inputStream);
+			ArrayList<Votazione> list = (ArrayList<Votazione>) oin.readObject();
+			for(int i = 0; i < list.size(); i++) {
+				if(list.get(i).getTipo().equals("referendum")) {
+					PreparedStatement stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
+		    		stmt.setInt(1, -1);
+		    		stmt.setInt(2, list.get(i).getId());
+			    	stmt.execute();
+				} else {
+					//TODO altri tipi di votazione
+				}
+			}
+		}
 	}
 	
 	public void avviaVotazione(String votazione) throws IOException, SQLException {
 		if(votazione.equals("Referendum")) {
-			outputStream.write("ok".getBytes(), 0, "ok".length());
-			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM Referendum");
+			//outputStream.write("ok".getBytes(), 0, "ok".length());
+			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM Referendum WHERE attivo = ?");
+			stmt.setInt(1, 0);
     		ResultSet rs = stmt.executeQuery();
     		if(!rs.next()) {
-    			outputStream.write("Inserire prima un referendum".getBytes(), 0, "Inserire prima un referendum".length());
+    			outputStream.write("no".getBytes(), 0, "no".length());
     		} else {
+    			outputStream.write("ok".getBytes(), 0, "ok".length());
     			List<Referendum> lista = new ArrayList<>();
     			ObjectOutputStream out = new ObjectOutputStream(outputStream);
     			do {
@@ -186,24 +214,69 @@ public class GestisciClient implements Runnable{
     			}while(rs.next());
 				out.writeObject(lista);
 				letti = inputStream.read(buffer);
-				int id = Integer.parseInt(new String(buffer, 0, letti));
-				stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
-	    		stmt.setInt(1, 1);
-	    		stmt.setInt(2, id);
-		    	stmt.execute();
-		    	Server.setVotazione(votazione);
-				//outputStream.write("ok".getBytes(), 0, "ok".length());
+				String risposta = new String(buffer, 0, letti);
+				if(risposta.equals("esc")) {
+					return;
+				} else {
+					int id = Integer.parseInt(risposta);
+					stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
+		    		stmt.setInt(1, 1);
+		    		stmt.setInt(2, id);
+			    	stmt.execute();
+			    	//Server.setVotazione(votazione);
+					//outputStream.write("ok".getBytes(), 0, "ok".length());
+				}
     		}
 		} else if(!votazione.equals("Referendum")) {
-			PreparedStatement stmt = conn.prepareStatement("SELECT idPartito FROM Partiti");
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Partiti");
     		ResultSet rs = stmt.executeQuery();
-    		PreparedStatement stmt1 = conn.prepareStatement("SELECT idCandidato FROM Candidati");
+    		PreparedStatement stmt1 = conn.prepareStatement("SELECT * FROM Candidati");
     		ResultSet rs1 = stmt1.executeQuery();
     		if(!rs.next() || !rs1.next()) {
-    			outputStream.write("Inserire prima partiti e candidati".getBytes(), 0, "Inserire prima partiti e candidati".length());
+    			outputStream.write("no".getBytes(), 0, "no".length());
     		} else {
-				Server.setVotazione(votazione);
-				outputStream.write("ok".getBytes(), 0, "ok".length());
+    			outputStream.write("ok".getBytes(), 0, "ok".length());
+    			letti = inputStream.read(buffer);
+				if(new String(buffer, 0, letti).equals("no")) {
+					return;
+				}
+				getPartiti();
+				boolean done = false;
+				String nome_t = "";
+				while(true) {
+					letti = inputStream.read(buffer);
+					String risposta = new String(buffer, 0, letti);
+					if(risposta.equals("esc")) {
+						return;
+					} else {
+						String[] v = risposta.split(",");
+						if(!done) {
+							stmt = conn.prepareStatement("INSERT INTO attive (nome, tipo) VALUES (?, ?)");
+							stmt.setString(1, v[0]);
+							stmt.setString(2, v[1]);
+					    	stmt.execute();
+					    	stmt = conn.prepareStatement("SELECT * FROM attive WHERE nome = ?");
+							stmt.setString(1, v[0]);
+				    		rs = stmt.executeQuery();
+				    		rs.next();
+				    		nome_t = rs.getString("nome") + rs.getInt("idAttive");
+							stmt = conn.prepareStatement("CREATE TABLE " + nome_t + " (id INT, tipo VARCHAR(9), voto INT NOT NULL DEFAULT 0, PRIMARY KEY(id, tipo))");
+					    	stmt.execute();
+					    	done = true;
+						}
+						
+				    	for(int i = 2; i < v.length; i++) {
+				    		stmt = conn.prepareStatement("INSERT INTO " + nome_t + " (id, tipo) VALUES (?, ?)");
+							stmt.setInt(1, Integer.parseInt(v[i]));
+							if(i == 2)
+								stmt.setString(2, "partito");
+							else
+								stmt.setString(2, "candidato");
+					    	stmt.execute();
+				    	}
+				    	
+					}
+				}
     		}
 		}
 		return;
