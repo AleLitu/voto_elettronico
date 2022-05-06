@@ -71,10 +71,8 @@ public class GestisciClient implements Runnable{
 					switch(scelta) {
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						letti = inputStream.read(buffer);
-						String testo = new String(buffer, 0, letti);
-						inserisciRef(testo);
-						outputStream.write("ok".getBytes(), 0, "ok".length());
+						inserisciRef();
+						//outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					case "b":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -157,41 +155,63 @@ public class GestisciClient implements Runnable{
 	}
 	
 	//da mergiare con getDomanda()
-	public ArrayList<Referendum> getReferendumAttivi() throws SQLException{
-		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE attivo = ?");
+	public ArrayList<Votazione> getReferendumAttivi() throws SQLException{
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, nome FROM referendum WHERE attivo = ?");
 		stmt.setInt(1, 1);
 		ResultSet rs = stmt.executeQuery();
-		ArrayList<Referendum> ref = new ArrayList<>();
+		ArrayList<Votazione> ref = new ArrayList<>();
 		if(!rs.next()) {
 			return null;
 		} else {
 			do {
-				ref.add(new Referendum(rs.getInt("idReferendum"), rs.getString("testo")));
+				ref.add(new Votazione(rs.getInt("idReferendum"), "referendum", rs.getString("nome")));
 			} while(rs.next());
 		}
 		return ref;
 	}
 	
+	public ArrayList<Votazione> getVotazioniAttive() throws SQLException{
+		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM attive");
+		ResultSet rs = stmt.executeQuery();
+		ArrayList<Votazione> vot = new ArrayList<>();
+		if(!rs.next()) {
+			return null;
+		} else {
+			do {
+				vot.add(new Votazione(rs.getInt("idAttive"), rs.getString("tipo"), rs.getString("nome")));
+			} while(rs.next());
+		}
+		return vot;
+	}
+	
 	public void terminaVotazione() throws SQLException, IOException, ClassNotFoundException {
-		ArrayList<Referendum> ref = getReferendumAttivi();
-		if(ref == null) {
-			System.out.println("nessun ref attivo");
+		ArrayList<Votazione> ref = getReferendumAttivi();
+		ArrayList<Votazione> vot = getVotazioniAttive();
+		if(ref == null && vot == null) {
 			outputStream.write("no".getBytes(), 0, "no".length());
 		} else {
-			System.out.println("ref attivi");
+			vot.addAll(ref);
 			outputStream.write("ok".getBytes(), 0, "ok".length());
 			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
-			oout.writeObject(ref);
+			oout.writeObject(vot);
 			ObjectInputStream oin = new ObjectInputStream(inputStream);
 			ArrayList<Votazione> list = (ArrayList<Votazione>) oin.readObject();
 			for(int i = 0; i < list.size(); i++) {
 				if(list.get(i).getTipo().equals("referendum")) {
-					PreparedStatement stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
+					PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET attivo = ? WHERE idReferendum = ?;");
 		    		stmt.setInt(1, -1);
 		    		stmt.setInt(2, list.get(i).getId());
 			    	stmt.execute();
 				} else {
-					//TODO altri tipi di votazione
+					PreparedStatement stmt = conn.prepareStatement("INSERT INTO terminate (idTerminate, nome, tipo) VALUES (?, ?, ?)");
+		    		stmt.setInt(1, list.get(i).getId());
+		    		stmt.setString(2, list.get(i).getNome());
+		    		stmt.setString(3, list.get(i).getTipo());
+			    	stmt.execute();
+			    	stmt = conn.prepareStatement("DELETE FROM attive WHERE idAttive = ? AND nome = ?");
+			    	stmt.setInt(1, list.get(i).getId());
+		    		stmt.setString(2, list.get(i).getNome());
+		    		stmt.execute();
 				}
 			}
 		}
@@ -200,17 +220,17 @@ public class GestisciClient implements Runnable{
 	public void avviaVotazione(String votazione) throws IOException, SQLException {
 		if(votazione.equals("Referendum")) {
 			//outputStream.write("ok".getBytes(), 0, "ok".length());
-			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM Referendum WHERE attivo = ?");
+			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, nome FROM Referendum WHERE attivo = ?");
 			stmt.setInt(1, 0);
     		ResultSet rs = stmt.executeQuery();
     		if(!rs.next()) {
     			outputStream.write("no".getBytes(), 0, "no".length());
     		} else {
     			outputStream.write("ok".getBytes(), 0, "ok".length());
-    			List<Referendum> lista = new ArrayList<>();
+    			List<Votazione> lista = new ArrayList<>();
     			ObjectOutputStream out = new ObjectOutputStream(outputStream);
     			do {
-    				lista.add(new Referendum(rs.getInt("idReferendum"), rs.getString("testo")));
+    				lista.add(new Votazione(rs.getInt("idReferendum"), "referendum", rs.getString("nome")));
     			}while(rs.next());
 				out.writeObject(lista);
 				letti = inputStream.read(buffer);
@@ -282,11 +302,17 @@ public class GestisciClient implements Runnable{
 		return;
 	}
 	
-	public void inserisciRef(String testo) {
+	public void inserisciRef() {
 		try {    	
+			letti = inputStream.read(buffer);
+			String testo = new String(buffer, 0, letti);
+			if(testo.equals("no")) 
+				return;
+			String v[] = testo.split(",");
 	    	//Query per inserire il referendum
-	    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo) VALUES (?);");
-	    	stmt.setString(1, testo);
+	    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo, nome) VALUES (?, ?);");
+	    	stmt.setString(1, v[0]);
+	    	stmt.setString(2, v[1]);
 	    	stmt.execute();
     	}catch (Exception e) {
     		System.out.println(e.getMessage());

@@ -127,16 +127,13 @@ public class ControllerGestore {
             	throw new Exception("Errore nella chiusura");
             }
     	}*/
-		System.out.println("sono nella handle termina");
 		out.write("end".getBytes(), 0, "end".length());
-		System.out.println("sono dopo il messaggio end");
 		letti = in.read(buffer);
         risposta = new String(buffer, 0, letti);
         if(risposta.equals("no")) {
 			Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive da chiudere", ButtonType.CLOSE);
     		alert.show();
 		} else {
-			System.out.println("devo entrare nel file termina");
 			Node node = (Node) event.getSource();
 			Stage actual = (Stage) node.getScene().getWindow();
 			Parent root = FXMLLoader.load(getClass().getResource("termina.fxml"));

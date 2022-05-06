@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Referendum;
+import model.Votazione;
 
 public class ControllerAvvioRef {
 
@@ -77,7 +78,7 @@ public class ControllerAvvioRef {
     	in = so.getInputStream();
     	out = so.getOutputStream();
     	ObjectInputStream oin = new ObjectInputStream(in);
-    	List<Referendum> list = (List<Referendum>) oin.readObject();
+    	List<Votazione> list = (List<Votazione>) oin.readObject();
     	List<HBox> righe = new ArrayList<>();
     	group = new ToggleGroup();
     	for(int i = 0; i < list.size(); i++) {
@@ -85,7 +86,7 @@ public class ControllerAvvioRef {
     		rb.setToggleGroup(group);
     		rb.setId(Integer.toString(list.get(i).getId()));
     		rb.setPadding(new Insets(10));
-    		Label l = new Label(list.get(i).getTesto());
+    		Label l = new Label(list.get(i).getNome());
     		l.setWrapText(true);
     		l.setPadding(new Insets(10));
     		righe.add(new HBox(rb, l));

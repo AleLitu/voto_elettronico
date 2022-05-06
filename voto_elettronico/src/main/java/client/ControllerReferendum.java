@@ -14,8 +14,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class ControllerReferendum{
@@ -25,6 +29,9 @@ public class ControllerReferendum{
     
     @FXML
     private Button btnIndietro;
+    
+    @FXML
+    private TextField txtNome;
 
     @FXML
     private TextArea txtDomanda;
@@ -44,19 +51,27 @@ public class ControllerReferendum{
 
 		if(ok.equals("ok")) {
 	        String testo = txtDomanda.getText();
-	    	outputStream.write(testo.getBytes(), 0, testo.length());
-			letti = inputStream.read(buffer);
-			ok = new String(buffer, 0, letti);
-			
-			if(ok.equals("ok")) {
-				Node node = (Node) event.getSource();
-				Stage actual = (Stage) node.getScene().getWindow();
-				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
-		        actual.setScene(new Scene(root));
-		        actual.setTitle("Gestore");
-			} else {
-				System.out.println("Errore");
-			}
+	        String nome = txtNome.getText();
+	        if(testo.equals("") || nome.equals("")) {
+		    	outputStream.write("no".getBytes(), 0, "no".length());
+		    	Alert alert = new Alert(AlertType.WARNING, "Compilare prima entrambi i campi", ButtonType.CLOSE);
+        		alert.show();
+	        } else {
+	        	testo += "," + nome;
+	        	outputStream.write(testo.getBytes(), 0, testo.length());
+				//letti = inputStream.read(buffer);
+				//ok = new String(buffer, 0, letti);
+
+				//if(ok.equals("ok")) {
+					Node node = (Node) event.getSource();
+					Stage actual = (Stage) node.getScene().getWindow();
+					Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+			        actual.setScene(new Scene(root));
+			        actual.setTitle("Gestore");
+				/*} else {
+					System.out.println("Errore");
+				}*/
+	        }
 		}
     }
 
