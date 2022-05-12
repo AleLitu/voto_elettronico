@@ -67,7 +67,7 @@ public class ControllerGestore {
     private Button btnTermina;
 
     @FXML
-    private MenuButton btnScrutinio;
+    private Button btnScrutinio;
 
     @FXML
     private Label lblNome;
@@ -103,30 +103,6 @@ public class ControllerGestore {
 		int letti;
 		String risposta;
 		byte buffer[] = new byte[dim_buffer];
-		/*
-		out.write("type".getBytes(), 0, "type".length());
-        letti = in.read(buffer);
-        risposta = new String(buffer, 0, letti);
-    	if(risposta.equals("null")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive da chiudere", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		out.write("end".getBytes(), 0, "end".length());
-    		letti = in.read(buffer);
-            String r = new String(buffer, 0, letti);
-            if(r.equals("ok")) {
-            	if(risposta.equals("Referendum")) {
-            		btnMaggioranza.setVisible(false);
-            		btnMaggAss.setVisible(false);
-            	} else {
-            		btnNoQuorum.setVisible(false);
-            		btnQuorum.setVisible(false);
-            	}
-            	return;
-            } else {
-            	throw new Exception("Errore nella chiusura");
-            }
-    	}*/
 		out.write("end".getBytes(), 0, "end".length());
 		letti = in.read(buffer);
         risposta = new String(buffer, 0, letti);
@@ -241,10 +217,47 @@ public class ControllerGestore {
         actual.setScene(new Scene(root));
         actual.setTitle("");
     }
+    
+    @FXML
+    void handleScrutinio(ActionEvent event) throws IOException {
+    	int dim_buffer = 100;
+		int letti;
+		String risposta;
+		byte buffer[] = new byte[dim_buffer];
+		out.write("scrutinio".getBytes(), 0, "scrutinio".length());
+		letti = in.read(buffer);
+        risposta = new String(buffer, 0, letti);
+        if(risposta.equals("no")) {
+			Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni terminate", ButtonType.CLOSE);
+    		alert.show();
+		} else {
+			Node node = (Node) event.getSource();
+			Stage actual = (Stage) node.getScene().getWindow();
+			Parent root = FXMLLoader.load(getClass().getResource("scrutinio.fxml"));
+	        actual.setScene(new Scene(root));
+	        actual.setTitle("Scrutinio votazioni");
+    	}
+    }
 
     @FXML
-    void handleRisultati(ActionEvent event) {
-
+    void handleRisultati(ActionEvent event) throws IOException {
+    	int dim_buffer = 100;
+		int letti;
+		String risposta;
+		byte buffer[] = new byte[dim_buffer];
+		out.write("calculated".getBytes(), 0, "calculated".length());
+		letti = in.read(buffer);
+        risposta = new String(buffer, 0, letti);
+        if(risposta.equals("no")) {
+			Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni risultati da mostrare", ButtonType.CLOSE);
+    		alert.show();
+		} else {
+			Node node = (Node) event.getSource();
+			Stage actual = (Stage) node.getScene().getWindow();
+			Parent root = FXMLLoader.load(getClass().getResource("risultati.fxml"));
+	        actual.setScene(new Scene(root));
+	        actual.setTitle("Risultati");
+    	}
     }
     
     @FXML
