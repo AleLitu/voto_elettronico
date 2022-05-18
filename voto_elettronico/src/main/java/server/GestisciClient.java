@@ -298,13 +298,21 @@ public class GestisciClient implements Runnable{
 					String nome_tab = list.get(i).getNome() + list.get(i).getId();
 					PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + nome_tab);
 					ResultSet rs = stmt.executeQuery();
+					rs.next();
+					stmt = conn.prepareStatement("SELECT tipo FROM terminate WHERE idTerminate = ? AND nome = ?");
+					stmt.setInt(1, list.get(i).getId());
+					stmt.setString(2, list.get(i).getNome());
+					ResultSet rs1 = stmt.executeQuery();
+					rs1.next();
+					String tipo_vot = rs1.getString("tipo");
 					ArrayList<Candidato> idp_max = new ArrayList<>();
 					ArrayList<Candidato> idc_max = new ArrayList<>();
 					ArrayList<String> messaggio = new ArrayList<>();
 					messaggio.add(list.get(i).getNome());
 					int max_p = 0, max_c = 0;
-					while(rs.next()) {
-						if(rs.getString("tipo").equals("partito") && rs.getInt("voto") >= max_p) {
+					while(rs.getString("tipo").equals("partito")) {
+						rs.getString("nome");
+						if(rs.getInt("voto") >= max_p) {
 							if(rs.getInt("voto") > max_p) {
 								idp_max.clear();
 								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
@@ -313,15 +321,24 @@ public class GestisciClient implements Runnable{
 								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
 							}
 							max_p = rs.getInt("voto");
-						} else if(rs.getString("tipo").equals("candidato") && rs.getInt("voto") >= max_c) {
-							if(rs.getInt("voto") > max_c) {
-								idc_max.clear();
-								idc_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
-								
-							} else {
-								idc_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+						}
+						rs.next();
+					}
+					if(!tipo_vot.equals("categorico")) {
+						stmt = conn.prepareStatement("SELECT id, " + nome_tab + ".nome, voto FROM " + nome_tab + " INNER JOIN candidati ON id = idCandidato WHERE idPartito = ?");
+						stmt.setInt(1, idp_max.get(i).getId());
+						rs1 = stmt.executeQuery();
+						while(rs1.next()) {
+							if(rs1.getInt("voto") >= max_c) {
+								if(rs1.getInt("voto") > max_c) {
+									idc_max.clear();
+									idc_max.add(new Candidato(rs1.getInt("id"), rs1.getString("nome")));
+									
+								} else {
+									idc_max.add(new Candidato(rs1.getInt("id"), rs1.getString("nome")));
+								}
+								max_c = rs1.getInt("voto");
 							}
-							max_c = rs.getInt("voto");
 						}
 					}
 					stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
@@ -333,12 +350,14 @@ public class GestisciClient implements Runnable{
 						stmt.setString(3, idp_max.get(j).getNome());
 						stmt.execute();
 					}
-					for(int j = 0; j < idc_max.size(); j++) {
-						stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
-						stmt.setInt(1, 1);
-						stmt.setInt(2, idc_max.get(j).getId());
-						stmt.setString(3, idc_max.get(j).getNome());
-						stmt.execute();
+					if(!tipo_vot.equals("categorico")) {
+						for(int j = 0; j < idc_max.size(); j++) {
+							stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
+							stmt.setInt(1, 1);
+							stmt.setInt(2, idc_max.get(j).getId());
+							stmt.setString(3, idc_max.get(j).getNome());
+							stmt.execute();
+						}
 					}
 					stmt = conn.prepareStatement("DELETE FROM terminate WHERE idTerminate = ? AND nome = ?");
 					stmt.setInt(1, list.get(i).getId());
