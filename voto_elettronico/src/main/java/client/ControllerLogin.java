@@ -5,7 +5,9 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.User;
 import model.UserDao;
 import model.UserDaoImpl;
@@ -93,34 +96,35 @@ public class ControllerLogin {
     				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
                     actual.setScene(new Scene(root));
                     actual.setTitle("Logged");
+                    /*
+                    actual.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent e) {
+	            			try {
+								outputStream.write("logout".getBytes(), 0, "logout".length());
+								Platform.exit();
+		                         System.exit(0);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+                        }
+                      });*/
     			} else {
     				int dim_buffer = 100;
     				int letti;
     				String risposta;
     				byte buffer[] = new byte[dim_buffer];
-    				outputStream.write("type".getBytes(), 0, "type".length());
+    				outputStream.write("attive".getBytes(), 0, "attive".length());
     		        letti = inputStream.read(buffer);
     		        risposta = new String(buffer, 0, letti);
-    		        if(risposta.equals("null")) {
+    		        if(risposta.equals("no")) {
     		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
     		    		alert.show();
     		    		so.close();
-    		        } else if(risposta.equals("Voto categorico")){
-    		        	Parent root = FXMLLoader.load(getClass().getResource("votoCategorico.fxml"));
-    		        	actual.setScene(new Scene(root));
-    	                actual.setTitle("Voto categorico");
-    		        } else if(risposta.equals("Voto categorico con preferenze")){
-    		        	Parent root = FXMLLoader.load(getClass().getResource("votoCategoricoP.fxml"));
-    	                actual.setScene(new Scene(root));
-    	                actual.setTitle("Voto categorico con preferenze");
-    		        } else if(risposta.equals("Voto ordinale")){
-    		        	/*Parent root = FXMLLoader.load(getClass().getResource("ordinaleVoto.fxml"));
-    	                actual.setScene(new Scene(root));
-    	                actual.setTitle("Voto ordinale");*/
-    		        } else if(risposta.equals("Referendum")){
-    		        	Parent root = FXMLLoader.load(getClass().getResource("referendumVoto.fxml"));
-    	                actual.setScene(new Scene(root));
-    	                actual.setTitle("Referendum");
+    		        } else {
+    					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+    			        actual.setScene(new Scene(root));
+    			        actual.setTitle("Scegli");
     		        }
     			}
     		} catch(Exception e) {

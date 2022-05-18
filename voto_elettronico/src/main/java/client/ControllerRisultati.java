@@ -47,7 +47,6 @@ public class ControllerRisultati {
     OutputStream out;
     ObjectInputStream oin;
     ObjectOutputStream oout;
-    //ArrayList<RadioButton> selected;
     List<HBox> righe;
 
     @FXML
@@ -91,7 +90,6 @@ public class ControllerRisultati {
     		rb.setId(v[0] + v[1]);
     		rb.setPadding(new Insets(10));
     		rb.setToggleGroup(group);
-    		//selected.add(rb);
     		Label ln = new Label(v[0]);
     		ln.setWrapText(true);
     		ln.setPadding(new Insets(10));

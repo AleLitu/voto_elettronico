@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +25,8 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.event.EventHandler;
 
 public class ControllerGestore {
 	
@@ -119,16 +122,6 @@ public class ControllerGestore {
     }
 
     @FXML
-    void handleCategorico(ActionEvent event) {
-
-    }
-
-    @FXML
-    void handleCategoricoPr(ActionEvent event) {
-
-    }
-
-    @FXML
     void handleLista(ActionEvent event) throws IOException {
 		Stage actual = (Stage) gestoreBorderPane.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("liste.fxml"));
@@ -138,76 +131,12 @@ public class ControllerGestore {
 
     @FXML
     void handleLogout(ActionEvent event) throws IOException {
+    	out.write("logout".getBytes(), 0, "logout".length());
     	Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
         actual.setScene(new Scene(root));
         actual.setTitle("Login");
-    }
-
-    @FXML
-    void handleMaggAss(ActionEvent event) throws IOException {
-    	byte buffer[] = new byte[100];
-    	out.write("magg".getBytes(), 0, "magg_ass".length());
-    	int letti = in.read(buffer);
-    	String risposta = new String(buffer, 0, letti);
-    	if(risposta.equals("ok")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Calcoli completati correttamente; aprire il file creato per consultare i risultati", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolodei risultati", ButtonType.CLOSE);
-    		alert.show();
-    	}
-    }
-
-    @FXML
-    void handleMaggioranza(ActionEvent event) throws IOException {
-		byte buffer[] = new byte[100];
-    	out.write("magg".getBytes(), 0, "magg".length());
-    	int letti = in.read(buffer);
-    	String risposta = new String(buffer, 0, letti);
-    	if(risposta.equals("ok")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Calcoli completati correttamente; aprire il file creato per consultare i risultati", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolodei risultati", ButtonType.CLOSE);
-    		alert.show();
-    	}
-    }
-    
-    @FXML
-    void btnNoQuorum(ActionEvent event) throws IOException {
-    	byte buffer[] = new byte[100];
-    	out.write("noquorum".getBytes(), 0, "noquorum".length());
-    	int letti = in.read(buffer);
-    	String risposta = new String(buffer, 0, letti);
-    	if(risposta.equals("ok")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Consulta le sezione risultati", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolo dei risultati", ButtonType.CLOSE);
-    		alert.show();
-    	}
-    }
-    
-    @FXML
-    void handleQuorum(ActionEvent event) throws IOException {
-    	byte buffer[] = new byte[100];
-    	out.write("quorum".getBytes(), 0, "quorum".length());
-    	int letti = in.read(buffer);
-    	String risposta = new String(buffer, 0, letti);
-    	if(risposta.equals("ok")) {
-    		Alert alert = new Alert(AlertType.WARNING, "Calcoli completati correttamente; aprire il file creato per consultare i risultati", ButtonType.CLOSE);
-    		alert.show();
-    	} else {
-    		Alert alert = new Alert(AlertType.WARNING, "Errore nel calcolodei risultati", ButtonType.CLOSE);
-    		alert.show();
-    	}
-    }
-
-    @FXML
-    void handleOrdinale(ActionEvent event) {
-
     }
 
     @FXML

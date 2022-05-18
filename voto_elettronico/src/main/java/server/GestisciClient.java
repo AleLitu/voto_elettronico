@@ -1,15 +1,11 @@
 package server;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,8 +27,6 @@ public class GestisciClient implements Runnable{
 	int dim_buffer;
 	byte buffer[];
 	int letti;
-	//String votazione_conclusa;
-	int id_ref;			//per sapere quale referendum è stato chiuso e poi per prendere i dati per fare il file dei risultati
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -41,7 +35,6 @@ public class GestisciClient implements Runnable{
 			so = socket;
 			inputStream = so.getInputStream();
 			outputStream = so.getOutputStream();
-			id_ref = -1;
 			//votazione_conclusa = "null";
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -58,13 +51,9 @@ public class GestisciClient implements Runnable{
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
     	}
-		
+		    	
 		while(true) {
 			try {
-				//System.out.println("0");
-				//if(so.isInputShutdown()) {
-					//System.out.println("1");
-
 				letti = inputStream.read(buffer);
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
@@ -92,23 +81,20 @@ public class GestisciClient implements Runnable{
 						break;
 					case "avvio":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						//if(Server.getVotazione().equals("null")) {
-							letti = inputStream.read(buffer);
-							String votazione = new String(buffer, 0, letti);
-							avviaVotazione(votazione);
-						/*} else {
-							String messaggio = Server.getVotazione() + " già avviato";
-							outputStream.write(messaggio.getBytes(), 0, messaggio.length());
-						}*/
+						letti = inputStream.read(buffer);
+						String votazione = new String(buffer, 0, letti);
+						avviaVotazione(votazione);
 						break;
-					/*case "type":
-						outputStream.write(Server.getVotazione().getBytes(), 0, Server.getVotazione().length());
-						break;*/
+					case "attive":
+						getAttive();
+						break;
+						/*
 					case "domanda":
 						getDomanda();
 						break;
-					case "partiti":
-						getPartiti();
+						*/
+					case "votazione":
+						getVotazione();
 						break;
 					case "vc":
 						letti = inputStream.read(buffer);
@@ -127,20 +113,71 @@ public class GestisciClient implements Runnable{
 						break;
 					case "end":
 						terminaVotazione();
-						//outputStream.write("ok".getBytes(), 0, "ok".length());
+						break;
+					case "logout":
+						inputStream.close();
+						outputStream.close();
+						so.close();
+						return;
 					}				
-				}else {
+				} else {
 					so.close();
 					return;
 				}
-				/*}else {
-					so.close();
-					return;
-				}*/
+			} catch(SocketException se) {
+				return;
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	//invia la votazione selezionata dal client per votare
+	public void getVotazione() throws IOException, SQLException {
+		letti = inputStream.read(buffer);
+		String[] v = new String(buffer, 0, letti).split("@");
+		if(!v[2].equals("referendum")) {
+			String nome_t = v[0] + v[1];
+			PreparedStatement stmt = conn.prepareStatement("SELECT id, nome FROM " + nome_t + " WHERE tipo = ?");
+			stmt.setString(1, "partito");
+			ResultSet rs = stmt.executeQuery();
+			ArrayList<Partito> partiti = new ArrayList<>();
+			while(rs.next()) {
+				PreparedStatement stmt1 = conn.prepareStatement("SELECT id, " + nome_t + ".nome FROM " + nome_t + " INNER JOIN candidati ON id = idCandidato WHERE idPartito = ? AND tipo = ?");
+				stmt1.setInt(1, rs.getInt("id"));
+				stmt1.setString(2, "candidato");
+				ResultSet rs1 = stmt1.executeQuery();
+				ArrayList<Candidato> candidati = new ArrayList<>();
+				while(rs1.next()) {
+					candidati.add(new Candidato(rs1.getInt("id"), rs1.getString("nome")));
+				}
+				partiti.add(new Partito(rs.getInt("id"), rs.getString("nome"), candidati));
+			}
+			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+			oout.writeObject(partiti);
+		} else {
+			getDomanda(Integer.parseInt(v[1]), v[0]);
+		}
+	}
+	
+	//invia la lista delle votazioni attive al client per selezionare quale votare
+	public void getAttive() throws SQLException, IOException {
+		ArrayList<Votazione> ref = getReferendumAttivi();
+		ArrayList<Votazione> vot = getVotazioniAttive();
+		if(ref == null && vot == null) {
+			outputStream.write("no".getBytes(), 0, "no".length());
+		} else {
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+			if(vot == null) {
+				oout.writeObject(ref);
+			} else if(ref == null) {
+				oout.writeObject(vot);
+			} else {
+				vot.addAll(ref);
+				oout.writeObject(vot);
+			}
+		}		
 	}
 	
 	public ArrayList<Votazione> getReferendumTerminati() throws SQLException{
@@ -258,21 +295,60 @@ public class GestisciClient implements Runnable{
 					stmt.setString(2, list.get(i).getNome());
 					stmt.execute();
 				} else if(list.get(i).getTipo().equals("Maggioranza")) {
-					//TODO da rifare
 					String nome_tab = list.get(i).getNome() + list.get(i).getId();
-					//String nome_view = list.get(i).getId() + list.get(i).getNome();
-					/*
-					PreparedStatement stmt = conn.prepareStatement("CREATE VIEW `" + nome_view + "` AS SELECT id, nome, voto FROM " + nome_tab);
+					PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + nome_tab);
+					ResultSet rs = stmt.executeQuery();
+					ArrayList<Candidato> idp_max = new ArrayList<>();
+					ArrayList<Candidato> idc_max = new ArrayList<>();
+					ArrayList<String> messaggio = new ArrayList<>();
+					messaggio.add(list.get(i).getNome());
+					int max_p = 0, max_c = 0;
+					while(rs.next()) {
+						if(rs.getString("tipo").equals("partito") && rs.getInt("voto") >= max_p) {
+							if(rs.getInt("voto") > max_p) {
+								idp_max.clear();
+								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+								
+							} else {
+								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+							}
+							max_p = rs.getInt("voto");
+						} else if(rs.getString("tipo").equals("candidato") && rs.getInt("voto") >= max_c) {
+							if(rs.getInt("voto") > max_c) {
+								idc_max.clear();
+								idc_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+								
+							} else {
+								idc_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+							}
+							max_c = rs.getInt("voto");
+						}
+					}
+					stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
 					stmt.execute();
-					*/
-					PreparedStatement stmt = conn.prepareStatement("DELETE FROM terminate WHERE idTerminate = ? AND nome = ?");
+					for(int j = 0; j < idp_max.size(); j++) {
+						stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
+						stmt.setInt(1, 1);
+						stmt.setInt(2, idp_max.get(j).getId());
+						stmt.setString(3, idp_max.get(j).getNome());
+						stmt.execute();
+					}
+					for(int j = 0; j < idc_max.size(); j++) {
+						stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
+						stmt.setInt(1, 1);
+						stmt.setInt(2, idc_max.get(j).getId());
+						stmt.setString(3, idc_max.get(j).getNome());
+						stmt.execute();
+					}
+					stmt = conn.prepareStatement("DELETE FROM terminate WHERE idTerminate = ? AND nome = ?");
 					stmt.setInt(1, list.get(i).getId());
 					stmt.setString(2, list.get(i).getNome());
 					stmt.execute();
-					stmt = conn.prepareStatement("INSERT INTO calcolare (nomeVot, tipoCalcolo) VALUES (?, ?)");
-					stmt.setString(1, nome_tab);
+					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo) VALUES (?, ?)");
+					stmt.setString(1, list.get(i).getNome() + "@" + list.get(i).getId());
 					stmt.setString(2, list.get(i).getTipo());
 					stmt.execute();
+					
 				} else if(list.get(i).getTipo().equals("Maggioranza assoluta")) {
 
 				}
@@ -559,13 +635,16 @@ public class GestisciClient implements Runnable{
 		}
 	}
 	
-	public void getDomanda() throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE attivo = ?");
-		stmt.setInt(1, 1);
+	public void getDomanda(int id, String nome) throws SQLException, IOException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE idReferendum = ? AND nome = ?");
+		stmt.setInt(1, id);
+		stmt.setString(2, nome);
+		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		if(!rs.next()) {
 			//TODO
 		} else {
+			//TODO mettere anche il nome nella classe referendum così si può mostrare anche quello durante la votazione
 			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(re);
@@ -600,41 +679,35 @@ public class GestisciClient implements Runnable{
 	}
 	
 	public void votoCategorico(String votazione) throws SQLException {
-		String[] v = votazione.split(",");
-		if(v[0].equals("partito")) {
-			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
-			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(v[1]));
-	    	stmt.execute();
-		} else if(v[0].equals("candidato")) {
-			PreparedStatement stmt = conn.prepareStatement("UPDATE candidati SET voto = voto + ? WHERE idCandidato = ?");
-			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(v[1]));
-	    	stmt.execute();
-		}
+		String[] voto = votazione.split(",");
+		String[] tabella = voto[0].split("@");
+		PreparedStatement stmt = conn.prepareStatement("UPDATE " + tabella[0]+tabella[1] + " SET voto = voto + ? WHERE id = ? AND nome = ? AND tipo = ?");
+		stmt.setInt(1, 1);
+		stmt.setInt(2, Integer.parseInt(voto[1].split("@")[0]));
+		stmt.setString(3, voto[1].split("@")[1]);
+		stmt.setString(4, "partito");
+    	stmt.execute();
 	}
 	
 	public void votoCategoricoPreferenze(String s) throws SQLException {
-		if(!s.contains(",")) {
-			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
+		String[] v = s.split(",");
+		String nome_t = v[0].split("@")[0]+v[0].split("@")[1];
+		PreparedStatement stmt = conn.prepareStatement("UPDATE "+ nome_t +" SET voto = voto + ? WHERE id = ? AND nome = ? AND tipo = ?");
+		stmt.setInt(1, 1);
+		stmt.setInt(2, Integer.parseInt(v[1].split("@")[0]));
+		stmt.setString(3, v[1].split("@")[1]);
+		stmt.setString(4, "partito");
+    	stmt.execute();
+		for(int i = 2; i < v.length; i++) {
+			stmt = conn.prepareStatement("UPDATE " + nome_t + " SET voto = voto + ? WHERE id = ? AND nome = ? AND tipo = ?");
 			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(s));
+			stmt.setInt(2, Integer.parseInt(v[i].split("@")[0]));
+			stmt.setString(3, v[i].split("@")[1]);
+			stmt.setString(4, "candidato");
 	    	stmt.execute();
-		} else {
-			String[] v = s.split(",");
-			PreparedStatement stmt = conn.prepareStatement("UPDATE partiti SET voto = voto + ? WHERE idPartito = ?");
-			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(v[0]));
-	    	stmt.execute();
-    		for(int i = 1; i < v.length; i++) {
-    			stmt = conn.prepareStatement("UPDATE candidati SET voto = voto + ? WHERE idCandidato = ?");
-    			stmt.setInt(1, 1);
-    			stmt.setInt(2, Integer.parseInt(v[i]));
-    	    	stmt.execute();
-    		}
 		}
 	}
-	
+		
 	public void mostraRisultati() throws SQLException, IOException {
 		PreparedStatement stmt = conn.prepareStatement("SELECT nomeVot FROM calcolate");
 		ResultSet rs = stmt.executeQuery();
@@ -654,8 +727,23 @@ public class GestisciClient implements Runnable{
 				stmt = conn.prepareStatement("SELECT * FROM `" + reply +"`");
 				ResultSet rs1 = stmt.executeQuery();
 				rs1.next();
-				String s = rs1.getString("nome") + "@" + rs1.getString("testo") + "@" + rs1.getInt("si") + "@" + rs1.getInt("no") + "@" + rs1.getInt("sb") + "@" + rs1.getString("vincitore");
-				oout.writeObject(s);
+				ArrayList<String> messaggio = new ArrayList<>();
+				ObjectOutputStream oout1 = new ObjectOutputStream(outputStream);
+				if(rs1.isLast()) {
+					float tot = rs1.getInt("si") + rs1.getInt("no") + rs1.getInt("sb");
+					float perc_si = (rs1.getInt("si") / tot) * 100;
+					float perc_no = (rs1.getInt("no") / tot) * 100;
+					float perc_sb = (rs1.getInt("sb") / tot) * 100;
+					messaggio.add(rs1.getString("nome") + "@" + rs1.getString("testo") + "@" + rs1.getInt("si") + "%" + perc_si + "@" + rs1.getInt("no") + "%" + perc_no + "@" + rs1.getInt("sb") + "%" + perc_sb + "@" + rs1.getString("vincitore"));
+					//outputStream.write(s.getBytes(), 0, s.length());
+				} else {
+					reply = reply.replaceAll("\\d","");
+					messaggio.add(reply);
+					do {
+						messaggio.add(rs1.getString("tipo") + "@" + rs1.getString("nome") + "@" + rs1.getInt("voto") + "@" + rs1.getString("vincitore"));
+					}while(rs1.next());
+				}
+				oout1.writeObject(messaggio);
 			}
 		}
 	}

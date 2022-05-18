@@ -55,7 +55,7 @@ public class ControllerVCP {
     	boolean trovato = false;
         if (rb != null) {
     		out.write("vcp".getBytes(), 0, "vcp".length());
-    		String s = rb.getId();
+    		String s = ControllerAttive.getScelta() + "," + rb.getId();
     		for(int i = 0; i < selected.size(); i++) {
     			if(selected.get(i).isSelected()) {
     				s += "," + selected.get(i).getId();
@@ -77,7 +77,7 @@ public class ControllerVCP {
     	so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
-        out.write("partiti".getBytes(), 0, "partiti".length());
+        //out.write("partiti".getBytes(), 0, "partiti".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
     	list = (List<Partito>) oin.readObject();
     	List<HBox> righe = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ControllerVCP {
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
     		rb.setToggleGroup(groupPa);
-    		rb.setId(Integer.toString(list.get(i).getId()));
+    		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
     		rb.setPadding(new Insets(10));
     		Label l = new Label(list.get(i).getNome());
     		l.setWrapText(true);
@@ -100,13 +100,13 @@ public class ControllerVCP {
                 RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
                 if (rb != null) {
                 	for(int i = 0; i < list.size(); i++) {
-                		if(list.get(i).getId() == Integer.parseInt(rb.getId())) {
+                		if(list.get(i).getId() == Integer.parseInt(rb.getId().split("@")[0])) {
                 			ArrayList<Candidato> candidati = list.get(i).getCandidati();
                 			selected = new ArrayList<>();
                 			List<HBox> righe = new ArrayList<>();
                 	    	for(int j = 0; j < candidati.size(); j++) {
                 	    		RadioButton rb1 = new RadioButton();
-                	    		rb1.setId(Integer.toString(candidati.get(j).getId()));
+                	    		rb1.setId(candidati.get(j).getId() + "@" + candidati.get(j).getNome());
                 	    		rb1.setPadding(new Insets(10));
                 	    		selected.add(rb1);
                 	    		Label l = new Label(candidati.get(j).getNome());

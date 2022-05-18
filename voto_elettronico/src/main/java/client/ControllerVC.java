@@ -51,21 +51,9 @@ public class ControllerVC {
     @FXML
     void handleConferma(ActionEvent event) throws IOException {
     	RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
-    	boolean trovato = false;
         if (rb != null) {
-        	for(int i = 0; i < list.size(); i++) {
-        		if(list.get(i).getId() == Integer.parseInt(rb.getId())) {
-        			trovato = true;
-        			break;
-        		}
-        	}
-        	if(trovato) {
         		out.write("vc".getBytes(), 0, "vc".length());
-        		out.write(("partito,"+rb.getId()).getBytes(), 0, ("partito,"+rb.getId()).length());
-        	} else {
-        		out.write("vc".getBytes(), 0, "vc".length());
-        		out.write(("candidato,"+rb.getId()).getBytes(), 0, ("candidato,"+rb.getId()).length());
-        	}
+        		out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
         } else {
         	//TODO: scheda bianca
         }
@@ -81,7 +69,7 @@ public class ControllerVC {
     	so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
-        out.write("partiti".getBytes(), 0, "partiti".length());
+        //out.write("attive".getBytes(), 0, "attive".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
     	list = (List<Partito>) oin.readObject();
     	List<HBox> righe = new ArrayList<>();
@@ -89,7 +77,7 @@ public class ControllerVC {
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
     		rb.setToggleGroup(groupPa);
-    		rb.setId(Integer.toString(list.get(i).getId()));
+    		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
     		rb.setPadding(new Insets(10));
     		Label l = new Label(list.get(i).getNome());
     		l.setWrapText(true);
@@ -104,21 +92,23 @@ public class ControllerVC {
                 RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
                 if (rb != null) {
                 	for(int i = 0; i < list.size(); i++) {
-                		if(list.get(i).getId() == Integer.parseInt(rb.getId())) {
+                		if(list.get(i).getId() == Integer.parseInt(rb.getId().split("@")[0])) {
                 			ArrayList<Candidato> candidati = list.get(i).getCandidati();
                 			List<HBox> righe = new ArrayList<>();
+                			vboxCa.getChildren().clear();
                 	    	for(int j = 0; j < candidati.size(); j++) {
-                	    		RadioButton rb1 = new RadioButton();
+                	    		/*RadioButton rb1 = new RadioButton();
                 	    		rb1.setToggleGroup(groupPa);
                 	    		rb1.setId(Integer.toString(candidati.get(j).getId()));
-                	    		rb1.setPadding(new Insets(10));
+                	    		rb1.setPadding(new Insets(10));*/
                 	    		Label l = new Label(candidati.get(j).getNome());
                 	    		l.setWrapText(true);
                 	    		l.setPadding(new Insets(10));
-                	    		righe.add(new HBox(rb1, l));
+                	    		vboxCa.getChildren().addAll(l);
+                	    		//righe.add(new HBox(rb1, l));
                 	    	}
-                	    	vboxCa.getChildren().clear();
-                	    	vboxCa.getChildren().addAll(righe);
+                	    	//vboxCa.getChildren().clear();
+                	    	//vboxCa.getChildren().addAll(righe);
                 		}
                 	}
                 }

@@ -86,7 +86,7 @@ public class ControllerReferendumVoto{
     	so = ControllerLogin.getSocket();
         outputStream = so.getOutputStream();
         inputStream = so.getInputStream();
-        outputStream.write("domanda".getBytes(), 0, "domanda".length());
+        //outputStream.write("domanda".getBytes(), 0, "domanda".length());
         ois = new ObjectInputStream(inputStream);
     	re = (Referendum) ois.readObject();
     	lblReferendum.setText(re.getTesto());
