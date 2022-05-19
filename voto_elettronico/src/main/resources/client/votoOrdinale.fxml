@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="454.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerVO">
+   <left>
+      <ScrollPane prefHeight="337.0" prefWidth="467.0" BorderPane.alignment="CENTER">
+         <content>
+            <VBox fx:id="vboxPa" prefHeight="362.0" prefWidth="462.0" />
+         </content></ScrollPane>
+   </left>
+   <top>
+      <VBox prefHeight="92.0" prefWidth="466.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Voto ordinale">
+               <VBox.margin>
+                  <Insets left="200.0" />
+               </VBox.margin>
+            </Label>
+            <HBox prefHeight="24.0" prefWidth="466.0">
+               <children>
+                  <RadioButton id="p" mnemonicParsing="false" text="Partiti">
+                     <HBox.margin>
+                        <Insets left="50.0" />
+                     </HBox.margin>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="group" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton id="c" alignment="CENTER_LEFT" mnemonicParsing="false" text="Candidati" toggleGroup="$group">
+                     <HBox.margin>
+                        <Insets left="225.0" />
+                     </HBox.margin>
+                  </RadioButton>
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <HBox prefHeight="58.0" prefWidth="466.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnPulisci" mnemonicParsing="false" onAction="#handlePulisci" text="Pulisci">
+               <HBox.margin>
+                  <Insets bottom="50.0" left="100.0" right="50.0" top="50.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnConferma" mnemonicParsing="false" onAction="#handleConferma" text="Conferma">
+               <HBox.margin>
+                  <Insets bottom="50.0" left="75.0" right="50.0" top="50.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+      </HBox>
+   </bottom>
+</BorderPane>

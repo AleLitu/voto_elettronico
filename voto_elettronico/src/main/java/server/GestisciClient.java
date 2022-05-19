@@ -93,6 +93,9 @@ public class GestisciClient implements Runnable{
 						getDomanda();
 						break;
 						*/
+					case "candidati":
+						getCandidati();
+						break;
 					case "votazione":
 						getVotazione();
 						break;
@@ -105,6 +108,13 @@ public class GestisciClient implements Runnable{
 						String s = new String(buffer, 0, letti);
 						votoCategoricoPreferenze(s);
 						break;
+					case "vo":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String voti = new String(buffer, 0, letti);
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						votoOrdinale(voti);
+						break;	
 					case "scrutinio":
 						getTerminate();
 						break;
@@ -128,6 +138,50 @@ public class GestisciClient implements Runnable{
 				return;
 			}catch(Exception e) {
 				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void getCandidati() throws SQLException, IOException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT idCandidato, nome FROM candidati ORDER BY nome");
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			//TODO
+		} else {
+			ArrayList<Candidato> candidati = new ArrayList<>();
+			do {
+				candidati.add(new Candidato(rs.getInt("idCandidato"), rs.getString("nome")));
+			}while(rs.next());
+			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+			oos.writeObject(candidati);
+		}
+	}
+	
+	public void votoOrdinale(String voto) throws SQLException, IOException, ClassNotFoundException {
+		outputStream.write("ok".getBytes(), 0, "ok".length());
+		if(voto.equals("partiti")) {
+			List<Partito> voti;
+			ObjectInputStream oin = new ObjectInputStream(inputStream);
+	        voti = (List<Partito>) oin.readObject();
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+			for(int i = 0; i < voti.size(); i++) {
+				PreparedStatement stmt = conn.prepareStatement("INSERT INTO voto_partito (idPartito, voto) VALUES (?, ?)");
+				stmt.setInt(1, voti.get(i).getId());
+				stmt.setInt(2, i + 1);
+		    	stmt.execute();
+			}
+		}else {
+			List<Candidato> voti;
+			ObjectInputStream oin = new ObjectInputStream(inputStream);
+	        voti = (List<Candidato>) oin.readObject();
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+			System.out.println(voti.size());
+			for(int i = 0; i < voti.size(); i++) {
+				System.out.println("1");
+				PreparedStatement stmt = conn.prepareStatement("INSERT INTO voto_candidato (idCandidato, voto) VALUES (?, ?)");
+				stmt.setInt(1, voti.get(i).getId());
+				stmt.setInt(2, i + 1);
+		    	stmt.execute();
 			}
 		}
 	}

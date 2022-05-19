@@ -78,7 +78,7 @@ public class ControllerAttive {
 	        	actual.setScene(new Scene(root));
                 actual.setTitle(v[0]);
     		} else if(v[2].equals("ordinale")) {
-    			Parent root = FXMLLoader.load(getClass().getResource("ordinaleVoto.fxml"));
+    			Parent root = FXMLLoader.load(getClass().getResource("VotoOrdinale.fxml"));
                 actual.setScene(new Scene(root));
                 actual.setTitle(v[0]);
     		}

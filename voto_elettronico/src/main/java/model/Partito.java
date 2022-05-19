@@ -14,6 +14,12 @@ public class Partito implements Serializable{
 		this.candidati = candidati;
 	}
 	
+	public Partito(int id, String nome) {
+		this.id = id;
+		this.nome = nome;
+		this.candidati = null;
+	}
+	
 	public int getId() {
 		return id;
 	}
