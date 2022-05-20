@@ -85,48 +85,87 @@ public class ControllerRiepilogo {
     		l1.setPadding(new Insets(10));
     		vbox.getChildren().addAll(l1);
 
-    		l1 = new Label("Vincitore: " + v[5]);
+    		if(v[5].contains("%")) {
+    			v1 = v[5].split("%");
+        		l1 = new Label("Vincitore: " + v1[0] + "   -->   Raggiunto il " + v1[1] + " % dei voti possibili");
+    		} else {
+        		l1 = new Label("Vincitore: " + v[5]);
+    		}
     		l1.setWrapText(true);
     		l1.setPadding(new Insets(10));
     		vbox.getChildren().addAll(l1);
     	} else {
-    		lblTitolo.setText("Riepilogo per: " + list.get(0));
-    		String prev = "";
-    		for(int i = 1; i < list.size(); i++) {
-        		String[] v = list.get(i).split("@");
-        		
-        		HBox hbox = new HBox();
-        		
-        		if(!prev.equals(v[0])) {
+    		lblTitolo.setText("Riepilogo per: " + list.get(1));
+    		if(list.get(0).equals("categorico")) {
+    			for(int i = 2; i < list.size(); i++) {
+            		String[] v = list.get(i).split("@");
+            		
+            		HBox hbox = new HBox();
+            		
         			HBox hbox1 = new HBox();
         			Label l1;
-        			if(v[0].equals("partito"))
-            			l1 = new Label("Partiti");
-        			else
-            			l1 = new Label("Candidati");
+            		l1 = new Label("Partiti");
             		l1.setWrapText(true);
             		l1.setPadding(new Insets(10));
-            		prev = v[0];
             		hbox1.getChildren().addAll(l1);
             		vbox.getChildren().addAll(hbox1);
-        		}
-    			Label l1 = new Label(v[1]);
-        		l1.setWrapText(true);
-        		l1.setPadding(new Insets(10));
-        		hbox.getChildren().addAll(l1);
-        		
-        		l1 = new Label (v[2] + "   -->   "  + " %");
-        		l1.setWrapText(true);
-        		l1.setPadding(new Insets(10));
-        		hbox.getChildren().addAll(l1);
+            		
+        			l1 = new Label(v[1]);
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+            		
+            		l1 = new Label (v[2]);
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
 
-        		if(Integer.parseInt(v[3]) == 1) {
-        			l1 = new Label("Vincitore");
-	        		l1.setWrapText(true);
-	        		l1.setPadding(new Insets(10));
-	        		hbox.getChildren().addAll(l1);
+            		if(Integer.parseInt(v[3]) == 1) {
+            			l1 = new Label("Vincitore");
+    	        		l1.setWrapText(true);
+    	        		l1.setPadding(new Insets(10));
+    	        		hbox.getChildren().addAll(l1);
+            		}
+            		vbox.getChildren().addAll(hbox);
         		}
-        		vbox.getChildren().addAll(hbox);
+    		} else {
+    			String prev = "";
+        		for(int i = 2; i < list.size(); i++) {
+            		String[] v = list.get(i).split("@");
+            		
+            		HBox hbox = new HBox();
+            		
+            		if(!prev.equals(v[0])) {
+            			HBox hbox1 = new HBox();
+            			Label l1;
+            			if(v[0].equals("partito"))
+                			l1 = new Label("Partiti");
+            			else
+                			l1 = new Label("Candidati");
+                		l1.setWrapText(true);
+                		l1.setPadding(new Insets(10));
+                		prev = v[0];
+                		hbox1.getChildren().addAll(l1);
+                		vbox.getChildren().addAll(hbox1);
+            		}
+        			Label l1 = new Label(v[1]);
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+            		
+            		l1 = new Label (v[2]);
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+
+            		if(Integer.parseInt(v[3]) == 1) {
+            			l1 = new Label("Vincitore");
+    	        		l1.setWrapText(true);
+    	        		l1.setPadding(new Insets(10));
+    	        		hbox.getChildren().addAll(l1);
+            		}
+            		vbox.getChildren().addAll(hbox);
+        		}
         	}
     	}
     }

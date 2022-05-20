@@ -289,23 +289,28 @@ public class GestisciClient implements Runnable{
 					ResultSet rs = stmt.executeQuery();
 					rs.next();
 					String nome_t = list.get(i).getNome() + list.get(i).getId();
-					stmt = conn.prepareStatement("CREATE TABLE `" + nome_t + "` (nome VARCHAR(45), testo VARCHAR(200), si INT, no INT, sb INT, vincitore VARCHAR(2))");
+					stmt = conn.prepareStatement("CREATE TABLE `" + nome_t + "` (nome VARCHAR(45), testo VARCHAR(200), si VARCHAR(20), no VARCHAR(20), sb VARCHAR(20), vincitore VARCHAR(2))");
 					stmt.execute();
 					String vincitore = "No";
 					if(rs.getInt("si") > rs.getInt("no")) {
 						vincitore = "Sì";
 					}
+					float tot = rs.getInt("si") + rs.getInt("no") + rs.getInt("sb");
+					float perc_si = (rs.getInt("si") / tot) * 100;
+					float perc_no = (rs.getInt("no") / tot) * 100;
+					float perc_sb = (rs.getInt("sb") / tot) * 100;
 					stmt = conn.prepareStatement("INSERT INTO `" + nome_t + "` (nome, testo, si, no, sb, vincitore) VALUES (?, ?, ?, ?, ?, ?)");
 					stmt.setString(1, rs.getString("nome"));
 					stmt.setString(2, rs.getString("testo"));
-					stmt.setInt(3, rs.getInt("si"));
-					stmt.setInt(4, rs.getInt("no"));
-					stmt.setInt(5, rs.getInt("sb"));
+					stmt.setString(3, rs.getInt("si") + "%" + perc_si);
+					stmt.setString(4, rs.getInt("no") + "%" + perc_no);
+					stmt.setString(5, rs.getInt("sb") + "%" + perc_sb);
 					stmt.setString(6, vincitore);
 					stmt.execute();
-					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo) VALUES (?, ?)");
+					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo, tipoVot) VALUES (?, ?, ?)");
 					stmt.setString(1, list.get(i).getNome() + "@" + list.get(i).getId());
 					stmt.setString(2, list.get(i).getTipo());
+					stmt.setString(3, "referendum");
 					stmt.execute();
 					stmt = conn.prepareStatement("DELETE FROM referendum WHERE idReferendum = ? AND nome = ?");
 					stmt.setInt(1, list.get(i).getId());
@@ -322,27 +327,32 @@ public class GestisciClient implements Runnable{
 					stmt.setString(1, "elettore");
 					ResultSet rs1 = stmt.executeQuery();
 					rs1.next();
-					stmt = conn.prepareStatement("CREATE TABLE `" + nome_t + "` (nome VARCHAR(45), testo VARCHAR(200), si INT, no INT, sb INT, vincitore VARCHAR(20))");
+					stmt = conn.prepareStatement("CREATE TABLE `" + nome_t + "` (nome VARCHAR(45), testo VARCHAR(200), si VARCHAR(20), no VARCHAR(20), sb VARCHAR(20), vincitore VARCHAR(30))");
 					stmt.execute();
 					String vincitore = "No";
 					if(rs.getInt("si") > rs.getInt("no")) {
 						vincitore = "Sì";
 					}
-					int sum = rs.getInt("si") + rs.getInt("no") + rs.getInt("sb");
-					if((rs1.getInt("votanti") / 2) >= sum) {
-						vincitore = "Quorum non raggiunto";
+					float tot = rs.getInt("si") + rs.getInt("no") + rs.getInt("sb");
+					float perc_si = (rs.getInt("si") / tot) * 100;
+					float perc_no = (rs.getInt("no") / tot) * 100;
+					float perc_sb = (rs.getInt("sb") / tot) * 100;
+					float perc_quo = (tot / rs1.getInt("votanti")) * 100;
+					if((rs1.getInt("votanti") / 2) >= tot) {
+						vincitore = "Quorum non raggiunto%" + perc_quo;
 					}
 					stmt = conn.prepareStatement("INSERT INTO `" + nome_t + "` (nome, testo, si, no, sb, vincitore) VALUES (?, ?, ?, ?, ?, ?)");
 					stmt.setString(1, rs.getString("nome"));
 					stmt.setString(2, rs.getString("testo"));
-					stmt.setInt(3, rs.getInt("si"));
-					stmt.setInt(4, rs.getInt("no"));
-					stmt.setInt(5, rs.getInt("sb"));
+					stmt.setString(3, rs.getInt("si") + "%" + perc_si);
+					stmt.setString(4, rs.getInt("no") + "%" + perc_no);
+					stmt.setString(5, rs.getInt("sb") + "%" + perc_sb);
 					stmt.setString(6, vincitore);
 					stmt.execute();
-					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo) VALUES (?, ?)");
+					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo, tipoVot) VALUES (?, ?, ?)");
 					stmt.setString(1, list.get(i).getNome() + "@" + list.get(i).getId());
 					stmt.setString(2, list.get(i).getTipo());
+					stmt.setString(3, "referendum");
 					stmt.execute();
 					stmt = conn.prepareStatement("DELETE FROM referendum WHERE idReferendum = ? AND nome = ?");
 					stmt.setInt(1, list.get(i).getId());
@@ -363,14 +373,13 @@ public class GestisciClient implements Runnable{
 					ArrayList<Candidato> idc_max = new ArrayList<>();
 					ArrayList<String> messaggio = new ArrayList<>();
 					messaggio.add(list.get(i).getNome());
-					int max_p = 0, max_c = 0;
+					int max_p = 0;
 					while(rs.getString("tipo").equals("partito")) {
 						rs.getString("nome");
 						if(rs.getInt("voto") >= max_p) {
 							if(rs.getInt("voto") > max_p) {
 								idp_max.clear();
 								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
-								
 							} else {
 								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
 							}
@@ -379,6 +388,7 @@ public class GestisciClient implements Runnable{
 						rs.next();
 					}
 					if(!tipo_vot.equals("categorico")) {
+						int max_c = 0;
 						stmt = conn.prepareStatement("SELECT id, " + nome_tab + ".nome, voto FROM " + nome_tab + " INNER JOIN candidati ON id = idCandidato WHERE idPartito = ?");
 						stmt.setInt(1, idp_max.get(i).getId());
 						rs1 = stmt.executeQuery();
@@ -394,6 +404,7 @@ public class GestisciClient implements Runnable{
 								max_c = rs1.getInt("voto");
 							}
 						}
+						
 					}
 					stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
 					stmt.execute();
@@ -417,13 +428,95 @@ public class GestisciClient implements Runnable{
 					stmt.setInt(1, list.get(i).getId());
 					stmt.setString(2, list.get(i).getNome());
 					stmt.execute();
-					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo) VALUES (?, ?)");
+					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo, tipoVot) VALUES (?, ?, ?)");
 					stmt.setString(1, list.get(i).getNome() + "@" + list.get(i).getId());
 					stmt.setString(2, list.get(i).getTipo());
+					stmt.setString(3, tipo_vot);
 					stmt.execute();
 					
 				} else if(list.get(i).getTipo().equals("Maggioranza assoluta")) {
-
+					String nome_tab = list.get(i).getNome() + list.get(i).getId();
+					PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + nome_tab);
+					ResultSet rs = stmt.executeQuery();
+					rs.next();
+					stmt = conn.prepareStatement("SELECT tipo FROM terminate WHERE idTerminate = ? AND nome = ?");
+					stmt.setInt(1, list.get(i).getId());
+					stmt.setString(2, list.get(i).getNome());
+					ResultSet rs1 = stmt.executeQuery();
+					rs1.next();
+					String tipo_vot = rs1.getString("tipo");
+					ArrayList<Candidato> idp_max = new ArrayList<>();
+					ArrayList<Candidato> idc_max = new ArrayList<>();
+					ArrayList<String> messaggio = new ArrayList<>();
+					messaggio.add(list.get(i).getNome());
+					int max_p = 0, tot_p = 0;
+					while(rs.getString("tipo").equals("partito")) {
+						rs.getString("nome");
+						if(rs.getInt("voto") >= max_p) {
+							if(rs.getInt("voto") > max_p) {
+								idp_max.clear();
+								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+							} else {
+								idp_max.add(new Candidato(rs.getInt("id"), rs.getString("nome")));
+							}
+							max_p = rs.getInt("voto");
+						}
+						tot_p += rs.getInt("voto");
+						rs.next();
+					}
+					stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
+					stmt.execute();
+					if((tot_p / 2) < max_p) {
+						if(!tipo_vot.equals("categorico")) {
+							int max_c = 0;
+							stmt = conn.prepareStatement("SELECT id, " + nome_tab + ".nome, voto FROM " + nome_tab + " INNER JOIN candidati ON id = idCandidato WHERE idPartito = ?");
+							stmt.setInt(1, idp_max.get(i).getId());
+							rs1 = stmt.executeQuery();
+							while(rs1.next()) {
+								if(rs1.getInt("voto") >= max_c) {
+									if(rs1.getInt("voto") > max_c) {
+										idc_max.clear();
+										idc_max.add(new Candidato(rs1.getInt("id"), rs1.getString("nome")));
+										
+									} else {
+										idc_max.add(new Candidato(rs1.getInt("id"), rs1.getString("nome")));
+									}
+									max_c = rs1.getInt("voto");
+								}
+							}
+							
+						}
+						for(int j = 0; j < idp_max.size(); j++) {
+							stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
+							stmt.setInt(1, 1);
+							stmt.setInt(2, idp_max.get(j).getId());
+							stmt.setString(3, idp_max.get(j).getNome());
+							stmt.execute();
+						}
+						if(!tipo_vot.equals("categorico")) {
+							for(int j = 0; j < idc_max.size(); j++) {
+								stmt = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ? WHERE id = ? AND nome = ?;");
+								stmt.setInt(1, 1);
+								stmt.setInt(2, idc_max.get(j).getId());
+								stmt.setString(3, idc_max.get(j).getNome());
+								stmt.execute();
+							}
+						}
+					} else {
+						PreparedStatement stmt1 = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ?;");
+						stmt1.setInt(1, -1);
+						stmt1.execute();
+					}
+					
+					stmt = conn.prepareStatement("DELETE FROM terminate WHERE idTerminate = ? AND nome = ?");
+					stmt.setInt(1, list.get(i).getId());
+					stmt.setString(2, list.get(i).getNome());
+					stmt.execute();
+					stmt = conn.prepareStatement("INSERT INTO calcolate (nomeVot, tipoCalcolo, tipoVot) VALUES (?, ?, ?)");
+					stmt.setString(1, list.get(i).getNome() + "@" + list.get(i).getId());
+					stmt.setString(2, list.get(i).getTipo());
+					stmt.setString(3, tipo_vot);
+					stmt.execute();
 				}
 			}
 		}
@@ -803,20 +896,31 @@ public class GestisciClient implements Runnable{
 				ArrayList<String> messaggio = new ArrayList<>();
 				ObjectOutputStream oout1 = new ObjectOutputStream(outputStream);
 				if(rs1.isLast()) {
-					float tot = rs1.getInt("si") + rs1.getInt("no") + rs1.getInt("sb");
-					float perc_si = (rs1.getInt("si") / tot) * 100;
-					float perc_no = (rs1.getInt("no") / tot) * 100;
-					float perc_sb = (rs1.getInt("sb") / tot) * 100;
-					messaggio.add(rs1.getString("nome") + "@" + rs1.getString("testo") + "@" + rs1.getInt("si") + "%" + perc_si + "@" + rs1.getInt("no") + "%" + perc_no + "@" + rs1.getInt("sb") + "%" + perc_sb + "@" + rs1.getString("vincitore"));
-					//outputStream.write(s.getBytes(), 0, s.length());
+					messaggio.add(rs1.getString("nome") + "@" + rs1.getString("testo") + "@" + rs1.getString("si")+ "@" + rs1.getString("no") + "@" + rs1.getString("sb") + "@" + rs1.getString("vincitore"));
 				} else {
+					stmt = conn.prepareStatement("SELECT tipoVot FROM calcolate WHERE nomeVot = ?");
+					String digits = reply.replaceAll("[^0-9]", "");
 					reply = reply.replaceAll("\\d","");
+					stmt.setString(1, reply + "@" + digits);
+					ResultSet rs2 = stmt.executeQuery();
+					rs2.next();
 					messaggio.add(reply);
-					do {
-						messaggio.add(rs1.getString("tipo") + "@" + rs1.getString("nome") + "@" + rs1.getInt("voto") + "@" + rs1.getString("vincitore"));
-					}while(rs1.next());
+					messaggio.add(rs2.getString("tipoVot"));
+					//TODO se c'è tempo cercare candidati di quel partito e mostrarli vicini in fase di stampa risultati --> bisogna modificare la tabella della votazione già in creazione e mettere una colonna con il partito di quel candidato 
+					if(rs2.getString("tipoVot").equals("categorico")) {
+						do {
+							if(rs1.getString("tipo").equals("partito"))
+								messaggio.add(rs1.getString("tipo") + "@" + rs1.getString("nome") + "@" + rs1.getInt("voto") + "@" + rs1.getString("vincitore"));
+						} while(rs1.next());
+					} else {
+						do {
+							messaggio.add(rs1.getString("tipo") + "@" + rs1.getString("nome") + "@" + rs1.getInt("voto") + "@" + rs1.getString("vincitore"));
+						} while(rs1.next());
+					}
 				}
 				oout1.writeObject(messaggio);
+			} else {
+				//TODO
 			}
 		}
 	}
