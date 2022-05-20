@@ -1,4 +1,5 @@
 package server;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -6,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.Cipher;
 
 import model.Candidato;
 import model.Partito;
@@ -27,6 +31,7 @@ public class GestisciClient implements Runnable{
 	int dim_buffer;
 	byte buffer[];
 	int letti;
+	Cipher cipher;
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -35,8 +40,8 @@ public class GestisciClient implements Runnable{
 			so = socket;
 			inputStream = so.getInputStream();
 			outputStream = so.getOutputStream();
-			//votazione_conclusa = "null";
-		} catch (IOException e) {
+			cipher = Cipher.getInstance("RSA");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -75,8 +80,15 @@ public class GestisciClient implements Runnable{
 						String id = new String(buffer, 0, letti);
 						inserisciVotato(Integer.parseInt(id));
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						letti = inputStream.read(buffer);
-						String voto = new String(buffer, 0, letti);
+
+						DataInputStream dis = new DataInputStream(inputStream);
+
+					    letti = dis.readInt();
+					    byte[] cipherData = new byte[letti];
+					    dis.readFully(cipherData);
+						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						String voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
+
 						inserisciRefVoto(voto);
 						break;
 					case "avvio":
@@ -805,11 +817,12 @@ public class GestisciClient implements Runnable{
 		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE idReferendum = ? AND nome = ?");
 		stmt.setInt(1, id);
 		stmt.setString(2, nome);
-		System.out.println(stmt);
 		ResultSet rs = stmt.executeQuery();
 		if(!rs.next()) {
 			//TODO
 		} else {
+			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
+			pubkey.writeObject(Server.getPublicKey());
 			//TODO mettere anche il nome nella classe referendum così si può mostrare anche quello durante la votazione
 			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
