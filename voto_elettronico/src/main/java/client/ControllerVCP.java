@@ -1,12 +1,21 @@
 package client;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -48,9 +57,10 @@ public class ControllerVCP {
     
     List<Partito> list;
     ArrayList<RadioButton> selected;
+    private PublicKey pubKey;
 
     @FXML
-    void handleConferma(ActionEvent event) throws IOException {
+    void handleConferma(ActionEvent event) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     	RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
     	boolean trovato = false;
         if (rb != null) {
@@ -61,7 +71,14 @@ public class ControllerVCP {
     				s += "," + selected.get(i).getId();
     			}
     		}
-    		out.write(s.getBytes(), 0, s.length());
+    		byte[] cipherData = null;
+			Cipher cipher = Cipher.getInstance("RSA");
+	        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+    		cipherData = cipher.doFinal(s.getBytes());
+	        DataOutputStream dos = new DataOutputStream(out);
+	        dos.writeInt(cipherData.length);
+	        dos.write(cipherData, 0, cipherData.length);
+    		//out.write(s.getBytes(), 0, s.length());
         } else {
         	//TODO: scheda bianca
         }
@@ -77,6 +94,8 @@ public class ControllerVCP {
     	so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
+    	ObjectInputStream keystream = new ObjectInputStream(in);
+        pubKey = (PublicKey) keystream.readObject();
         //out.write("partiti".getBytes(), 0, "partiti".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
     	list = (List<Partito>) oin.readObject();

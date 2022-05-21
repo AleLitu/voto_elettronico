@@ -1,12 +1,21 @@
 package client;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,13 +56,21 @@ public class ControllerVC {
     private Button btnConferma;
     
     List<Partito> list;
+    private PublicKey pubKey;
 
     @FXML
-    void handleConferma(ActionEvent event) throws IOException {
+    void handleConferma(ActionEvent event) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     	RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
         if (rb != null) {
-        		out.write("vc".getBytes(), 0, "vc".length());
-        		out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
+        	byte[] cipherData = null;
+			Cipher cipher = Cipher.getInstance("RSA");
+	        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+    		out.write("vc".getBytes(), 0, "vc".length());
+    		cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + rb.getId()).getBytes());
+	        DataOutputStream dos = new DataOutputStream(out);
+	        dos.writeInt(cipherData.length);
+	        dos.write(cipherData, 0, cipherData.length);
+    		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
         } else {
         	//TODO: scheda bianca
         }
@@ -69,6 +86,8 @@ public class ControllerVC {
     	so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
+    	ObjectInputStream keystream = new ObjectInputStream(in);
+        pubKey = (PublicKey) keystream.readObject();
         //out.write("attive".getBytes(), 0, "attive".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
     	list = (List<Partito>) oin.readObject();

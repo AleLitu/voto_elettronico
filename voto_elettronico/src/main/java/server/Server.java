@@ -26,6 +26,8 @@ public class Server{
 	
 	public void start() {
 		try {
+			LogHandler.createLog();
+			LogHandler.writeLog("Server started");
 			KeyPair loadedKeyPair = LoadKeyPair("RSA");
 			pubKey = loadedKeyPair.getPublic();
 			privKey = loadedKeyPair.getPrivate();

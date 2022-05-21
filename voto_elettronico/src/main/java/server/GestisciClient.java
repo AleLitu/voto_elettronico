@@ -27,9 +27,11 @@ public class GestisciClient implements Runnable{
 	private Socket so;
 	InputStream inputStream;
 	OutputStream outputStream;
+	DataInputStream dis;
 	Connection conn;
 	int dim_buffer;
 	byte buffer[];
+	byte[] cipherData;
 	int letti;
 	Cipher cipher;
 	
@@ -81,10 +83,9 @@ public class GestisciClient implements Runnable{
 						inserisciVotato(Integer.parseInt(id));
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 
-						DataInputStream dis = new DataInputStream(inputStream);
-
+						dis = new DataInputStream(inputStream);
 					    letti = dis.readInt();
-					    byte[] cipherData = new byte[letti];
+					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						String voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
@@ -112,13 +113,23 @@ public class GestisciClient implements Runnable{
 						getVotazione();
 						break;
 					case "vc":
-						letti = inputStream.read(buffer);
-						votoCategorico(new String(buffer, 0, letti));
+						dis = new DataInputStream(inputStream);
+					    letti = dis.readInt();
+					    cipherData = new byte[letti];
+					    dis.readFully(cipherData);
+						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						//letti = inputStream.read(buffer);
+						votoCategorico(new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8));
 						break;
 					case "vcp":
-						letti = inputStream.read(buffer);
-						String s = new String(buffer, 0, letti);
-						votoCategoricoPreferenze(s);
+						dis = new DataInputStream(inputStream);
+					    letti = dis.readInt();
+					    cipherData = new byte[letti];
+					    dis.readFully(cipherData);
+						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						//letti = inputStream.read(buffer);
+						//String s = new String(buffer, 0, letti);
+						votoCategoricoPreferenze(new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8));
 						break;
 					case "vo":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -219,6 +230,8 @@ public class GestisciClient implements Runnable{
 				}
 				partiti.add(new Partito(rs.getInt("id"), rs.getString("nome"), candidati));
 			}
+			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
+			pubkey.writeObject(Server.getPublicKey());
 			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
 			oout.writeObject(partiti);
 		} else {
