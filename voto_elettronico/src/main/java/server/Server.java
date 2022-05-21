@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,7 +21,52 @@ import java.security.spec.X509EncodedKeySpec;
 public class Server{
 	private static PublicKey pubKey;
 	private static PrivateKey privKey;
-	public static void main(String[] args) {
+	ServerSocket sSrv;
+	Socket toClient;
+	
+	public void start() {
+		try {
+			KeyPair loadedKeyPair = LoadKeyPair("RSA");
+			pubKey = loadedKeyPair.getPublic();
+			privKey = loadedKeyPair.getPrivate();
+			System.out.println("Chiavi caricate correttamente");
+		}catch(FileNotFoundException e) {
+			GenerateKeys();
+		} catch (IOException e) {
+			System.out.println("Errore nella lettura delle chiavi dai file");
+			return;
+		} catch(InvalidKeySpecException e) {
+			System.out.println("Le chiavi hanno subito delle modifiche, verranno ricreate");
+			GenerateKeys();
+		} catch(Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		try {			
+			sSrv = new ServerSocket(50000);
+			System.out.println("Indirizzo: " + sSrv.getInetAddress() + "; porta: " + sSrv.getLocalPort());
+			while(true) {
+				toClient = sSrv.accept();
+				System.out.println("Indirizzo client: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
+				GestisciClient client = new GestisciClient(toClient);
+				Thread t = new Thread(client);
+				t.start();
+			}
+		}catch(SocketException e) {
+			return;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void stop() throws IOException {
+		if(toClient != null)
+			toClient.close();
+		if(sSrv != null)
+			sSrv.close();
+	}
+	
+	/*public static void main(String[] args) {
 		ServerSocket sSrv;
 		Socket toClient;
 		try {
@@ -53,7 +99,7 @@ public class Server{
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	protected static PublicKey getPublicKey() {
 		return pubKey;
