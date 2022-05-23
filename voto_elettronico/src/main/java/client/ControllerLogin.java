@@ -86,7 +86,8 @@ public class ControllerLogin {
     	lblSecond.setText("0");
     	lblThird.setText("0");
     	lblFourth.setText("1");
-    	checkIntType();
+    	if(!checkIntType())
+    		return;
     	if(user != null) {
     		Node node = (Node) event.getSource();
     		Stage actual = (Stage) node.getScene().getWindow();
@@ -136,11 +137,18 @@ public class ControllerLogin {
     	}
     }
     
-    public void connection (String address) throws IOException{
-    	so = new Socket(address, SOCKET_PORT);
-        outputStream = so.getOutputStream();
-        inputStream = so.getInputStream();
-		System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
+    public boolean connection (String address){
+    	try {
+			so = new Socket(address, SOCKET_PORT);
+			outputStream = so.getOutputStream();
+	        inputStream = so.getInputStream();
+			System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
+			return true;
+		} catch (IOException e) {
+			Alert alert = new Alert(AlertType.WARNING, "Il server non è online", ButtonType.CLOSE);
+    		alert.show();
+    		return false;
+		}
     }
     
     public int isInteger(String input) {
@@ -153,7 +161,7 @@ public class ControllerLogin {
         }
     }
     
-    protected void checkIntType() throws Exception {
+    protected boolean checkIntType() throws Exception {
         String n1=lblFirst.getText();
         String n2=lblSecond.getText();
         String n3=lblThird.getText();
@@ -164,15 +172,13 @@ public class ControllerLogin {
         int n3_int=isInteger(n3);
         int n4_int=isInteger(n4);
         if(((n1_int<0))||(n1_int>255)||((n2_int<0))||(n2_int>255)||((n3_int<0))||(n3_int>255)||((n4_int<0))||(n4_int>255)){
-        	lblMessage.setText("Indirizzo sbagliato coglione");
+        	Alert alert = new Alert(AlertType.WARNING, "Errore nell'indirizzo", ButtonType.CLOSE);
+    		alert.show();
+        	return false;
         }else{
             String indirizzo=n1+"."+n2+"."+n3+"."+n4;
-            //errorLabel.setText("L'indirizzo inserito: "+indirizzo);
-            //errorLabel.setOpacity(1);
-            connection(indirizzo);
-            //DA QUA CI DOVREBBE ESSERE IL TENTATIVO DI CONNESSIONE AL SERVER
+            return connection(indirizzo);
         }
-
     }
 
     @FXML

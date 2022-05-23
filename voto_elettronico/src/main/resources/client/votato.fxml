@@ -4,11 +4,12 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerVotato">
    <top>
-      <Label fx:id="lblVoto" text="Votato Con successo/Errore nella votazione" BorderPane.alignment="CENTER">
+      <Label fx:id="lblVoto" text="Votazione confermata" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
          </BorderPane.margin>
@@ -18,10 +19,19 @@
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
    </center>
    <bottom>
-      <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#handleLogout" text="Logout" BorderPane.alignment="CENTER">
-         <BorderPane.margin>
-            <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
-         </BorderPane.margin>
-      </Button>
+      <HBox prefHeight="72.0" prefWidth="415.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnLogout" mnemonicParsing="false" onAction="#handleLogout" text="Logout">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="175.0" right="10.0" top="10.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnElenco" mnemonicParsing="false" onAction="#handleElenco" text="Torna all'elenco">
+               <HBox.margin>
+                  <Insets bottom="10.0" left="50.0" right="10.0" top="10.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
    </bottom>
 </BorderPane>

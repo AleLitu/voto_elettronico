@@ -19,7 +19,10 @@ import model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -64,40 +67,134 @@ public class ControllerReferendumVoto{
 		int letti, count = 0;
 		String ok;
 		byte buffer[] = new byte[dim_buffer];
-        outputStream.write("c".getBytes(), 0, "c".length());
+        outputStream.write("ref".getBytes(), 0, "ref".length());
         letti = inputStream.read(buffer);
 		ok = new String(buffer, 0, letti);
 		if(ok.equals("ok")) {
-			outputStream.write(String.valueOf(ControllerLogin.getUser().getId()).getBytes(), 0, String.valueOf(ControllerLogin.getUser().getId()).length());
-			if(ok.equals("ok")) {
-				byte[] cipherData = null;
+			//outputStream.write(String.valueOf(ControllerLogin.getUser().getId()).getBytes(), 0, String.valueOf(ControllerLogin.getUser().getId()).length());
+			//if(ok.equals("ok")) {
+				//byte[] cipherData;
 				Cipher cipher = Cipher.getInstance("RSA");
 		        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
 				if(!radioNo.isSelected() && !radioSi.isSelected()) {
-					cipherData = cipher.doFinal("sb".getBytes());
-			        DataOutputStream dos = new DataOutputStream(outputStream);
-			        dos.writeInt(cipherData.length);
-			        dos.write(cipherData, 0, cipherData.length);
+					Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
+					alert.showAndWait().ifPresent(response -> {
+					     if (response == ButtonType.OK) {
+					        try {
+					        	byte[] cipherData = cipher.doFinal("sb".getBytes());
+						        DataOutputStream dos = new DataOutputStream(outputStream);
+								dos.writeInt(cipherData.length);
+								dos.write(cipherData, 0, cipherData.length);
+								int mes = inputStream.read(buffer);
+								String s = new String(buffer, 0, mes);
+								if(s.equals("ok"))
+									votato(event);
+								else {
+									new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+									return;
+								}
+							} catch (Exception e) {
+								new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+								return;
+							}
+					     } else {
+							try {
+								byte[] cipherData = cipher.doFinal("err".getBytes());
+								DataOutputStream dos = new DataOutputStream(outputStream);
+								dos.writeInt(cipherData.length);
+								dos.write(cipherData, 0, cipherData.length);
+						    	return;
+							} catch (Exception e) {
+								new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+								return;
+							}
+					     }
+					 });
 		   		}else{
 					if(radioSi.isSelected()) {
-				        cipherData = cipher.doFinal("si".getBytes());
-				        DataOutputStream dos = new DataOutputStream(outputStream);
-				        dos.writeInt(cipherData.length);
-				        dos.write(cipherData, 0, cipherData.length);
+						Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Sì?");
+						alert.showAndWait().ifPresent(response -> {
+						     if (response == ButtonType.OK) {
+						        try {
+						        	byte[] cipherData = cipher.doFinal("si".getBytes());
+							        DataOutputStream dos = new DataOutputStream(outputStream);
+									dos.writeInt(cipherData.length);
+									dos.write(cipherData, 0, cipherData.length);
+									int mes = inputStream.read(buffer);
+									String s = new String(buffer, 0, mes);
+									if(s.equals("ok"))
+										votato(event);
+									else {
+										radioSi.setSelected(false);
+										new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+										return;
+									}
+								} catch (Exception e) {
+									new Alert(AlertType.WARNING, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+									return;
+								} 
+						     } else {
+						    	 try {
+									byte[] cipherData = cipher.doFinal("err".getBytes());
+									DataOutputStream dos = new DataOutputStream(outputStream);
+									dos.writeInt(cipherData.length);
+									dos.write(cipherData, 0, cipherData.length);
+									radioSi.setSelected(false);
+							    	return;
+								} catch (Exception e) {
+									new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+									return;
+								}
+						     }
+						 });
 					} else {
-						cipherData = cipher.doFinal("no".getBytes());
-				        DataOutputStream dos = new DataOutputStream(outputStream);
-				        dos.writeInt(cipherData.length);
-				        dos.write(cipherData, 0, cipherData.length);
+						Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare No?");
+						alert.showAndWait().ifPresent(response -> {
+						     if (response == ButtonType.OK) {
+						        try {
+						        	byte[] cipherData = cipher.doFinal("no".getBytes());
+							        DataOutputStream dos = new DataOutputStream(outputStream);
+									dos.writeInt(cipherData.length);
+									dos.write(cipherData, 0, cipherData.length);
+									int mes = inputStream.read(buffer);
+									String s = new String(buffer, 0, mes);
+									if(s.equals("ok"))
+										votato(event);
+									else {
+										radioNo.setSelected(false);
+										new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+										return;
+									}
+								} catch (Exception e) {
+									new Alert(AlertType.WARNING, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+									return;
+								} 
+						     } else {
+						    	 try {
+									byte[] cipherData = cipher.doFinal("err".getBytes());
+									DataOutputStream dos = new DataOutputStream(outputStream);
+									dos.writeInt(cipherData.length);
+									dos.write(cipherData, 0, cipherData.length);
+									radioNo.setSelected(false);
+							    	return;
+								} catch (Exception e) {
+									new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+									return;
+								}
+						     }
+						 });
 				    }
 			    }
 			}else{
-			   		System.out.println("Errore");
+			   	System.out.println("Errore");
 			}
-		}else{
-	   		System.out.println("Errore");
-		}
-		Node node = (Node) event.getSource();
+		//}else{
+	   		//System.out.println("Errore");
+		//}
+    }
+    
+    private void votato(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
         actual.setScene(new Scene(root));
@@ -106,7 +203,10 @@ public class ControllerReferendumVoto{
     
     @FXML
     private void initialize() throws IOException, ClassNotFoundException {
-    	so = ControllerLogin.getSocket();
+    	if(ControllerLogin.getSocket() == null)
+    		so = ClientLocal.getSocket();
+    	else
+    		so = ControllerLogin.getSocket();
         outputStream = so.getOutputStream();
         inputStream = so.getInputStream();
         ObjectInputStream keystream = new ObjectInputStream(inputStream);

@@ -1,0 +1,225 @@
+
+2022-05-23 11:37:02 --- Server started
+2022-05-23 11:37:02 --- Chiavi caricate correttamente
+2022-05-23 11:37:13 --- Client connesso: /127.0.0.1; porta: 61827
+2022-05-23 11:37:44 --- Nuova lista creata
+2022-05-23 11:38:08 --- Nuovo referendum creato
+2022-05-23 11:38:15 --- Nuovo referendum avviato
+2022-05-23 11:38:31 --- Nuova votazione avviata
+2022-05-23 11:38:51 --- Votazione terminata
+2022-05-23 11:38:54 --- Votazione terminata
+2022-05-23 11:39:00 --- Votazione calcolata
+2022-05-23 11:39:04 --- Votazione calcolata
+2022-05-23 11:39:42 --- Client connesso: /127.0.0.1; porta: 61844
+2022-05-23 11:39:47 --- Voto ricevuto
+2022-05-23 11:43:54 --- Client connesso: /127.0.0.1; porta: 61871
+2022-05-23 11:44:01 --- Voto ricevuto
+2022-05-23 11:56:57 --- Server started
+2022-05-23 11:56:57 --- Chiavi caricate correttamente
+2022-05-23 11:57:09 --- Client connesso: /127.0.0.1; porta: 59145
+2022-05-23 12:23:29 --- Server started
+2022-05-23 12:23:29 --- Chiavi caricate correttamente
+2022-05-23 12:23:36 --- Client connesso: /127.0.0.1; porta: 59333
+2022-05-23 12:27:20 --- Server spento
+2022-05-23 12:27:20 --- Client disconnesso
+2022-05-23 12:27:37 --- Server started
+2022-05-23 12:27:37 --- Chiavi caricate correttamente
+2022-05-23 12:27:39 --- Client connesso: /127.0.0.1; porta: 59359
+2022-05-23 12:28:04 --- Server started
+2022-05-23 12:28:04 --- Chiavi caricate correttamente
+2022-05-23 12:28:07 --- Client connesso: /127.0.0.1; porta: 59367
+2022-05-23 12:28:37 --- Client connesso: /127.0.0.1; porta: 59374
+2022-05-23 12:29:12 --- Server started
+2022-05-23 12:29:12 --- Chiavi caricate correttamente
+2022-05-23 12:29:15 --- Client connesso: /127.0.0.1; porta: 59386
+2022-05-23 12:34:42 --- Server started
+2022-05-23 12:34:42 --- Chiavi caricate correttamente
+2022-05-23 12:34:52 --- Client connesso: /127.0.0.1; porta: 59416
+2022-05-23 12:37:10 --- Client connesso: /127.0.0.1; porta: 59426
+2022-05-23 15:15:04 --- Server started
+2022-05-23 15:15:04 --- Chiavi caricate correttamente
+2022-05-23 15:15:22 --- Client connesso: /127.0.0.1; porta: 57402
+2022-05-23 15:16:45 --- Client connesso: /127.0.0.1; porta: 57414
+2022-05-23 15:17:59 --- Client connesso: /127.0.0.1; porta: 57441
+2022-05-23 15:18:24 --- Server started
+2022-05-23 15:18:24 --- Chiavi caricate correttamente
+2022-05-23 15:18:31 --- Client connesso: /127.0.0.1; porta: 57455
+2022-05-23 15:29:47 --- Server started
+2022-05-23 15:29:47 --- Chiavi caricate correttamente
+2022-05-23 15:30:00 --- Client connesso: /127.0.0.1; porta: 64827
+2022-05-23 15:31:18 --- Client connesso: /127.0.0.1; porta: 56718
+2022-05-23 15:31:45 --- Client connesso: /127.0.0.1; porta: 56729
+2022-05-23 15:31:50 --- Voto ricevuto
+2022-05-23 15:36:19 --- Server started
+2022-05-23 15:36:19 --- Chiavi caricate correttamente
+2022-05-23 15:36:30 --- Client connesso: /127.0.0.1; porta: 56763
+2022-05-23 15:37:11 --- Server started
+2022-05-23 15:37:11 --- Chiavi caricate correttamente
+2022-05-23 15:37:19 --- Client connesso: /127.0.0.1; porta: 56774
+2022-05-23 15:38:01 --- Server started
+2022-05-23 15:38:01 --- Chiavi caricate correttamente
+2022-05-23 15:38:14 --- Client connesso: /127.0.0.1; porta: 56787
+2022-05-23 15:41:07 --- Server started
+2022-05-23 15:41:07 --- Chiavi caricate correttamente
+2022-05-23 15:41:15 --- Client connesso: /127.0.0.1; porta: 56843
+2022-05-23 15:41:48 --- Client connesso: /127.0.0.1; porta: 62229
+2022-05-23 15:43:24 --- Server started
+2022-05-23 15:43:24 --- Chiavi caricate correttamente
+2022-05-23 15:43:31 --- Client connesso: /127.0.0.1; porta: 62255
+2022-05-23 15:43:53 --- Client connesso: /127.0.0.1; porta: 62263
+2022-05-23 15:44:37 --- Client connesso: /127.0.0.1; porta: 62272
+2022-05-23 15:45:17 --- Client connesso: /127.0.0.1; porta: 62282
+2022-05-23 15:53:04 --- Server started
+2022-05-23 15:53:04 --- Chiavi caricate correttamente
+2022-05-23 15:53:14 --- Client connesso: /127.0.0.1; porta: 62587
+2022-05-23 15:53:30 --- Voto ricevuto
+2022-05-23 15:59:14 --- Server started
+2022-05-23 15:59:14 --- Chiavi caricate correttamente
+2022-05-23 15:59:27 --- Client connesso: /127.0.0.1; porta: 62620
+2022-05-23 16:01:55 --- Server started
+2022-05-23 16:01:55 --- Chiavi caricate correttamente
+2022-05-23 16:01:57 --- Client connesso: /127.0.0.1; porta: 62646
+2022-05-23 16:03:06 --- Server started
+2022-05-23 16:03:06 --- Chiavi caricate correttamente
+2022-05-23 16:03:15 --- Client connesso: /127.0.0.1; porta: 62657
+2022-05-23 16:03:52 --- Client connesso: /127.0.0.1; porta: 62666
+2022-05-23 16:22:41 --- Server started
+2022-05-23 16:22:41 --- Chiavi caricate correttamente
+2022-05-23 16:22:52 --- Client connesso: /127.0.0.1; porta: 62747
+2022-05-23 16:22:58 --- Errore inserimento voto
+2022-05-23 16:22:58 --- Voto ricevuto
+2022-05-23 16:24:50 --- Client connesso: /127.0.0.1; porta: 62756
+2022-05-23 16:24:55 --- Errore inserimento voto
+2022-05-23 16:24:55 --- Voto ricevuto
+2022-05-23 16:25:16 --- Server started
+2022-05-23 16:25:16 --- Chiavi caricate correttamente
+2022-05-23 16:25:26 --- Client connesso: /127.0.0.1; porta: 62779
+2022-05-23 16:25:31 --- Errore inserimento voto
+2022-05-23 16:26:20 --- Server started
+2022-05-23 16:26:20 --- Chiavi caricate correttamente
+2022-05-23 16:26:26 --- Client connesso: /127.0.0.1; porta: 62795
+2022-05-23 16:26:32 --- Errore inserimento voto
+2022-05-23 16:27:08 --- Server started
+2022-05-23 16:27:08 --- Chiavi caricate correttamente
+2022-05-23 16:27:13 --- Client connesso: /127.0.0.1; porta: 62811
+2022-05-23 16:27:18 --- Errore inserimento voto
+2022-05-23 16:27:59 --- Server started
+2022-05-23 16:28:00 --- Chiavi caricate correttamente
+2022-05-23 16:28:07 --- Client connesso: /127.0.0.1; porta: 62823
+2022-05-23 16:28:12 --- Errore inserimento voto
+2022-05-23 16:28:17 --- Errore inserimento voto
+2022-05-23 16:28:21 --- Errore inserimento voto
+2022-05-23 16:57:26 --- Server started
+2022-05-23 16:57:26 --- Chiavi caricate correttamente
+2022-05-23 16:57:32 --- Client connesso: /127.0.0.1; porta: 62990
+2022-05-23 16:58:16 --- Client connesso: /127.0.0.1; porta: 63007
+2022-05-23 17:07:26 --- Server started
+2022-05-23 17:07:26 --- Chiavi caricate correttamente
+2022-05-23 17:07:35 --- Client connesso: /127.0.0.1; porta: 63052
+2022-05-23 17:12:32 --- Server started
+2022-05-23 17:12:32 --- Chiavi caricate correttamente
+2022-05-23 17:12:41 --- Client connesso: /127.0.0.1; porta: 63077
+2022-05-23 17:13:11 --- Server started
+2022-05-23 17:13:12 --- Chiavi caricate correttamente
+2022-05-23 17:13:19 --- Client connesso: /127.0.0.1; porta: 63087
+2022-05-23 17:13:25 --- Voto ricevuto
+2022-05-23 17:13:40 --- Client connesso: /127.0.0.1; porta: 63096
+2022-05-23 17:13:47 --- Voto ricevuto
+2022-05-23 17:25:38 --- Server started
+2022-05-23 17:25:38 --- Chiavi caricate correttamente
+2022-05-23 17:25:40 --- Client connesso: /127.0.0.1; porta: 63142
+2022-05-23 17:25:48 --- Errore inserimento voto
+2022-05-23 17:25:48 --- Voto ricevuto
+2022-05-23 17:25:50 --- Errore inserimento voto
+2022-05-23 17:25:50 --- Voto ricevuto
+2022-05-23 17:25:51 --- Errore inserimento voto
+2022-05-23 17:25:51 --- Voto ricevuto
+2022-05-23 17:25:53 --- Errore inserimento voto
+2022-05-23 17:25:53 --- Voto ricevuto
+2022-05-23 17:25:55 --- Voto ricevuto
+2022-05-23 17:25:55 --- Voto ricevuto
+2022-05-23 17:26:47 --- Errore inserimento voto
+2022-05-23 17:26:47 --- Voto ricevuto
+2022-05-23 17:26:48 --- Errore inserimento voto
+2022-05-23 17:26:48 --- Voto ricevuto
+2022-05-23 17:26:49 --- Errore inserimento voto
+2022-05-23 17:26:49 --- Voto ricevuto
+2022-05-23 17:26:58 --- Voto ricevuto
+2022-05-23 17:26:58 --- Voto ricevuto
+2022-05-23 17:30:23 --- Server started
+2022-05-23 17:30:23 --- Chiavi caricate correttamente
+2022-05-23 17:30:32 --- Client connesso: /127.0.0.1; porta: 63166
+2022-05-23 17:30:38 --- Voto ricevuto
+2022-05-23 17:30:38 --- Voto ricevuto
+2022-05-23 17:30:50 --- Server started
+2022-05-23 17:30:50 --- Chiavi caricate correttamente
+2022-05-23 17:30:58 --- Client connesso: /127.0.0.1; porta: 63178
+2022-05-23 17:31:07 --- Errore inserimento voto
+2022-05-23 17:31:07 --- Voto ricevuto
+2022-05-23 17:31:08 --- Errore inserimento voto
+2022-05-23 17:31:08 --- Voto ricevuto
+2022-05-23 17:31:10 --- Voto ricevuto
+2022-05-23 17:31:10 --- Voto ricevuto
+2022-05-23 17:33:26 --- Server started
+2022-05-23 17:33:26 --- Chiavi caricate correttamente
+2022-05-23 17:33:33 --- Client connesso: /127.0.0.1; porta: 63211
+2022-05-23 17:33:48 --- Errore inserimento voto
+2022-05-23 17:33:48 --- Voto ricevuto
+2022-05-23 17:34:43 --- Server started
+2022-05-23 17:34:43 --- Chiavi caricate correttamente
+2022-05-23 17:34:51 --- Client connesso: /127.0.0.1; porta: 63227
+2022-05-23 17:35:05 --- Voto ricevuto
+2022-05-23 17:35:25 --- Client connesso: /127.0.0.1; porta: 63236
+2022-05-23 17:35:30 --- Errore inserimento voto
+2022-05-23 17:35:30 --- Voto ricevuto
+2022-05-23 17:35:31 --- Errore inserimento voto
+2022-05-23 17:35:31 --- Voto ricevuto
+2022-05-23 17:35:33 --- Errore inserimento voto
+2022-05-23 17:35:33 --- Voto ricevuto
+2022-05-23 17:37:26 --- Server started
+2022-05-23 17:37:26 --- Chiavi caricate correttamente
+2022-05-23 17:37:32 --- Client connesso: /127.0.0.1; porta: 63247
+2022-05-23 17:37:39 --- Errore inserimento voto
+2022-05-23 17:37:39 --- Voto ricevuto
+2022-05-23 17:38:45 --- Server started
+2022-05-23 17:38:45 --- Chiavi caricate correttamente
+2022-05-23 17:38:51 --- Client connesso: /127.0.0.1; porta: 63263
+2022-05-23 17:40:20 --- Server started
+2022-05-23 17:40:20 --- Chiavi caricate correttamente
+2022-05-23 17:40:27 --- Client connesso: /127.0.0.1; porta: 63282
+2022-05-23 17:40:41 --- Voto ricevuto
+2022-05-23 17:49:34 --- Server started
+2022-05-23 17:49:34 --- Chiavi caricate correttamente
+2022-05-23 17:49:41 --- Client connesso: /127.0.0.1; porta: 63445
+2022-05-23 17:50:47 --- Server started
+2022-05-23 17:50:47 --- Chiavi caricate correttamente
+2022-05-23 17:50:48 --- Client connesso: /127.0.0.1; porta: 63465
+2022-05-23 17:55:57 --- Server started
+2022-05-23 17:55:57 --- Chiavi caricate correttamente
+2022-05-23 17:55:59 --- Client connesso: /127.0.0.1; porta: 60742
+2022-05-23 17:56:12 --- Voto ricevuto
+2022-05-23 17:57:53 --- Server started
+2022-05-23 17:57:53 --- Chiavi caricate correttamente
+2022-05-23 17:57:58 --- Client connesso: /127.0.0.1; porta: 60764
+2022-05-23 17:59:07 --- Server started
+2022-05-23 17:59:07 --- Chiavi caricate correttamente
+2022-05-23 17:59:12 --- Client connesso: /127.0.0.1; porta: 60782
+2022-05-23 17:59:25 --- Voto ricevuto
+2022-05-23 18:02:58 --- Server started
+2022-05-23 18:02:58 --- Chiavi caricate correttamente
+2022-05-23 18:03:07 --- Client connesso: /127.0.0.1; porta: 57317
+2022-05-23 18:03:14 --- Voto ricevuto
+2022-05-23 18:03:21 --- Voto ricevuto
+2022-05-23 18:03:27 --- Voto ricevuto
+2022-05-23 18:04:00 --- Server started
+2022-05-23 18:04:00 --- Chiavi caricate correttamente
+2022-05-23 18:04:14 --- Client connesso: /127.0.0.1; porta: 57332
+2022-05-23 18:04:22 --- Voto ricevuto
+2022-05-23 18:04:59 --- Server started
+2022-05-23 18:04:59 --- Chiavi caricate correttamente
+2022-05-23 18:05:02 --- Client connesso: /127.0.0.1; porta: 57354
+2022-05-23 18:05:48 --- Server started
+2022-05-23 18:05:48 --- Chiavi caricate correttamente
+2022-05-23 18:05:58 --- Client connesso: /127.0.0.1; porta: 57368
+2022-05-23 18:06:05 --- Voto ricevuto
+2022-05-23 18:06:13 --- Voto ricevuto

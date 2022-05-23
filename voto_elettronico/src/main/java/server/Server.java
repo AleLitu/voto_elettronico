@@ -24,21 +24,21 @@ public class Server{
 	ServerSocket sSrv;
 	Socket toClient;
 	
-	public void start() {
+	public void start() throws IOException {
 		try {
 			LogHandler.createLog();
 			LogHandler.writeLog("Server started");
 			KeyPair loadedKeyPair = LoadKeyPair("RSA");
 			pubKey = loadedKeyPair.getPublic();
 			privKey = loadedKeyPair.getPrivate();
-			System.out.println("Chiavi caricate correttamente");
+			LogHandler.writeLog("Chiavi caricate correttamente");
 		}catch(FileNotFoundException e) {
 			GenerateKeys();
 		} catch (IOException e) {
-			System.out.println("Errore nella lettura delle chiavi dai file");
+			LogHandler.writeLog("Errore nella lettura delle chiavi dai file");
 			return;
 		} catch(InvalidKeySpecException e) {
-			System.out.println("Le chiavi hanno subito delle modifiche, verranno ricreate");
+			LogHandler.writeLog("Le chiavi hanno subito delle modifiche, verranno ricreate");
 			GenerateKeys();
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -46,15 +46,16 @@ public class Server{
 		}
 		try {			
 			sSrv = new ServerSocket(50000);
-			System.out.println("Indirizzo: " + sSrv.getInetAddress() + "; porta: " + sSrv.getLocalPort());
+			//System.out.println("Indirizzo: " + sSrv.getInetAddress() + "; porta: " + sSrv.getLocalPort());
 			while(true) {
 				toClient = sSrv.accept();
-				System.out.println("Indirizzo client: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
+				LogHandler.writeLog("Client connesso: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
 				GestisciClient client = new GestisciClient(toClient);
 				Thread t = new Thread(client);
 				t.start();
 			}
 		}catch(SocketException e) {
+			LogHandler.writeLog("Client disconnesso");
 			return;
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -66,6 +67,7 @@ public class Server{
 			toClient.close();
 		if(sSrv != null)
 			sSrv.close();
+		LogHandler.writeLog("Server spento");
 	}
 	
 	/*public static void main(String[] args) {
@@ -111,7 +113,7 @@ public class Server{
 		return privKey;
 	}
 	
-	private static void GenerateKeys() { 
+	private static void GenerateKeys() throws IOException { 
 		KeyPairGenerator generator;
 		try {
 			generator = KeyPairGenerator.getInstance("RSA");
@@ -121,11 +123,10 @@ public class Server{
 			pubKey = generatedKeyPair.getPublic();
 			SaveKeyPair(generatedKeyPair);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("Errore nell'algoritmo di creazione delle chiavi");
+			LogHandler.writeLog("Errore nell'algoritmo di creazione delle chiavi");
 		} catch (IOException e) {
-			System.out.println("Errore nel salvataggio delle chiavi");
+			LogHandler.writeLog("Errore nel salvataggio delle chiavi");
 		} 
-		
 	}
 	
 	private static void SaveKeyPair(KeyPair keyPair) throws IOException {
@@ -133,24 +134,20 @@ public class Server{
 		PublicKey publicKey = keyPair.getPublic();
  
 		// Store Public Key.
-		X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
-				publicKey.getEncoded());
+		X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(publicKey.getEncoded());
 		FileOutputStream fos = new FileOutputStream("keys/public.key");
 		fos.write(x509EncodedKeySpec.getEncoded());
 		fos.close();
  
 		// Store Private Key.
-		PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
-				privateKey.getEncoded());
+		PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
 		fos = new FileOutputStream("keys/private.key");
 		fos.write(pkcs8EncodedKeySpec.getEncoded());
 		fos.close();
-		System.out.println("Chiavi create e salvate correttamente");
+		LogHandler.writeLog("Chiavi create e salvate correttamente");
 	}
 	
-	private static KeyPair LoadKeyPair(String algorithm)
-			throws IOException, NoSuchAlgorithmException,
-			InvalidKeySpecException {
+	private static KeyPair LoadKeyPair(String algorithm) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		// Read Public Key.
 		File filePublicKey = new File("keys/public.key");
 		FileInputStream fis = new FileInputStream("keys/public.key");
@@ -167,12 +164,9 @@ public class Server{
  
 		// Generate KeyPair.
 		KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-				encodedPublicKey);
+		X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encodedPublicKey);
 		PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
- 
-		PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
-				encodedPrivateKey);
+		PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
 		PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
  
 		return new KeyPair(publicKey, privateKey);

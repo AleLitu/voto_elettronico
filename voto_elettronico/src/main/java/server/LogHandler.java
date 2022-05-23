@@ -22,30 +22,19 @@ public class LogHandler {
 	}
 	
 	public static void writeLog(String mes) throws IOException {
-		File file = new File(path);
-		FileWriter fw = new FileWriter(file);
+		FileWriter fw = new FileWriter(path, true);
 		BufferedWriter bw = new BufferedWriter(fw);
 		PrintWriter pw = new PrintWriter(bw);
 		try {
-			
-			//fw = new FileWriter(file);
-			//bw = new BufferedWriter(fw);
-			//bw.append(dateHandle(LocalDateTime.now()));
-			//pw = new PrintWriter(bw);
-
-            pw.println(dateHandle(LocalDateTime.now()) + "---" + mes);
-            //pw.println("Root");
-            //pw.println("Ben");
+            pw.println(dateHandle(LocalDateTime.now()) + " --- " + mes);
 			pw.flush();
-			
-			//bw.close();
-			} catch(Exception e) {
+		} catch(Exception e) {
 			e.printStackTrace();
-			} finally {
+		} finally {
 				pw.close();
                 bw.close();
                 fw.close();
-			}
+		}
 	}
 	
 	private static String dateHandle(LocalDateTime date){

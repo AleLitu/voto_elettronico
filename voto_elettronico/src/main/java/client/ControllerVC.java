@@ -24,11 +24,14 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -42,6 +45,9 @@ public class ControllerVC {
 	Socket so;
     InputStream in;
     OutputStream out;
+    
+    @FXML
+    private Label lblNome;
     
     @FXML
     private VBox vboxPa;
@@ -61,20 +67,85 @@ public class ControllerVC {
     @FXML
     void handleConferma(ActionEvent event) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     	RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
+    	byte buffer[] = new byte[100];
+    	//byte[] cipherData = null;
+    	Cipher cipher = Cipher.getInstance("RSA");
+    	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+    	out.write("vc".getBytes(), 0, "vc".length());
         if (rb != null) {
-        	byte[] cipherData = null;
-			Cipher cipher = Cipher.getInstance("RSA");
-	        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-    		out.write("vc".getBytes(), 0, "vc".length());
-    		cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + rb.getId()).getBytes());
-	        DataOutputStream dos = new DataOutputStream(out);
-	        dos.writeInt(cipherData.length);
-	        dos.write(cipherData, 0, cipherData.length);
+    		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + rb.getText() + "?");
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.OK) {
+			        try {
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + rb.getId()).getBytes());
+				        DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+						int mes = in.read(buffer);
+						String s = new String(buffer, 0, mes);
+						if(s.equals("ok"))
+							votato(event);
+						else {
+							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+							return;
+						}
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+						return;
+					}
+			     } else {
+					try {
+						byte[] cipherData = cipher.doFinal("err".getBytes());
+						DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+				    	return;
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+						return;
+					}
+			     }
+			 });
     		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
         } else {
-        	//TODO: scheda bianca
+        	Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.OK) {
+			        try {
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + ",-1@schede bianche,").getBytes());
+				        DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+						int mes = in.read(buffer);
+						String s = new String(buffer, 0, mes);
+						if(s.equals("ok"))
+							votato(event);
+						else {
+							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+							return;
+						}
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+						return;
+					}
+			     } else {
+					try {
+						byte[] cipherData = cipher.doFinal("err".getBytes());
+						DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+				    	return;
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+						return;
+					}
+			     }
+			 });
         }
-        Node node = (Node) event.getSource();
+    }
+    
+    private void votato(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
 		Stage actual = (Stage) node.getScene().getWindow();
 		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
         actual.setScene(new Scene(root));
@@ -83,28 +154,37 @@ public class ControllerVC {
     
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
-    	so = ControllerLogin.getSocket();
+    	if(ControllerLogin.getSocket() == null)
+    		so = ClientLocal.getSocket();
+    	else
+    		so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
+    	ObjectInputStream oin = new ObjectInputStream(in);
+    	String nome = (String) oin.readObject();
+    	lblNome.setText(nome);
     	ObjectInputStream keystream = new ObjectInputStream(in);
         pubKey = (PublicKey) keystream.readObject();
         //out.write("attive".getBytes(), 0, "attive".length());
-    	ObjectInputStream oin = new ObjectInputStream(in);
-    	list = (List<Partito>) oin.readObject();
-    	List<HBox> righe = new ArrayList<>();
+    	ObjectInputStream oin1 = new ObjectInputStream(in);
+    	list = (List<Partito>) oin1.readObject();
+    	//List<HBox> righe = new ArrayList<>();
     	groupPa = new ToggleGroup();
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
     		rb.setToggleGroup(groupPa);
     		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
     		rb.setPadding(new Insets(10));
+    		rb.setText(list.get(i).getNome());
+    		/*
     		Label l = new Label(list.get(i).getNome());
     		l.setWrapText(true);
-    		l.setPadding(new Insets(10));
-    		righe.add(new HBox(rb, l));
+    		l.setPadding(new Insets(10));*/
+    		vboxPa.getChildren().addAll(rb);
+    		//righe.add(new HBox(rb, l));
     	}
-    	vboxPa.getChildren().clear();
-    	vboxPa.getChildren().addAll(righe);
+    	//vboxPa.getChildren().clear();
+    	//vboxPa.getChildren().addAll(righe);
     	
     	groupPa.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ob, Toggle o, Toggle n) {

@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import model.User;
 
 
-public class DaoPatternDemo extends Application {
+public class ClientOnline extends Application {
 	
     @Override
     public void start(Stage primaryStage) throws Exception{

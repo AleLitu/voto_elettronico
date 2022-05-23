@@ -187,7 +187,10 @@ public class ControllerVO{
     
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
-    	so = ControllerLogin.getSocket();
+    	if(ControllerLogin.getSocket() == null)
+    		so = ClientLocal.getSocket();
+    	else
+    		so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
     	
