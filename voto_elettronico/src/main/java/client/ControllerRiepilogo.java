@@ -95,27 +95,40 @@ public class ControllerRiepilogo {
     		l1.setPadding(new Insets(10));
     		vbox.getChildren().addAll(l1);
     	} else {
-    		lblTitolo.setText("Riepilogo per: " + list.get(1));
-    		if(list.get(0).equals("categorico")) {
-    			for(int i = 2; i < list.size(); i++) {
-            		String[] v = list.get(i).split("@");
-            		
+    		lblTitolo.setText("Riepilogo per: " + list.get(0));
+    		if(list.get(1).equals("categorico")) {
+    			String[] v = list.get(2).split("@");
+    			HBox hboxb = new HBox();
+    			Label l1;
+    			
+    			l1 = new Label("Schede bianche");
+        		l1.setWrapText(true);
+        		l1.setPadding(new Insets(10));
+        		hboxb.getChildren().addAll(l1);
+        		
+        		l1 = new Label (v[1] + " voti");
+        		l1.setWrapText(true);
+        		l1.setPadding(new Insets(10));
+        		hboxb.getChildren().addAll(l1);
+        		vbox.getChildren().addAll(hboxb);
+        		
+        		HBox hbox1 = new HBox();
+        		l1 = new Label("Partiti");
+        		l1.setWrapText(true);
+        		l1.setPadding(new Insets(10));
+        		hbox1.getChildren().addAll(l1);
+        		vbox.getChildren().addAll(hbox1);
+
+    			for(int i = 3; i < list.size(); i++) {
+            		v = list.get(i).split("@");
             		HBox hbox = new HBox();
-            		
-        			HBox hbox1 = new HBox();
-        			Label l1;
-            		l1 = new Label("Partiti");
-            		l1.setWrapText(true);
-            		l1.setPadding(new Insets(10));
-            		hbox1.getChildren().addAll(l1);
-            		vbox.getChildren().addAll(hbox1);
-            		
+
         			l1 = new Label(v[1]);
             		l1.setWrapText(true);
             		l1.setPadding(new Insets(10));
             		hbox.getChildren().addAll(l1);
             		
-            		l1 = new Label (v[2]);
+            		l1 = new Label (v[2] + " voti");
             		l1.setWrapText(true);
             		l1.setPadding(new Insets(10));
             		hbox.getChildren().addAll(l1);
@@ -130,14 +143,27 @@ public class ControllerRiepilogo {
         		}
     		} else {
     			String prev = "";
-        		for(int i = 2; i < list.size(); i++) {
-            		String[] v = list.get(i).split("@");
+    			String[] v = list.get(2).split("@");
+    			HBox hboxb = new HBox();
+    			Label l1;
+    			
+    			l1 = new Label("Schede bianche");
+        		l1.setWrapText(true);
+        		l1.setPadding(new Insets(10));
+        		hboxb.getChildren().addAll(l1);
+        		
+        		l1 = new Label (v[1] + " voti");
+        		l1.setWrapText(true);
+        		l1.setPadding(new Insets(10));
+        		hboxb.getChildren().addAll(l1);
+        		vbox.getChildren().addAll(hboxb);
+        		for(int i = 3; i < list.size(); i++) {
+            		v = list.get(i).split("@");
             		
             		HBox hbox = new HBox();
             		
             		if(!prev.equals(v[0])) {
             			HBox hbox1 = new HBox();
-            			Label l1;
             			if(v[0].equals("partito"))
                 			l1 = new Label("Partiti");
             			else
@@ -148,12 +174,12 @@ public class ControllerRiepilogo {
                 		hbox1.getChildren().addAll(l1);
                 		vbox.getChildren().addAll(hbox1);
             		}
-        			Label l1 = new Label(v[1]);
+        			l1 = new Label(v[1]);
             		l1.setWrapText(true);
             		l1.setPadding(new Insets(10));
             		hbox.getChildren().addAll(l1);
             		
-            		l1 = new Label (v[2]);
+            		l1 = new Label (v[2] + " voti");
             		l1.setWrapText(true);
             		l1.setPadding(new Insets(10));
             		hbox.getChildren().addAll(l1);
