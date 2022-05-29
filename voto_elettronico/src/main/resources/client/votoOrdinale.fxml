@@ -25,6 +25,11 @@
                   <Insets left="200.0" />
                </VBox.margin>
             </Label>
+            <Label fx:id="lblNome">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="50.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
             <HBox prefHeight="24.0" prefWidth="466.0">
                <children>
                   <RadioButton id="p" mnemonicParsing="false" text="Partiti">

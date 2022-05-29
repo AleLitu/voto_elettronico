@@ -6,21 +6,38 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 public class User {
-	private int id;
-	private String username;
+	//private int id;
+	private String codiceFiscale;
+	private String cognome;
+	private String nome;
+	//private String username;
 	private String password;
+	private String sesso;
+	private int anno;
+	private int mese;
+	private int giorno;
+	private String paese;
+	private String citta;
+	private String comune;
 	private String type;
 	static Random _rnd;
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
+	
+	public User(String codiceFiscale, String cognome, String nome, String password, String sesso, int anno, int mese, int giorno, String paese, String citta, String comune, String type) {
+		this.codiceFiscale = codiceFiscale;
+		this.cognome = cognome;
+		this.nome = nome;
+		this.password = create(password);
+		this.sesso = sesso;
+		this.anno = anno;
+		this.mese = mese;
+		this.giorno = giorno;
+		this.paese = paese;
+		this.citta = citta;
+		this.comune = comune;
 		this.type = type;
 	}
 
-	public User(int id, String username, String password, String type){
+	/*public User(int id, String username, String password, String type){
 		this.id = id;
 		this.username = username;
 		this.password = create(password);
@@ -31,9 +48,97 @@ public class User {
 		this.username = username;
 		this.password = md5(password+salt);
 		this.type = type;
+	}*/
+	
+	public String getCodiceFiscale() {
+		return codiceFiscale;
 	}
 
-	public int getId() {
+	public void setCodiceFiscale(String codiceFiscale) {
+		this.codiceFiscale = codiceFiscale;
+	}
+
+	public String getCognome() {
+		return cognome;
+	}
+
+	public void setCognome(String cognome) {
+		this.cognome = cognome;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getSesso() {
+		return sesso;
+	}
+
+	public void setSesso(String sesso) {
+		this.sesso = sesso;
+	}
+
+	public int getAnno() {
+		return anno;
+	}
+
+	public void setAnno(int anno) {
+		this.anno = anno;
+	}
+
+	public int getMese() {
+		return mese;
+	}
+
+	public void setMese(int mese) {
+		this.mese = mese;
+	}
+
+	public int getGiorno() {
+		return giorno;
+	}
+
+	public void setGiorno(int giorno) {
+		this.giorno = giorno;
+	}
+
+	public String getPaese() {
+		return paese;
+	}
+
+	public void setPaese(String paese) {
+		this.paese = paese;
+	}
+
+	public String getCitta() {
+		return citta;
+	}
+
+	public void setCitta(String citta) {
+		this.citta = citta;
+	}
+
+	public String getComune() {
+		return comune;
+	}
+
+	public void setComune(String comune) {
+		this.comune = comune;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/*public int getId() {
 		return id;
 	}
 	
@@ -43,14 +148,14 @@ public class User {
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
+	}*/
 
 	public String getPassword() {
 		return password;
 	}
 
 	public void setPassword(String password) {
-		this.password = create(password);
+		this.password = password;
 	}
 	
 	public static String create(String passwd) {
@@ -77,6 +182,11 @@ public class User {
 			r.append(x);
 		}
 		return r.toString();      
+	}
+	
+	@Override
+	public String toString() {
+		return codiceFiscale + "@" + cognome + "@" + nome + "@" + password + "@" + sesso + "@" + anno + "@" + mese + "@" + giorno + "@" + paese + "@" + citta + "@" + comune + "@" + type;
 	}
 
 	public boolean check(String passwd,String salt, String cpasswd) {

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="497.0" prefWidth="603.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerRegistrazione">
+   <top>
+      <Label text="Registrazione" textFill="#121294" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+   </top>
+   <center>
+      <VBox prefHeight="146.0" prefWidth="274.0" spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label text="Indirizzo server">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="lblFirst" prefHeight="25.0" prefWidth="54.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="50.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <TextField fx:id="lblSecond" prefHeight="25.0" prefWidth="60.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <TextField fx:id="lblThird" prefHeight="25.0" prefWidth="57.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <TextField fx:id="lblFourth" prefHeight="25.0" prefWidth="56.0">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="49.0" prefWidth="546.0">
+               <children>
+                  <Label fx:id="lblCognome" prefHeight="18.0" prefWidth="61.0" text="Cognome">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="tfCognome" prefHeight="25.0" prefWidth="114.0" promptText="Inserire Cognome">
+                     <HBox.margin>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label fx:id="lblNome" text="Nome">
+                     <HBox.margin>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="tfNome" prefHeight="26.0" prefWidth="90.0" promptText="Inserire Nome">
+                     <HBox.margin>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Label fx:id="lblCF" text="Codice fiscale">
+                     <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="tfCF" prefHeight="25.0" prefWidth="134.0" promptText="Inserire codice fiscale">
+                     <HBox.margin>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox spacing="5.0">
+               <children>
+                  <Label fx:id="lblPassword" prefHeight="17.0" prefWidth="109.0" text="Password">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <PasswordField fx:id="pfPassword" prefHeight="25.0" prefWidth="170.0" promptText="Inserire password">
+                     <HBox.margin>
+                        <Insets left="30.0" />
+                     </HBox.margin>
+                  </PasswordField>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label fx:id="lblConfPassword" prefHeight="16.0" prefWidth="112.0" text="Conferma password">
+                           <HBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </HBox.margin>
+                        </Label>
+                        <PasswordField fx:id="pfConfPassword" prefHeight="25.0" prefWidth="170.0" promptText="Inserire conferma password">
+                           <HBox.margin>
+                              <Insets left="30.0" />
+                           </HBox.margin></PasswordField>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+                     </VBox.margin>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </HBox>
+                  <HBox prefHeight="111.0" prefWidth="546.0">
+                     <children>
+                        <Label fx:id="lblDataNascita" text="Data di nascita">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <MenuButton fx:id="btnAnno" mnemonicParsing="false" text="Anno">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="25.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </MenuButton>
+                        <MenuButton fx:id="btnMese" mnemonicParsing="false" text="Mese">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </MenuButton>
+                        <MenuButton fx:id="btnGiorno" mnemonicParsing="false" text="Giorno">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="20.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </MenuButton>
+                        <Label text="Sesso">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="50.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <MenuButton fx:id="mbSesso" mnemonicParsing="false" text="Sesso">
+                          <items>
+                            <MenuItem fx:id="miMaschio" mnemonicParsing="false" text="M" />
+                            <MenuItem fx:id="miFemmina" mnemonicParsing="false" text="F" />
+                          </items>
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </MenuButton>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblPaese" text="Paese">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="tfPaese" prefHeight="25.0" prefWidth="105.0" promptText="Inserire Paese">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label fx:id="lblCitta" text="Città">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="tfCitta" prefHeight="25.0" prefWidth="104.0" promptText="Inserire Città">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                        <Label fx:id="lblComune" text="Comune">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="tfComune" prefHeight="25.0" prefWidth="105.0" promptText="Inserire Comune">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="btnregister" mnemonicParsing="false" onAction="#handleRegistrazione" text="REGISTRATI">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="125.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="btnIndietro" mnemonicParsing="false" text="INDIETRO">
+                           <HBox.margin>
+                              <Insets bottom="10.0" left="175.0" right="10.0" top="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
+   </center>
+   <bottom>
+      <Label fx:id="lblMessage" BorderPane.alignment="CENTER" />
+   </bottom>
+</BorderPane>

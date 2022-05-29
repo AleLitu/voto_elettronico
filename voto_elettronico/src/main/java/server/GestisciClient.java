@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +24,9 @@ import model.Partito;
 import model.Referendum;
 import model.Votazione;
 
-public class GestisciClient implements Runnable{
+import model.User;
+
+public class GestisciClient implements Runnable, Serializable{
 	private Socket so;
 	InputStream inputStream;
 	OutputStream outputStream;
@@ -65,6 +68,24 @@ public class GestisciClient implements Runnable{
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
 					switch(scelta) {
+					case "registrazione":
+						/*outputStream.write("ok".getBytes(), 0, "ok".length());
+						ObjectInputStream oin = new ObjectInputStream(inputStream);
+						ArrayList<User> us = (ArrayList<User>) oin.readObject();
+				        outputStream.write("ok".getBytes(), 0, "ok".length());
+						registrazione(us);*/
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						dis = new DataInputStream(inputStream);
+					    letti = dis.readInt();
+					    cipherData = new byte[letti];
+					    dis.readFully(cipherData);
+						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						String reg = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
+						System.out.println("reg: " + reg);
+						if(!reg.equals("err")) {
+							registrazione(reg);
+						}
+						break;
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						inserisciRef();
@@ -103,6 +124,10 @@ public class GestisciClient implements Runnable{
 						break;
 					case "candidati":
 						getCandidati();
+						
+						break;
+					case "partiti":
+						getPartiti();
 						break;
 					case "votazione":
 						getVotazione();
@@ -130,12 +155,15 @@ public class GestisciClient implements Runnable{
 						}
 						break;
 					case "vo":
-						outputStream.write("ok".getBytes(), 0, "ok".length());
-						letti = inputStream.read(buffer);
-						String voti = new String(buffer, 0, letti);
-						outputStream.write("ok".getBytes(), 0, "ok".length());
-						votoOrdinale(voti);
-						LogHandler.writeLog("Voto ricevuto");
+						dis = new DataInputStream(inputStream);
+					    letti = dis.readInt();
+					    cipherData = new byte[letti];
+					    dis.readFully(cipherData);
+						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
+						if(!voto.equals("err")) {
+							votoOrdinale(voto);
+						}
 						break;	
 					case "scrutinio":
 						getTerminate();
@@ -165,6 +193,25 @@ public class GestisciClient implements Runnable{
 		}
 	}
 	
+	public void registrazione(String s) throws SQLException, IOException {
+		/*PreparedStatement stmt = conn.prepareStatement("INSERT INTO utenti VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		stmt.setString(1, user.getCodiceFiscale());
+		stmt.setString(2, user.getCognome());
+		stmt.setString(3, user.getNome());
+		String[] psw = user.getPassword().split(":");
+		stmt.setString(4, psw[0]);
+		stmt.setString(5, psw[1]);
+		stmt.setString(6, user.getSesso());
+		stmt.setInt(7, user.getAnno());
+		stmt.setInt(8, user.getMese());
+		stmt.setInt(9, user.getGiorno());
+		stmt.setString(10, user.getPaese());
+		stmt.setString(11, user.getCitta());
+		stmt.setString(12, user.getComune());
+    	stmt.execute();*/
+		outputStream.write("ok".getBytes(), 0, "ok".length());
+	}
+	
 	public void getCandidati() throws SQLException, IOException {
 		PreparedStatement stmt = conn.prepareStatement("SELECT idCandidato, nome FROM candidati ORDER BY nome");
 		ResultSet rs = stmt.executeQuery();
@@ -180,33 +227,65 @@ public class GestisciClient implements Runnable{
 		}
 	}
 	
-	public void votoOrdinale(String voto) throws SQLException, IOException, ClassNotFoundException {
-		outputStream.write("ok".getBytes(), 0, "ok".length());
-		if(voto.equals("partiti")) {
-			List<Partito> voti;
-			ObjectInputStream oin = new ObjectInputStream(inputStream);
-	        voti = (List<Partito>) oin.readObject();
-			outputStream.write("ok".getBytes(), 0, "ok".length());
-			for(int i = 0; i < voti.size(); i++) {
-				PreparedStatement stmt = conn.prepareStatement("INSERT INTO voto_partito (idPartito, voto) VALUES (?, ?)");
-				stmt.setInt(1, voti.get(i).getId());
-				stmt.setInt(2, i + 1);
-		    	stmt.execute();
+	public void votoOrdinale(String s) throws SQLException, IOException, ClassNotFoundException {
+		try {
+			String[] v = s.split(",");
+			String nome_t = v[0].split("@")[0]+v[0].split("@")[1];
+			PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS num FROM " + nome_t); 
+			ResultSet rs = stmt.executeQuery();
+			int num = 0;
+			if(rs.next()) {
+				num = rs.getInt("num");
 			}
-		}else {
-			List<Candidato> voti;
-			ObjectInputStream oin = new ObjectInputStream(inputStream);
-	        voti = (List<Candidato>) oin.readObject();
-			outputStream.write("ok".getBytes(), 0, "ok".length());
-			System.out.println(voti.size());
-			for(int i = 0; i < voti.size(); i++) {
-				System.out.println("1");
-				PreparedStatement stmt = conn.prepareStatement("INSERT INTO voto_candidato (idCandidato, voto) VALUES (?, ?)");
-				stmt.setInt(1, voti.get(i).getId());
-				stmt.setInt(2, i + 1);
-		    	stmt.execute();
+			System.out.println(num);
+			stmt = conn.prepareStatement("SELECT * FROM " + nome_t + "1"); 
+			rs = stmt.executeQuery();	
+			boolean b = false;
+			if(rs.next()) {
+				b = true;
 			}
-		}
+			if(!b) {
+				stmt = conn.prepareStatement("SELECT * FROM " + nome_t); 
+				rs = stmt.executeQuery();
+				while(rs.next()) {
+					for(int i = 0; i < num; i++) {
+						stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
+						stmt.setInt(1, rs.getInt("id"));
+						stmt.setInt(2, i + 1);
+						stmt.setString(3, rs.getString("tipo"));
+						stmt.setString(4, rs.getString("nome"));
+						stmt.setInt(5, 0);
+						stmt.execute();
+					}
+				}
+			}
+			int j = 0;
+	    	if(v[1].equals("p")) {
+	    		for(int i = 2; i < v.length; i++) {
+	    			stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND numero = ?");
+					stmt.setInt(1, Integer.parseInt(v[i].split("@")[0]));
+					stmt.setInt(2, j + 1);
+					j++;
+			    	stmt.execute();
+				}
+				outputStream.write("ok".getBytes(), 0, "ok".length());
+				LogHandler.writeLog("Voto ricevuto");
+	    	}else {
+	    		for(int i = 2; i < v.length; i++) {
+    				stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND numero = ?");
+    				stmt.setInt(1, Integer.parseInt(v[i].split("@")[0]));
+    				stmt.setInt(2, j + 1);
+    				j++;
+    		    	stmt.execute();
+				}
+				outputStream.write("ok".getBytes(), 0, "ok".length());
+				LogHandler.writeLog("Voto ricevuto");
+	    	}
+			
+		}catch (Exception e) {
+    		outputStream.write("err".getBytes(), 0, "err".length());
+    		LogHandler.writeLog("Errore inserimento voto");
+    	}
 	}
 	
 	//invia la votazione selezionata dal client per votare
@@ -539,13 +618,13 @@ public class GestisciClient implements Runnable{
 								stmt.setString(3, idc_max.get(j).getNome());
 								stmt.execute();
 							}
+						}else {
+							PreparedStatement stmt1 = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ?;");
+							stmt1.setInt(1, -1);
+							stmt1.execute();
 						}
-					} else {
-						PreparedStatement stmt1 = conn.prepareStatement("UPDATE " + nome_tab + " SET vincitore = ?;");
-						stmt1.setInt(1, -1);
-						stmt1.execute();
 					}
-					
+						
 					stmt = conn.prepareStatement("DELETE FROM terminate WHERE idTerminate = ? AND nome = ?");
 					stmt.setInt(1, list.get(i).getId());
 					stmt.setString(2, list.get(i).getNome());
@@ -696,7 +775,7 @@ public class GestisciClient implements Runnable{
 				    		rs.next();
 				    		nome_t = rs.getString("nome") + rs.getInt("idAttive");
 							stmt = conn.prepareStatement("CREATE TABLE " + nome_t + " (id INT, tipo VARCHAR(9), nome VARCHAR(45), voto INT NOT NULL DEFAULT 0, PRIMARY KEY(id, tipo))");
-					    	stmt.execute();
+							stmt.execute();
 					    	done = true;
 						}
 						
@@ -722,12 +801,17 @@ public class GestisciClient implements Runnable{
 							}
 					    	stmt.execute();
 				    	}
-				    	stmt = conn.prepareStatement("INSERT INTO " + nome_t + " (id, tipo, nome) VALUES (?, ?, ?)");
-				    	stmt.setInt(1, -1);
-				    	stmt.setString(2, "bianche");
-						stmt.setString(3, "schede bianche");
-						stmt.execute();
-				    	LogHandler.writeLog("Nuova votazione avviata");
+				    	if(!votazione.equals("Voto ordinale")) {
+					    	stmt = conn.prepareStatement("INSERT INTO " + nome_t + " (id, tipo, nome) VALUES (?, ?, ?)");
+					    	stmt.setInt(1, -1);
+					    	stmt.setString(2, "bianche");
+							stmt.setString(3, "schede bianche");
+							stmt.execute();
+					    	LogHandler.writeLog("Nuova votazione avviata");
+				    	}else {
+				    		stmt = conn.prepareStatement("CREATE TABLE " + nome_t + "1" + " (id INT, numero INT, tipo VARCHAR(9), nome VARCHAR(45), voto INT NOT NULL DEFAULT 0, PRIMARY KEY(id, numero))");
+							stmt.execute();
+				    	}
 					}
 				}
     		}
@@ -956,6 +1040,7 @@ public class GestisciClient implements Runnable{
 			letti = inputStream.read(buffer);
 			String reply = new String(buffer, 0, letti);
 			if(!reply.equals("no")) {
+				String rep = reply;
 				stmt = conn.prepareStatement("SELECT * FROM `" + reply +"` ORDER BY id");
 				ResultSet rs1 = stmt.executeQuery();
 				rs1.next();
@@ -980,6 +1065,12 @@ public class GestisciClient implements Runnable{
 							if(rs1.getString("tipo").equals("partito"))
 								messaggio.add(rs1.getString("tipo") + "@" + rs1.getString("nome") + "@" + rs1.getInt("voto") + "@" + rs1.getString("vincitore"));
 						} while(rs1.next());
+					}else if(rs2.getString("tipoVot").equals("ordinale")) {
+						PreparedStatement stmt11 = conn.prepareStatement("SELECT * FROM `" + rep + "1" +"` ORDER BY id");
+						ResultSet rs11 = stmt11.executeQuery();
+						while(rs11.next()) {
+								messaggio.add(rs11.getString("tipo") + "@" + rs11.getString("numero") + "@" + rs11.getString("nome") + "@" + rs11.getInt("voto") + "@" + rs11.getString("vincitore"));
+						}
 					} else {
 						do {
 							if(rs1.getString("tipo").equals("bianche"))

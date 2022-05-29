@@ -191,7 +191,7 @@ public class ControllerGestore {
     
     @FXML
     public void initialize() {
-    	lblNome.setText("Benvenuto, " + ControllerLogin.getUser().getUsername());
+    	lblNome.setText("Benvenuto, " + ControllerLogin.getUser().getCognome() + " " + ControllerLogin.getUser().getNome());
     }
 
 }

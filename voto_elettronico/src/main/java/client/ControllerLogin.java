@@ -54,15 +54,12 @@ public class ControllerLogin {
     private TextField lblPassword;
 
     @FXML
-    private TextField lblUsername;
+    private TextField lblCodiceFiscale;
+    
+    @FXML
+    private Button btnRegister;
     
     public final static int SOCKET_PORT=50000;
-
-
-    @FXML
-    void handlePassword(ActionEvent event) {
-
-    }
     
     public static User getUser() {
     	return user;
@@ -73,12 +70,19 @@ public class ControllerLogin {
     }
 
     @FXML
+    void handleRegistration(ActionEvent event) throws Exception {
+    	Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+    	Parent root = FXMLLoader.load(getClass().getResource("registrazione.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Registrazione");
+    }
+
+    @FXML
     void handleSend(ActionEvent event) throws Exception {
     	lblMessage.setVisible(true);
-    	
-    	String usr = lblUsername.getText();
+    	String usr = lblCodiceFiscale.getText();
     	String pwd = lblPassword.getText();
-    	
     	UserDao userdao = new UserDaoImpl();
     	user = userdao.getUser(usr, pwd);
     	String messaggio;
@@ -180,10 +184,4 @@ public class ControllerLogin {
             return connection(indirizzo);
         }
     }
-
-    @FXML
-    void handleUsername(ActionEvent event) {
-
-    }
-
 }

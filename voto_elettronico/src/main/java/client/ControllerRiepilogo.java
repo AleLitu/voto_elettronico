@@ -141,7 +141,47 @@ public class ControllerRiepilogo {
             		}
             		vbox.getChildren().addAll(hbox);
         		}
-    		} else {
+    		} else if(list.get(1).equals("ordinale")){    
+    			for(int i = 2; i < list.size(); i++) {
+    				String[] v = list.get(i).split("@");
+        			HBox hboxb = new HBox();
+        			Label l1;
+	        		HBox hbox1 = new HBox();
+	        		if(v[0].equals("partito"))
+	        			l1 = new Label("Partito");
+	        		else
+	        			l1 = new Label("Candidato");
+	        		l1.setWrapText(true);
+	        		l1.setPadding(new Insets(10));
+	        		hbox1.getChildren().addAll(l1);
+	        		vbox.getChildren().addAll(hbox1);
+    			
+            		HBox hbox = new HBox();
+            		
+            		l1 = new Label (v[2]);
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+
+        			l1 = new Label("votato come: " +v[1] + "°");
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+            		
+            		l1 = new Label (v[3] + " voti");
+            		l1.setWrapText(true);
+            		l1.setPadding(new Insets(10));
+            		hbox.getChildren().addAll(l1);
+
+            		if(Integer.parseInt(v[4]) == 1) {
+            			l1 = new Label("Vincitore");
+    	        		l1.setWrapText(true);
+    	        		l1.setPadding(new Insets(10));
+    	        		hbox.getChildren().addAll(l1);
+            		}
+            		vbox.getChildren().addAll(hbox);
+    			}
+    		}else {
     			String prev = "";
     			String[] v = list.get(2).split("@");
     			HBox hboxb = new HBox();

@@ -1,14 +1,20 @@
 package client;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,13 +23,17 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -57,6 +67,9 @@ public class ControllerVO{
     private Button btnPulisci;
     
     @FXML
+    private Label lblNome;
+    
+    @FXML
     private MenuButton btnVoto[];
 
     @FXML
@@ -73,6 +86,7 @@ public class ControllerVO{
     List<Partito> listp;
     List<Candidato> listc;
     int voti = 0;
+    private PublicKey pubKey;
     
     @FXML
     void handlePulisci(ActionEvent event) {
@@ -85,7 +99,7 @@ public class ControllerVO{
     		}
     	}
     	if(mic != null) {
-    		for(int i = 0; i < listc.size(); i++) {
+    		for(int i = 0; i < mic.length; i++) {
     			mic[i] = null;
     			btnVoto[i].setText("Voto");
     			btnNumero[i].setText(count + "");
@@ -94,95 +108,132 @@ public class ControllerVO{
     }
     
     @FXML
-    void handleConferma(ActionEvent event) throws IOException {
+    void handleConferma(ActionEvent event) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
     	RadioButton rb = (RadioButton)group.getSelectedToggle();
-        if (rb != null) {
-        	if(rb.getId().equals("p")){
-        		ArrayList<Partito> votip = new ArrayList<>();
+    	String s = "";
+    	if (rb != null) {
+    		if(rb.getId().equals("p")){
+	    		int count = 1;
+	    		int i;
+	    		int j = 0;
+	    		for(i = 0; i < mip.length && count <= voti; i++) {
+	    			if(mip[i] != null) {
+	    				if(btnNumero[i].getText().equals(count + "")) {
+	    					if(j == 0) {
+	    						s = "p," + listp.get(i).getId() + "@" + listp.get(i).getNome();
+	    						j++;
+	    					}else {
+	    						s += "," + listp.get(i).getId() + "@" + listp.get(i).getNome();
+	    					}
+	    					count++;
+	    					i = -1;
+	    				}
+	    			}
+	    		}
+    		}else{
         		int count = 1;
         		int i;
-        		for(i = 0; i < mip.length && count <= voti; i++) {
-        			if(mip[i] != null) {
-        				if(btnNumero[i].getText().equals(count + "")) {
-        					votip.add(new Partito(Integer.parseInt(btnVoto[i].getId()), listp.get(i).getNome()));
-        					count++;
-        					i = -1;
-        				}
-        			}
-        		}        		
-        		out.write("vo".getBytes(), 0, "vo".length());
-        		byte buffer[];
-        		int dim_buffer = 100;
-    			buffer = new byte[dim_buffer];
-        		int letti = in.read(buffer);
-        		String risposta = new String(buffer, 0, letti);
-        		if(risposta.equals("ok")) {
-        			out.write("partiti".getBytes(), 0, "partiti".length());
-        			letti = in.read(buffer);
-        			risposta = "";
-        			risposta = new String(buffer, 0, letti);
-        			if(risposta.equals("ok")) {
-        				out = so.getOutputStream();
-        				ObjectOutputStream oos = new ObjectOutputStream(out);
-        				oos.writeObject(votip);
-        				//out.write(id.getBytes(), 0, id.length());
-        				letti = in.read(buffer);
-        				risposta = "";
-        				risposta = new String(buffer, 0, letti);
-        				if(risposta.equals("ok")) {
-        					Node node = (Node) event.getSource();
-        					Stage actual = (Stage) node.getScene().getWindow();
-        					Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
-        				    actual.setScene(new Scene(root));
-        				    actual.setTitle("Votazione");
-        				}
-        			}
-        		}
-        	}else{
-        		ArrayList<Candidato> votic = new ArrayList<>();
-        		int count = 1;
-        		int i;
+        		int j = 0;
         		for(i = 0; i < mic.length && count <= voti; i++) {
         			if(mic[i] != null) {
         				if(btnNumero[i].getText().equals(count + "")) {
-        					votic.add(new Candidato(Integer.parseInt(btnVoto[i].getId()), listc.get(i).getNome()));
+        					if(j == 0) {
+	    						s = "c," + listc.get(i).getId() + "@" +  listc.get(i).getNome();
+	    						j++;
+        					}else {
+        						s += "," + listc.get(i).getId() + "@" + listc.get(i).getNome();
+        					}
         					count++;
         					i = -1;
         				}
         			}
-        		}        		
-        		out.write("vo".getBytes(), 0, "vo".length());
-        		byte buffer[];
-        		int dim_buffer = 100;
-    			buffer = new byte[dim_buffer];
-        		int letti = in.read(buffer);
-        		String risposta = new String(buffer, 0, letti);
-        		if(risposta.equals("ok")) {
-        			out.write("candidati".getBytes(), 0, "candidati".length());
-        			letti = in.read(buffer);
-        			risposta = "";
-        			risposta = new String(buffer, 0, letti);
-        			if(risposta.equals("ok")) {
-        				out = so.getOutputStream();
-        				ObjectOutputStream oos = new ObjectOutputStream(out);
-        				oos.writeObject(votic);
-        				//out.write(id.getBytes(), 0, id.length());
-        				letti = in.read(buffer);
-        				risposta = "";
-        				risposta = new String(buffer, 0, letti);
-        				if(risposta.equals("ok")) {
-        					Node node = (Node) event.getSource();
-        					Stage actual = (Stage) node.getScene().getWindow();
-        					Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
-        				    actual.setScene(new Scene(root));
-        				    actual.setTitle("Votazione");
-        				}
-        			}
         		}
-        	}
-        } else {
-        	//TODO: scheda bianca
+    		}
+    	}
+    	final String a = s + ",";
+    	byte buffer[] = new byte[100];
+    	//byte[] cipherData = null;
+    	Cipher cipher = Cipher.getInstance("RSA");
+    	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+    	out.write("vo".getBytes(), 0, "vo".length());
+        if (rb != null) {
+    		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + rb.getText() + "?");
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.OK) {
+			        try {			        	
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + a).getBytes());
+				        DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+						int mes = in.read(buffer);
+						String r = new String(buffer, 0, mes);
+						if(r.equals("ok"))
+							votato(event);
+						else {
+							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+							return;
+						}
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+						return;
+					}
+			     } else {
+					try {
+						byte[] cipherData = cipher.doFinal("err".getBytes());
+						DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+				    	return;
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+						return;
+					}
+			     }
+			 });
+    		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
+        } else if(voti == 0) {
+        	Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.OK) {
+			        try {
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + ",-1@schede bianche,").getBytes());
+				        DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+						int mes = in.read(buffer);
+						String r = new String(buffer, 0, mes);
+						if(r.equals("ok"))
+							votato(event);
+						else {
+							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+							return;
+						}
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+						return;
+					}
+			     } else {
+					try {
+						byte[] cipherData = cipher.doFinal("err".getBytes());
+						DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+				    	return;
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+						return;
+					}
+			     }
+			 });
         }
+    }
+    
+    private void votato(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("votato.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Votazione");
     }
     
     @FXML
@@ -193,28 +244,34 @@ public class ControllerVO{
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();
     	out = so.getOutputStream();
-    	
-    	out.write("partiti".getBytes(), 0, "partiti".length());
     	ObjectInputStream oin = new ObjectInputStream(in);
-        listp = (List<Partito>) oin.readObject();
-        int sizep = listp.size();
-        
-        out.write("candidati".getBytes(), 0, "candidati".length());
-    	oin = new ObjectInputStream(in);
-        listc = (List<Candidato>) oin.readObject();
-    	List<HBox> righe = new ArrayList<>();
-    	int sizec = listc.size();
+    	String nome = (String) oin.readObject();
+		lblNome.setText(nome);
+    	ObjectInputStream keystream = new ObjectInputStream(in);
+    	pubKey = (PublicKey) keystream.readObject();
     	
+    	//out.write("partiti".getBytes(), 0, "partiti".length());
+    	ObjectInputStream oin1 = new ObjectInputStream(in);
+        listp = (List<Partito>) oin1.readObject();
+        int sizep = listp.size();
+        listc = new ArrayList<Candidato>();
+        for(int i = 0; i < listp.size(); i++) {
+        	for(int j = 0; j < listp.get(i).getCandidati().size(); j++) {
+            	listc.add(listp.get(i).getCandidati().get(j));
+            }
+        }
+        int sizec = listc.size();
     	group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ob, Toggle o, Toggle n) {
                 RadioButton rb = (RadioButton)group.getSelectedToggle();
                 if (rb != null) {
                 	if(rb.getId().equals("p")){
+                		count = 1;
                 		voti = 0;
                 		btnVoto = new MenuButton[sizep];
                     	List<HBox> righe = new ArrayList<>();
                     	btnNumero = new MenuItem[sizep];
-                    	for(int i = 0; i < listp.size(); i++) {
+                    	for(int i = 0; i < sizep; i++) {
                     		btnNumero[i] = new MenuItem(count + "");
                     		btnVoto[i] = new MenuButton("Voto", null, btnNumero[i]);
                     		btnVoto[i].setPadding(new Insets(10));
@@ -231,7 +288,7 @@ public class ControllerVO{
                     	for(int i = 0; i < listp.size(); i++) {
                     		mip[i] = null;
                     	}
-                    	for(int i = 0; i < listp.size(); i++) {
+                    	for(int i = 0; i < sizep; i++) {
                     		final int k = i;
                     		btnNumero[i].setOnAction(e -> {
                     			voti++;
@@ -245,11 +302,12 @@ public class ControllerVO{
                               });
                     	}
                 	}else{
+                		count = 1;
                 		voti = 0;
                 		btnVoto = new MenuButton[sizec];
                 		List<HBox> righe = new ArrayList<>();
                 		btnNumero = new MenuItem[sizec];
-                    	for(int i = 0; i < listc.size(); i++) {
+                    	for(int i = 0; i < sizec; i++) {
                     		btnNumero[i] = new MenuItem(count + "");
                     		btnVoto[i] = new MenuButton("Voto", null, btnNumero[i]);
                     		btnVoto[i].setPadding(new Insets(10));
@@ -263,17 +321,17 @@ public class ControllerVO{
                     	vboxPa.getChildren().addAll(righe);
                     	
                     	mic = new MenuItem[sizec];
-                    	for(int i = 0; i < listc.size(); i++) {
+                    	for(int i = 0; i < sizec; i++) {
                     		mic[i] = null;
                     	}
-                    	for(int i = 0; i < listc.size(); i++) {
+                    	for(int i = 0; i < sizec; i++) {
                     		final int k = i;
                     		btnNumero[i].setOnAction(e -> {
                     			voti++;
                     			mic[k] = btnNumero[k];
                     			btnVoto[k].setText(count + "");
                     			count++;
-                    			for(int j = 0; j < listc.size(); j++) {
+                    			for(int j = 0; j < sizec; j++) {
                     				if(mic[j] == null)
                     					btnNumero[j].setText(count + "");
                     			}
