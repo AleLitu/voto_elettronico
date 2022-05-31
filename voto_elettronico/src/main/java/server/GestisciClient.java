@@ -106,14 +106,31 @@ public class GestisciClient implements Runnable, Serializable{
 						break;
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						inserisciRef();
+						letti = inputStream.read(buffer);
+						String testo = new String(buffer, 0, letti);
+						if(href.inserisci(testo))
+							LogHandler.writeLog("Nuovo referendum creato");
+						else
+							LogHandler.writeLog("Errore creazione nuovo referendum");
+						//inserisciRef();
 						//outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					case "b":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String partito = new String(buffer, 0, letti);
-						inserisciPartito(partito);
+						int dim = 500;
+						byte buf[] = new byte[dim];
+						letti = inputStream.read(buf);
+						String candidati = new String(buf, 0, letti);
+						if(hvot.inserisci(partito + "€" + candidati)) {
+							outputStream.write("true".getBytes(), 0, "true".length());
+							LogHandler.writeLog("Nuova lista creata");
+						} else {
+							outputStream.write("false".getBytes(), 0, "false".length());
+							LogHandler.writeLog("Errore nell'inserimento di uan nuova lista");
+						}
+						//inserisciPartito(partito, candidati);
 						break;
 					case "ref":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -128,14 +145,21 @@ public class GestisciClient implements Runnable, Serializable{
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						String voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
-							inserisciRefVoto(voto);
+							if(href.inserisciVoto(voto)) {
+								outputStream.write("ok".getBytes(), 0, "ok".length());
+								LogHandler.writeLog("Voto ricevuto");
+							} else {
+								outputStream.write("err".getBytes(), 0, "err".length());
+					    		LogHandler.writeLog("Errore inserimento voto");
+							}
+							//inserisciRefVoto(voto);
 						}
 						break;
 					case "avvio":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String votazione = new String(buffer, 0, letti);
-						/*if(votazione.equals("Referendum")) {
+						if(votazione.equals("Referendum")) {
 							ArrayList<Votazione> refNAtt = href.getNonAttivi();
 				    		if(refNAtt == null) {
 				    			outputStream.write("no".getBytes(), 0, "no".length());
@@ -169,8 +193,9 @@ public class GestisciClient implements Runnable, Serializable{
 								if(partiti == null)
 									break;
 								else {
+									ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+									oos.writeObject(partiti);
 									boolean done = false;
-									String nome_t = "";
 									while(true) {
 										letti = inputStream.read(buffer);
 										String risposta = new String(buffer, 0, letti);
@@ -182,14 +207,14 @@ public class GestisciClient implements Runnable, Serializable{
 												hvot.avvia(v);
 										    	done = true;
 											}
-											hvot.avvia(v);
-											LogHandler.writeLog("Nuova votazione avviata");
+											hvot.addAvvia(v, votazione);
 										}
 									}
+									LogHandler.writeLog("Nuova votazione avviata");
 								}
 				    		}
-						}*/
-						avviaVotazione(votazione);
+						}
+						//avviaVotazione(votazione);
 						break;
 					case "attive":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -199,14 +224,42 @@ public class GestisciClient implements Runnable, Serializable{
 						getAttive(codFiscale2);
 						break;
 					case "candidati":
-						getCandidati();
-						
+						ArrayList<Candidato> c = hvot.getCandidati();
+						if(c != null) {
+							ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+							oos.writeObject(c);
+						}
 						break;
 					case "partiti":
-						getPartiti();
+						ArrayList<Partito> p = hvot.getPartiti();
+						if(p != null) {
+							ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+							oos.writeObject(p);
+						}
 						break;
 					case "votazione":
-						getVotazione();
+						letti = inputStream.read(buffer);
+						String[] v = new String(buffer, 0, letti).split("@");
+						if(!v[2].equals("referendum")) {
+							String nome_t = v[0] + v[1];
+							ArrayList<Partito> partiti = hvot.getVotazione(nome_t);
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							oout.writeObject(nome_t.replaceAll("\\d",""));
+							oout.flush();
+							ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
+							pubkey.writeObject(Server.getPublicKey());
+							oout = new ObjectOutputStream(outputStream);
+							oout.writeObject(partiti);
+						} else {
+							Referendum re = href.getDomanda(Integer.parseInt(v[1]), v[0]);
+							if(re != null) {
+								ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
+								pubkey.writeObject(Server.getPublicKey());
+								ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+								oos.writeObject(re);
+							}
+						}
+						//getVotazione();
 						break;
 					case "vc":
 						dis = new DataInputStream(inputStream);
@@ -216,7 +269,14 @@ public class GestisciClient implements Runnable, Serializable{
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
-							votoCategorico(voto);
+							if(hvot.inserisciVoto(voto+"€vc")) {
+								outputStream.write("ok".getBytes(), 0, "ok".length());
+								LogHandler.writeLog("Voto ricevuto");
+							} else {
+								outputStream.write("err".getBytes(), 0, "err".length());
+					    		LogHandler.writeLog("Errore inserimento voto");
+							}
+							//votoCategorico(voto);
 						}
 						break;
 					case "vcp":
@@ -227,7 +287,14 @@ public class GestisciClient implements Runnable, Serializable{
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
-							votoCategoricoPreferenze(voto);
+							if(hvot.inserisciVoto(voto+"€vcp")) {
+								outputStream.write("ok".getBytes(), 0, "ok".length());
+								LogHandler.writeLog("Voto ricevuto");
+							} else {
+								outputStream.write("err".getBytes(), 0, "err".length());
+					    		LogHandler.writeLog("Errore inserimento voto");
+							}
+							//votoCategoricoPreferenze(voto);
 						}
 						break;
 					case "vo":
@@ -238,7 +305,14 @@ public class GestisciClient implements Runnable, Serializable{
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
-							votoOrdinale(voto);
+							if(hvot.inserisciVoto(voto+"€vo")) {
+								outputStream.write("ok".getBytes(), 0, "ok".length());
+								LogHandler.writeLog("Voto ricevuto");
+							} else {
+								outputStream.write("err".getBytes(), 0, "err".length());
+					    		LogHandler.writeLog("Errore inserimento voto");
+							}
+							//votoOrdinale(voto);
 						}
 						break;	
 					case "scrutinio":
@@ -272,7 +346,7 @@ public class GestisciClient implements Runnable, Serializable{
 								LogHandler.writeLog("Votazione calcolata");
 							}
 						}
-						getTerminate();
+						//getTerminate();
 						break;
 					case "calculated":
 						ArrayList<String> calcolate = HandlerVotazioni.getCalcolate();
@@ -321,7 +395,7 @@ public class GestisciClient implements Runnable, Serializable{
 								}
 							}
 						}
-						terminaVotazione();
+						//terminaVotazione();
 						break;
 					case "logout":
 						inputStream.close();
@@ -568,7 +642,6 @@ public class GestisciClient implements Runnable, Serializable{
 	//invia la lista delle votazioni attive al client per selezionare quale votare
 	public void getAttive(String codFiscale) throws SQLException, IOException {
 		ArrayList<Votazione> vot = haVotato(codFiscale, getReferendumAttivi(), getVotazioniAttive());
-
 		if(vot == null) {
 			outputStream.write("no".getBytes(), 0, "no".length());
 		} else {
@@ -1093,7 +1166,6 @@ public class GestisciClient implements Runnable, Serializable{
 	}
 	
 	public void inserisciRefVoto(String voto) throws IOException, SQLException {
-		System.out.println(voto);
 		String v[] = voto.split(",");
 		votato(v[2], v[1] + v[0]);
 		try {
@@ -1120,7 +1192,7 @@ public class GestisciClient implements Runnable, Serializable{
     	}
 	}
 	
-	public void inserisciPartito(String partito) {
+	public void inserisciPartito(String partito, String candidati) {
 		int dim_buffer = 500;
 		byte buffer[] = new byte[dim_buffer];
 		int id;
@@ -1143,9 +1215,9 @@ public class GestisciClient implements Runnable, Serializable{
         		rs.next();
         		id = rs.getInt("idPartito");
     		}
-    		outputStream.write("ok".getBytes(), 0, "ok".length());
-			int letti = inputStream.read(buffer);
-			String candidati = new String(buffer, 0, letti);
+    		//outputStream.write("ok".getBytes(), 0, "ok".length());
+			//int letti = inputStream.read(buffer);
+			//String candidati = new String(buffer, 0, letti);
 			inserisciCandidati(id, candidati);
 			LogHandler.writeLog("Nuova lista creata");
     	}catch (Exception e) {

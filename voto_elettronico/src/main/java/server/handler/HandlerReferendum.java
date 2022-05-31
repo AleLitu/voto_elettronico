@@ -1,17 +1,33 @@
 package server.handler;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import model.Referendum;
 import model.Votazione;
+import server.LogHandler;
+import server.Server;
 
 public class HandlerReferendum extends HandlerVotazioni{
 		
 	public HandlerReferendum(Connection conn) {
 		super(conn);
+	}
+	
+	public boolean inserisci(String testo) throws SQLException {
+		if(testo.equals("no")) 
+			return false;
+		String v[] = testo.split(",");
+    	PreparedStatement stmt = conn.prepareStatement("INSERT INTO Referendum (testo, nome) VALUES (?, ?);");
+    	stmt.setString(1, v[0]);
+    	stmt.setString(2, v[1]);
+    	stmt.execute();
+    	return true;
 	}
 
 	public void avvia(String[] s) throws SQLException {
@@ -25,9 +41,41 @@ public class HandlerReferendum extends HandlerVotazioni{
     	stmt.execute();
 	}
 	
-	public void calcola() {
-		// TODO Auto-generated method stub
-		
+	public Referendum getDomanda(int id, String nome) throws SQLException, IOException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo, nome FROM referendum WHERE idReferendum = ? AND nome = ?");
+		stmt.setInt(1, id);
+		stmt.setString(2, nome);
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			return null;
+		} else {
+			return new Referendum(rs.getInt("idReferendum"), rs.getString("nome"), rs.getString("testo"));
+		}
+	}
+	
+	public boolean inserisciVoto(String voto) throws SQLException {
+		String v[] = voto.split(",");
+		super.votato(v[2], v[1] + v[0]);
+		try {
+			if(v[3].equals("no")) {
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET no = no + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
+		    	stmt.execute();
+			}
+			else if(v[3].equals("si")){
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET si = si + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
+		    	stmt.execute();
+			}
+			else{
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET sb = sb + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
+		    	stmt.execute();
+			}
+			return true;
+    	}catch (Exception e) {
+    		return false;
+    	}
 	}
 
 	public void termina(Votazione v) throws SQLException {
@@ -161,4 +209,5 @@ public class HandlerReferendum extends HandlerVotazioni{
 		stmt.setString(2, v.getNome());
 		stmt.execute();
 	}
+
 }

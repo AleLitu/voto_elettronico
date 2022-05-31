@@ -16,10 +16,16 @@ public abstract class HandlerVotazioni{
 		this.conn = conn;
 	}
 	
+	public abstract boolean inserisci(String s) throws SQLException;
 	public abstract void avvia(String[] v) throws SQLException;
-	public abstract void calcola();
+	public abstract boolean inserisciVoto(String voto) throws SQLException;
 	public abstract void termina(Votazione v) throws SQLException;
-
+	
+	public void votato(String codFisc, String tabella) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement("UPDATE votato SET " + tabella + " = 1 WHERE codFiscale = ?");
+		stmt.setString(1, codFisc);
+		stmt.execute();
+	}
 	
 	public static ArrayList<String> getSpecificCalculated(String nome_t) throws SQLException{
 		PreparedStatement stmt = conn.prepareStatement("SELECT tipoVot FROM calcolate WHERE nomeVot = ?");

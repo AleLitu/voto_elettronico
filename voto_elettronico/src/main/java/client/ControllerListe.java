@@ -55,26 +55,25 @@ public class ControllerListe{
 		if(ok.equals("ok")) {
 	        String partito = txtPartito.getText();
 	        if(!partito.equals("")) {
-	        	outputStream.write(partito.getBytes(), 0, partito.length());
-				letti = inputStream.read(buffer);
-				ok = new String(buffer, 0, letti);
-				if(ok.equals("ok")) {
+				//letti = inputStream.read(buffer);
+				//ok = new String(buffer, 0, letti);
+				//if(ok.equals("ok")) {
 					String candidati = txtCandidati.getText();
 					if(!candidati.equals("")) {
+			        	outputStream.write(partito.getBytes(), 0, partito.length());
 						outputStream.write(candidati.getBytes(), 0, candidati.length());
 						letti = inputStream.read(buffer);
 						ok = new String(buffer, 0, letti);
 						if(ok.equals("true"))
-								count = true;
-						} else {
-							System.out.println("Errore");
-						}
+							count = true;
+					} else {
+						Alert alert = new Alert(AlertType.WARNING, "Inserire anche i candidati", ButtonType.CLOSE);
+			    		alert.show();
 					}
 	        } else {
 	        	Alert alert = new Alert(AlertType.WARNING, "Inserire il nome del partito", ButtonType.CLOSE);
 	    		alert.show();
 	        }
-	    	
 		}
     	if(count) {
     		Alert alert = new Alert(AlertType.WARNING, "C'è un candidato duplicato in questo o altri partiti", ButtonType.CLOSE);
