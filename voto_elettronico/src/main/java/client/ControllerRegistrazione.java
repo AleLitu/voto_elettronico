@@ -38,7 +38,7 @@ import model.Candidato;
 
 import model.User;
 
-public class ControllerRegistrazione implements Serializable{
+public class ControllerRegistrazione{
 
 	private static User user;
 	private static Socket so;

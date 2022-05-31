@@ -27,6 +27,9 @@ import server.handler.HandlerReferendum;
 import server.handler.HandlerVotazione;
 import server.handler.HandlerVotazioni;
 import model.User;
+import server.handler.HandlerUser;
+import model.UserDao;
+import model.UserDaoImpl;
 
 public class GestisciClient implements Runnable, Serializable{
 	private Socket so;
@@ -41,6 +44,7 @@ public class GestisciClient implements Runnable, Serializable{
 	Cipher cipher;
 	private HandlerReferendum href;
 	private HandlerVotazione hvot;
+	private HandlerUser huser;
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -67,6 +71,7 @@ public class GestisciClient implements Runnable, Serializable{
     	}
     	href = new HandlerReferendum(conn);
     	hvot = new HandlerVotazione(conn);
+    	huser = new HandlerUser(conn);
 		    	
 		while(true) {
 			try {
@@ -89,15 +94,42 @@ public class GestisciClient implements Runnable, Serializable{
 						String reg = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						System.out.println("reg: " + reg);
 						if(!reg.equals("err")) {
-							registrazione(reg);
+							//registrazione(reg);
+							huser.registrazione(reg);
+							outputStream.write("ok".getBytes(), 0, "ok".length());
+						}
+						break;
+					case "login":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String cf = new String(buffer, 0, letti);
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						String r = huser.login(cf);
+						letti = inputStream.read(buffer);
+						cf = new String(buffer, 0, letti);
+						if(!r.equals("")) {
+							UserDao userdao = new UserDaoImpl();
+		                	User user = userdao.getUser(r);
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							oout.writeObject(user);
+						}
+						else
+						{
+							UserDao userdao = new UserDaoImpl();
+		                	User user = userdao.getUser("");
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							oout.writeObject(user);
 						}
 						break;
 					case "codiceFiscale":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String codFiscale = new String(buffer, 0, letti);
-						controllaCF(codFiscale);
-						break;
+						//inserisciCF(codFiscale)
+						if(!huser.controllaCF(codFiscale))
+							outputStream.write("err".getBytes(), 0, "err".length());
+						else
+							outputStream.write("ok".getBytes(), 0, "ok".length());
 					case "votante":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);

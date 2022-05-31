@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -20,10 +21,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import model.User;
+import model.UserDao;
+import model.UserDaoImpl;
 
 
 public class ControllerCL {
 	
+	private static User user;
 	private static Socket so;
 	private OutputStream outputStream;
 	private InputStream inputStream;
@@ -104,48 +108,57 @@ public class ControllerCL {
 								int letti;
 								String risposta;
 								byte buffer[] = new byte[dim_buffer];
-								outputStream.write("votante".getBytes(), 0, "votante".length());
+								outputStream.write("login".getBytes(), 0, "login".length());
 								letti = inputStream.read(buffer);
 							    risposta = new String(buffer, 0, letti);
-								if(risposta.equals("ok")) {
+				                if(risposta.equals("ok")) {
 									outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
 									letti = inputStream.read(buffer);
 								    risposta = new String(buffer, 0, letti);
-									if(risposta.equals("ok")) {
-										outputStream.write("attive".getBytes(), 0, "attive".length());
-										letti = inputStream.read(buffer);
-									    risposta = new String(buffer, 0, letti);
-									    if(risposta.equals("ok")) {
-											outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
-									        letti = inputStream.read(buffer);
-									        risposta = new String(buffer, 0, letti);
-									        if(risposta.equals("ok")) {
-									        	letti = inputStream.read(buffer);
+					                if(risposta.equals("ok")) {
+					                	 outputStream.write("a".getBytes(), 0, "a".length());
+					 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
+					 					User user = (User) oin.readObject();
+					 					System.out.println(user);
+					                	if(user != null) {
+											outputStream.write("attive".getBytes(), 0, "attive".length());
+											letti = inputStream.read(buffer);
+										    risposta = new String(buffer, 0, letti);
+										    if(risposta.equals("ok")) {
+												outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
+										        letti = inputStream.read(buffer);
 										        risposta = new String(buffer, 0, letti);
-										        if(risposta.equals("no")) {
-										        	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-										    		alert1.show();
-										    		so.close();
-										        } else {
-										        	Node node = (Node) event.getSource();
-										        	Stage actual = (Stage) node.getScene().getWindow();
-													Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-											        actual.setScene(new Scene(root));
-											        actual.setTitle("Scegli");
+										        if(risposta.equals("ok")) {
+										        	letti = inputStream.read(buffer);
+											        risposta = new String(buffer, 0, letti);
+											        if(risposta.equals("no")) {
+											        	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+											    		alert1.show();
+											    		so.close();
+											        } else {
+											        	Node node = (Node) event.getSource();
+											        	Stage actual = (Stage) node.getScene().getWindow();
+														Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+												        actual.setScene(new Scene(root));
+												        actual.setTitle("Scegli");
+											        }
 										        }
-									        }
-									    }else if(risposta.equals("no")) {
-									     	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-									 		alert1.show();
-									 		so.close();
-									     } else {
-									     	Node node = (Node) event.getSource();
-									     	Stage actual = (Stage) node.getScene().getWindow();
-											Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-											actual.setTitle("Scegli");
-											actual.setScene(new Scene(root, 400, 500));
-											actual.show();
-									     }
+										    }else if(risposta.equals("no")) {
+										     	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+										 		alert1.show();
+										 		so.close();
+										     } else {
+										     	Node node = (Node) event.getSource();
+										     	Stage actual = (Stage) node.getScene().getWindow();
+												Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+												actual.setTitle("Scegli");
+												actual.setScene(new Scene(root, 400, 500));
+												actual.show();
+										     }
+					                	}else {
+					                		Alert alert1 = new Alert(AlertType.WARNING, "Errore codice fiscale", ButtonType.CLOSE);
+								    		alert1.show();
+					                	}
 									}else {
 										Alert alert1 = new Alert(AlertType.WARNING, "Errore nell'inserimento nel database", ButtonType.CLOSE);
 							    		alert1.show();
@@ -157,7 +170,7 @@ public class ControllerCL {
 					    		alert1.show();
 					     	}
 						}
-					} catch (IOException e) {
+					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

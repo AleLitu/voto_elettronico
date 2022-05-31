@@ -1,9 +1,11 @@
 package client;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -24,6 +26,7 @@ import javafx.stage.WindowEvent;
 import model.User;
 import model.UserDao;
 import model.UserDaoImpl;
+import model.Votazione;
 
 public class ControllerLogin {
 	
@@ -83,71 +86,91 @@ public class ControllerLogin {
     	lblMessage.setVisible(true);
     	String usr = lblCodiceFiscale.getText();
     	String pwd = lblPassword.getText();
-    	UserDao userdao = new UserDaoImpl();
-    	user = userdao.getUser(usr, pwd);
     	String messaggio;
     	lblFirst.setText("127");
     	lblSecond.setText("0");
     	lblThird.setText("0");
     	lblFourth.setText("1");
-    	if(!checkIntType())
-    		return;
-    	if(user != null) {
-    		Node node = (Node) event.getSource();
-    		Stage actual = (Stage) node.getScene().getWindow();
-    		//actual.close();
-    		try {
-    			if(user.getType().equals("gestore")) {
-    				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
-                    actual.setScene(new Scene(root));
-                    actual.setTitle("Logged");
-                    /*
-                    actual.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent e) {
-	            			try {
-								outputStream.write("logout".getBytes(), 0, "logout".length());
-								Platform.exit();
-		                         System.exit(0);
-							} catch (IOException e1) {
-								e1.printStackTrace();
-							}
-                        }
-                      });*/
-    			} else {
-    				int dim_buffer = 100;
-    				int letti;
-    				String risposta;
-    				byte buffer[] = new byte[dim_buffer];
-    				outputStream.write("attive".getBytes(), 0, "attive".length());
-    				letti = inputStream.read(buffer);
-    		        risposta = new String(buffer, 0, letti);
-    		        if(risposta.equals("ok")) {
-	    				outputStream.write(user.getCodiceFiscale().getBytes(), 0, user.getCodiceFiscale().length());
-	    		        letti = inputStream.read(buffer);
-	    		        risposta = new String(buffer, 0, letti);
-	    		        if(risposta.equals("ok")) {
-	    		        	letti = inputStream.read(buffer);
-	        		        risposta = new String(buffer, 0, letti);
-		    		        if(risposta.equals("no")) {
-		    		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-		    		    		alert.show();
-		    		    		so.close();
-		    		        } else {
-		    					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-		    			        actual.setScene(new Scene(root));
-		    			        actual.setTitle("Scegli");
-		    		        }
-	    		        }
-    		        }  
-				 }
-    		} catch(Exception e) {
-    			System.out.println(e);
-    		}
-    	} else {
-    		messaggio = "Errore nelle credenziali inserite";
-    		lblMessage.setText(messaggio);
-    	}
+    	Alert alert;
+    	if(usr.equals("") && pwd.equals("")) {
+    		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale e la password", ButtonType.CLOSE);
+    		alert.show();
+    	}else {
+    		if(!checkIntType())
+        		return;
+        	int dim_buffer = 100;
+    		int letti;
+    		String risposta;
+    		byte buffer[] = new byte[dim_buffer];
+    		outputStream.write("login".getBytes(), 0, "login".length());
+    		letti = inputStream.read(buffer);
+            risposta = new String(buffer, 0, letti);
+            if(risposta.equals("ok")) {
+            	outputStream.write(usr.getBytes(), 0, usr.length());
+            	letti = inputStream.read(buffer);
+                risposta = new String(buffer, 0, letti);
+                if(risposta.equals("ok")) {
+				    outputStream.write("a".getBytes(), 0, "a".length());
+				    ObjectInputStream oin = new ObjectInputStream(inputStream);
+					User user = (User) oin.readObject();
+					if(user != null) {
+	            		Node node = (Node) event.getSource();
+	            		Stage actual = (Stage) node.getScene().getWindow();
+	            		//actual.close();
+	            		try {
+	            			if(user.getType().equals("gestore")) {
+	            				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+	                            actual.setScene(new Scene(root));
+	                            actual.setTitle("Logged");
+	                            /*
+	                            actual.setOnCloseRequest(new EventHandler<WindowEvent>() {
+	                                @Override
+	                                public void handle(WindowEvent e) {
+	        	            			try {
+	        								outputStream.write("logout".getBytes(), 0, "logout".length());
+	        								Platform.exit();
+	        		                         System.exit(0);
+	        							} catch (IOException e1) {
+	        								e1.printStackTrace();
+	        							}
+	                                }
+	                              });*/
+	            			} else {
+	            				outputStream.write("attive".getBytes(), 0, "attive".length());
+	            				letti = inputStream.read(buffer);
+	            		        risposta = new String(buffer, 0, letti);
+	            		        if(risposta.equals("ok")) {
+	        	    				outputStream.write(user.getCodiceFiscale().getBytes(), 0, user.getCodiceFiscale().length());
+	        	    		        letti = inputStream.read(buffer);
+	        	    		        risposta = new String(buffer, 0, letti);
+	        	    		        if(risposta.equals("ok")) {
+	        	    		        	letti = inputStream.read(buffer);
+	        	        		        risposta = new String(buffer, 0, letti);
+	        		    		        if(risposta.equals("no")) {
+	        		    		        	alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+	        		    		    		alert.show();
+	        		    		    		so.close();
+	        		    		        } else {
+	        		    					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+	        		    			        actual.setScene(new Scene(root));
+	        		    			        actual.setTitle("Scegli");
+	        		    		        }
+	        	    		        }
+	            		        }  
+	        				 }
+	            		} catch(Exception e) {
+	            			System.out.println(e);
+	            		}
+					}else {
+						messaggio = "Errore nelle credenziali inserite";
+	            		lblMessage.setText(messaggio);
+					}
+                }else {
+                	messaggio = "Errore nelle credenziali inserite";
+            		lblMessage.setText(messaggio);
+                }
+            }
+    	}	
     }
     
     public boolean connection (String address){

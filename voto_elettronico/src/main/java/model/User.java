@@ -1,11 +1,12 @@
 package model;
 import java.security.SecureRandom;
 import java.util.Random;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
-public class User {
+public class User implements Serializable{
 	//private int id;
 	private String codiceFiscale;
 	private String cognome;
