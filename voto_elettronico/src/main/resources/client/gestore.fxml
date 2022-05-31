@@ -8,12 +8,12 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="gestoreBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="310.0" prefWidth="239.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerGestore">
+<BorderPane fx:id="gestoreBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="339.0" prefWidth="239.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ControllerGestore">
    <top>
       <Label fx:id="lblNome" BorderPane.alignment="CENTER" />
    </top>
    <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="301.0" prefWidth="239.0" BorderPane.alignment="CENTER">
          <children>
             <MenuButton fx:id="btnInserimento" mnemonicParsing="false" text="Creazione votazione">
               <items>
@@ -40,6 +40,11 @@
                </VBox.margin>
             </Button>
             <Button fx:id="btnRisultati" mnemonicParsing="false" onAction="#handleRisultati" text="Risultati">
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="btnRegistra" mnemonicParsing="false" onAction="#handleRegistra" text="Registra">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>

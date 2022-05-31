@@ -67,6 +67,9 @@ public class ControllerGestore {
     private Button btnRisultati;
     
     @FXML
+    private Button btnRegistra;
+    
+    @FXML
     private Button btnTermina;
 
     @FXML
@@ -89,6 +92,15 @@ public class ControllerGestore {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    @FXML
+    void handleRegistra(ActionEvent event) throws IOException {
+    	Node node = (Node) event.getSource();
+		Stage actual = (Stage) node.getScene().getWindow();
+		Parent root = FXMLLoader.load(getClass().getResource("registrazione.fxml"));
+        actual.setScene(new Scene(root));
+        actual.setTitle("Avvia votazione");
     }
 
     @FXML

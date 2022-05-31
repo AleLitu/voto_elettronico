@@ -61,6 +61,27 @@ public class ControllerCL {
     	return codiceFiscale;
     }
     
+    public boolean isOkCF(String cf) throws IOException {
+    	int dim_buffer = 100;
+		int letti;
+		String risposta;
+		byte buffer[] = new byte[dim_buffer];
+		outputStream.write("codiceFiscale".getBytes(), 0, "codiceFiscale".length());
+		letti = inputStream.read(buffer);
+	    risposta = new String(buffer, 0, letti);
+		if(risposta.equals("ok")) {
+			outputStream.write(cf.getBytes(), 0, cf.length());
+			letti = inputStream.read(buffer);
+		    risposta = new String(buffer, 0, letti);
+		    if(risposta.equals("err")) {
+		    	return false;
+		    }else {
+		    	return true;
+		    }
+		}
+    	return false;
+    }
+    
     @FXML
     void handleSend(ActionEvent event) throws IOException {
     	codiceFiscale = lblCodiceFiscale.getText();
@@ -69,7 +90,7 @@ public class ControllerCL {
      		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale", ButtonType.CLOSE);
      		alert.show();
      	}else {
-	    	alert = new Alert(AlertType.CONFIRMATION, "Il gestore deve confermare il voto e verificare il codice fiscale "  + codiceFiscale);
+	    	alert = new Alert(AlertType.CONFIRMATION, "Conferma di votare con codice fiscale: "  + codiceFiscale);
 	    	alert.showAndWait().ifPresent(response -> {
     	    if (response == ButtonType.OK) {
     	    	{
@@ -78,58 +99,63 @@ public class ControllerCL {
 							Alert alert1 = new Alert(AlertType.WARNING, "Connessione non riuscita", ButtonType.CLOSE);
 							alert1.show();
 						}else {
-							int dim_buffer = 100;
-							int letti;
-							String risposta;
-							byte buffer[] = new byte[dim_buffer];
-							outputStream.write("votante".getBytes(), 0, "votante".length());
-							letti = inputStream.read(buffer);
-						    risposta = new String(buffer, 0, letti);
-							if(risposta.equals("ok")) {
-								outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
+							if(isOkCF(codiceFiscale)) {
+								int dim_buffer = 100;
+								int letti;
+								String risposta;
+								byte buffer[] = new byte[dim_buffer];
+								outputStream.write("votante".getBytes(), 0, "votante".length());
 								letti = inputStream.read(buffer);
 							    risposta = new String(buffer, 0, letti);
 								if(risposta.equals("ok")) {
-									outputStream.write("attive".getBytes(), 0, "attive".length());
+									outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
 									letti = inputStream.read(buffer);
 								    risposta = new String(buffer, 0, letti);
-								    if(risposta.equals("ok")) {
-										outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
-								        letti = inputStream.read(buffer);
-								        risposta = new String(buffer, 0, letti);
-								        if(risposta.equals("ok")) {
-								        	letti = inputStream.read(buffer);
+									if(risposta.equals("ok")) {
+										outputStream.write("attive".getBytes(), 0, "attive".length());
+										letti = inputStream.read(buffer);
+									    risposta = new String(buffer, 0, letti);
+									    if(risposta.equals("ok")) {
+											outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
+									        letti = inputStream.read(buffer);
 									        risposta = new String(buffer, 0, letti);
-									        if(risposta.equals("no")) {
-									        	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-									    		alert1.show();
-									    		so.close();
-									        } else {
-									        	Node node = (Node) event.getSource();
-									        	Stage actual = (Stage) node.getScene().getWindow();
-												Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-										        actual.setScene(new Scene(root));
-										        actual.setTitle("Scegli");
+									        if(risposta.equals("ok")) {
+									        	letti = inputStream.read(buffer);
+										        risposta = new String(buffer, 0, letti);
+										        if(risposta.equals("no")) {
+										        	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+										    		alert1.show();
+										    		so.close();
+										        } else {
+										        	Node node = (Node) event.getSource();
+										        	Stage actual = (Stage) node.getScene().getWindow();
+													Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+											        actual.setScene(new Scene(root));
+											        actual.setTitle("Scegli");
+										        }
 									        }
-								        }
-								    }else if(risposta.equals("no")) {
-								     	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-								 		alert1.show();
-								 		so.close();
-								     } else {
-								     	Node node = (Node) event.getSource();
-								     	Stage actual = (Stage) node.getScene().getWindow();
-										Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-										actual.setTitle("Scegli");
-										actual.setScene(new Scene(root, 400, 500));
-										actual.show();
-								     }
-								}else {
-									Alert alert1 = new Alert(AlertType.WARNING, "Errore nell'inserimento nel database", ButtonType.CLOSE);
-						    		alert1.show();
-						    		so.close();
-								}	
-							}
+									    }else if(risposta.equals("no")) {
+									     	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+									 		alert1.show();
+									 		so.close();
+									     } else {
+									     	Node node = (Node) event.getSource();
+									     	Stage actual = (Stage) node.getScene().getWindow();
+											Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+											actual.setTitle("Scegli");
+											actual.setScene(new Scene(root, 400, 500));
+											actual.show();
+									     }
+									}else {
+										Alert alert1 = new Alert(AlertType.WARNING, "Errore nell'inserimento nel database", ButtonType.CLOSE);
+							    		alert1.show();
+							    		so.close();
+									}	
+								}
+							}else {
+					     		Alert alert1 = new Alert(AlertType.WARNING, "Inserire il codice fiscale corretto", ButtonType.CLOSE);
+					    		alert1.show();
+					     	}
 						}
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -138,6 +164,6 @@ public class ControllerCL {
     	     	}
     	     }
     	});
+     	}
      }
-    }
 }

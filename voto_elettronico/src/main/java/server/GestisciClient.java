@@ -86,11 +86,17 @@ public class GestisciClient implements Runnable, Serializable{
 							registrazione(reg);
 						}
 						break;
-					case "votante":
+					case "codiceFiscale":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String codFiscale = new String(buffer, 0, letti);
-						inserisciVotante(codFiscale);
+						controllaCF(codFiscale);
+						break;
+					case "votante":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String codFiscale1 = new String(buffer, 0, letti);
+						inserisciVotante(codFiscale1);
 						break;
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -128,9 +134,9 @@ public class GestisciClient implements Runnable, Serializable{
 					case "attive":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
-						String codFiscale1 = new String(buffer, 0, letti);
+						String codFiscale2 = new String(buffer, 0, letti);
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						getAttive(codFiscale1);
+						getAttive(codFiscale2);
 						break;
 					case "candidati":
 						getCandidati();
@@ -228,6 +234,19 @@ public class GestisciClient implements Runnable, Serializable{
 		
 		outputStream.write("ok".getBytes(), 0, "ok".length());
 	}
+	
+	public void controllaCF(String cf) throws SQLException, IOException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT codiceFiscale FROM utenti WHERE codiceFiscale = ?");
+		stmt.setString(1, cf);
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			outputStream.write("err".getBytes(), 0, "err".length());
+		}else {
+			outputStream.write("ok".getBytes(), 0, "ok".length());
+		}
+	}
+	
+
 	
 	public void inserisciVotante(String cf) throws IOException, SQLException {
 		PreparedStatement stmt = conn.prepareStatement("SELECT codFiscale FROM votato WHERE codFiscale = ?");
