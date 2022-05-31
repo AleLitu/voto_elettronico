@@ -23,7 +23,9 @@ import model.Candidato;
 import model.Partito;
 import model.Referendum;
 import model.Votazione;
-
+import server.handler.HandlerReferendum;
+import server.handler.HandlerVotazione;
+import server.handler.HandlerVotazioni;
 import model.User;
 
 public class GestisciClient implements Runnable, Serializable{
@@ -37,6 +39,8 @@ public class GestisciClient implements Runnable, Serializable{
 	byte[] cipherData;
 	int letti;
 	Cipher cipher;
+	private HandlerReferendum href;
+	private HandlerVotazione hvot;
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -61,6 +65,8 @@ public class GestisciClient implements Runnable, Serializable{
     	}catch (Exception e) {
     		System.out.println(e.getMessage());
     	}
+    	href = new HandlerReferendum(conn);
+    	hvot = new HandlerVotazione(conn);
 		    	
 		while(true) {
 			try {
@@ -129,6 +135,60 @@ public class GestisciClient implements Runnable, Serializable{
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String votazione = new String(buffer, 0, letti);
+						/*if(votazione.equals("Referendum")) {
+							ArrayList<Votazione> refNAtt = href.getNonAttivi();
+				    		if(refNAtt == null) {
+				    			outputStream.write("no".getBytes(), 0, "no".length());
+				    		} else {
+				    			outputStream.write("ok".getBytes(), 0, "ok".length());
+				    			ObjectOutputStream out = new ObjectOutputStream(outputStream);
+								out.writeObject(refNAtt);
+								letti = inputStream.read(buffer);
+								String risposta = new String(buffer, 0, letti);
+								if(risposta.equals("esc")) {
+									break;
+								} else {
+									href.avvia(risposta.split("@"));
+							    	LogHandler.writeLog("Nuovo referendum avviato");
+								}
+				    		}
+						} else if(!votazione.equals("Referendum")) {
+							PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Partiti");
+				    		ResultSet rs = stmt.executeQuery();
+				    		PreparedStatement stmt1 = conn.prepareStatement("SELECT * FROM Candidati");
+				    		ResultSet rs1 = stmt1.executeQuery();
+				    		if(!rs.next() || !rs1.next()) {
+				    			outputStream.write("no".getBytes(), 0, "no".length());
+				    		} else {
+				    			outputStream.write("ok".getBytes(), 0, "ok".length());
+				    			letti = inputStream.read(buffer);
+								if(new String(buffer, 0, letti).equals("no")) {
+									break;
+								}
+								ArrayList<Partito> partiti = hvot.getPartiti();
+								if(partiti == null)
+									break;
+								else {
+									boolean done = false;
+									String nome_t = "";
+									while(true) {
+										letti = inputStream.read(buffer);
+										String risposta = new String(buffer, 0, letti);
+										if(risposta.equals("esc")) {
+											break;
+										} else {
+											String[] v = risposta.split(",");
+											if(!done) {
+												hvot.avvia(v);
+										    	done = true;
+											}
+											hvot.avvia(v);
+											LogHandler.writeLog("Nuova votazione avviata");
+										}
+									}
+								}
+				    		}
+						}*/
 						avviaVotazione(votazione);
 						break;
 					case "attive":
@@ -182,12 +242,85 @@ public class GestisciClient implements Runnable, Serializable{
 						}
 						break;	
 					case "scrutinio":
+						ArrayList<Votazione> refTer = href.getTerminati();
+						ArrayList<Votazione> votTer = hvot.getTerminate();
+						if(refTer == null && votTer == null) {
+							outputStream.write("no".getBytes(), 0, "no".length());
+						} else {
+							outputStream.write("ok".getBytes(), 0, "ok".length());
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							if(votTer == null) {
+								oout.writeObject(refTer);
+							} else if(refTer == null) {
+								oout.writeObject(votTer);
+							} else {
+								votTer.addAll(refTer);
+								oout.writeObject(votTer);
+							}
+							ObjectInputStream oin = new ObjectInputStream(inputStream);
+							ArrayList<Votazione> list = (ArrayList<Votazione>) oin.readObject();
+							for(int i = 0; i < list.size(); i++) {
+								if(list.get(i).getTipo().equals("Senza quorum")) {
+									href.calcolaSenzaQuorum(list.get(i));
+								} else if(list.get(i).getTipo().equals("Con quorum")) {
+									href.calcolaConQuorum(list.get(i));
+								} else if(list.get(i).getTipo().equals("Maggioranza")) {
+									hvot.calcolaMaggioranza(list.get(i));
+								} else if(list.get(i).getTipo().equals("Maggioranza assoluta")) {
+									hvot.calcolaMaggioranzaAssoluta(list.get(i));
+								}
+								LogHandler.writeLog("Votazione calcolata");
+							}
+						}
 						getTerminate();
 						break;
 					case "calculated":
-						mostraRisultati();
+						ArrayList<String> calcolate = HandlerVotazioni.getCalcolate();
+						if(calcolate == null) {
+							outputStream.write("no".getBytes(), 0, "no".length());
+						} else {
+							outputStream.write("ok".getBytes(), 0, "ok".length());
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							oout.writeObject(calcolate);
+							letti = inputStream.read(buffer);
+							String reply = new String(buffer, 0, letti);
+							if(!reply.equals("no")) {
+								ArrayList<String> messaggio = HandlerVotazioni.getSpecificCalculated(reply);
+								ObjectOutputStream oout1 = new ObjectOutputStream(outputStream);
+								oout1.writeObject(messaggio);
+							}
+						}
+						//mostraRisultati();
 						break;
 					case "end":
+						ArrayList<Votazione> refAtt = href.getAttivi();
+						ArrayList<Votazione> votAtt = hvot.getAttive();
+						if(refAtt == null && votAtt == null) {
+							outputStream.write("no".getBytes(), 0, "no".length());
+						} else {
+							outputStream.write("ok".getBytes(), 0, "ok".length());
+							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
+							if(votAtt == null) {
+								oout.writeObject(refAtt);
+							} else if(refAtt == null) {
+								oout.writeObject(votAtt);
+							} else {
+								votAtt.addAll(refAtt);
+								oout.writeObject(votAtt);
+							}	
+							ObjectInputStream oin = new ObjectInputStream(inputStream);
+							ArrayList<Votazione> list = (ArrayList<Votazione>) oin.readObject();
+							if(list != null) {
+								for(int i = 0; i < list.size(); i++) {
+									if(list.get(i).getTipo().equals("referendum")) {
+										href.termina(list.get(i));
+									} else {
+										hvot.termina(list.get(i));
+									}
+									LogHandler.writeLog("Votazione terminata");
+								}
+							}
+						}
 						terminaVotazione();
 						break;
 					case "logout":
@@ -1057,7 +1190,6 @@ public class GestisciClient implements Runnable, Serializable{
 		} else {
 			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
 			pubkey.writeObject(Server.getPublicKey());
-			//TODO mettere anche il nome nella classe referendum così si può mostrare anche quello durante la votazione
 			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("nome"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(re);
