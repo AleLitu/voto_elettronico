@@ -42,8 +42,14 @@ public class ControllerVotato {
     	Socket so;
     	OutputStream out;
     	InputStream in;
+    	String codfis = "";
+    	if(ControllerCL.getCodiceFiscale() != null)
+    		codfis = ControllerCL.getCodiceFiscale();
+    	else 
+    		codfis = ControllerLogin.getUser().getCodiceFiscale();
+    	final String cf = codfis;
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();
@@ -53,17 +59,29 @@ public class ControllerVotato {
 		String risposta;
 		byte buffer[] = new byte[dim_buffer];
 		out.write("attive".getBytes(), 0, "attive".length());
-        letti = in.read(buffer);
+		letti = in.read(buffer);
         risposta = new String(buffer, 0, letti);
-        if(risposta.equals("no")) {
-        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-    		alert.show();
-        } else {
-        	Node node = (Node) event.getSource();
-    		Stage actual = (Stage) node.getScene().getWindow();
-			Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-	        actual.setScene(new Scene(root));
-	        actual.setTitle("Scegli");
-        }
+        if(risposta.equals("ok")) {
+			out.write(cf.getBytes(), 0, cf.length());
+	        letti = in.read(buffer);
+	        risposta = new String(buffer, 0, letti);
+	        if(risposta.equals("ok")) {
+	        	letti = in.read(buffer);
+		        risposta = new String(buffer, 0, letti);
+		        if(risposta.equals("no")) {
+		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento. Verrai sloggato automaticamente", ButtonType.CLOSE);
+		    		alert.show();
+		    		so.close();
+		    		Node node = (Node) event.getSource();
+		        	((Stage) node.getScene().getWindow()).close();
+		        } else {
+		        	Node node = (Node) event.getSource();
+		    		Stage actual = (Stage) node.getScene().getWindow();
+					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+			        actual.setScene(new Scene(root));
+			        actual.setTitle("Scegli");
+		        }
+	        }
+        } 
     }
 }

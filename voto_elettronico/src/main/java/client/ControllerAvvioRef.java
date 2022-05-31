@@ -84,7 +84,7 @@ public class ControllerAvvioRef {
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
     		rb.setToggleGroup(group);
-    		rb.setId(Integer.toString(list.get(i).getId()));
+    		rb.setId(list.get(i).getNome() + "@" + Integer.toString(list.get(i).getId()));
     		rb.setPadding(new Insets(10));
     		Label l = new Label(list.get(i).getNome());
     		l.setWrapText(true);

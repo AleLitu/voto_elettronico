@@ -86,6 +86,12 @@ public class GestisciClient implements Runnable, Serializable{
 							registrazione(reg);
 						}
 						break;
+					case "votante":
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String codFiscale = new String(buffer, 0, letti);
+						inserisciVotante(codFiscale);
+						break;
 					case "a":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						inserisciRef();
@@ -120,7 +126,11 @@ public class GestisciClient implements Runnable, Serializable{
 						avviaVotazione(votazione);
 						break;
 					case "attive":
-						getAttive();
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						letti = inputStream.read(buffer);
+						String codFiscale1 = new String(buffer, 0, letti);
+						outputStream.write("ok".getBytes(), 0, "ok".length());
+						getAttive(codFiscale1);
 						break;
 					case "candidati":
 						getCandidati();
@@ -194,22 +204,47 @@ public class GestisciClient implements Runnable, Serializable{
 	}
 	
 	public void registrazione(String s) throws SQLException, IOException {
-		/*PreparedStatement stmt = conn.prepareStatement("INSERT INTO utenti VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-		stmt.setString(1, user.getCodiceFiscale());
-		stmt.setString(2, user.getCognome());
-		stmt.setString(3, user.getNome());
-		String[] psw = user.getPassword().split(":");
+		/*String[] r = s.split("@");
+		PreparedStatement stmt = conn.prepareStatement("INSERT INTO utenti VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		stmt.setString(1, r[0]);
+		stmt.setString(2, r[1]);
+		stmt.setString(3, r[2]);
+		String[] psw =r[3].split(":");
 		stmt.setString(4, psw[0]);
 		stmt.setString(5, psw[1]);
-		stmt.setString(6, user.getSesso());
-		stmt.setInt(7, user.getAnno());
-		stmt.setInt(8, user.getMese());
-		stmt.setInt(9, user.getGiorno());
-		stmt.setString(10, user.getPaese());
-		stmt.setString(11, user.getCitta());
-		stmt.setString(12, user.getComune());
-    	stmt.execute();*/
+		stmt.setString(6, r[4]);
+		stmt.setInt(7, r[5]);
+		stmt.setInt(8, r[6]);
+		stmt.setInt(9, r[7]);
+		stmt.setString(10, r[8]);
+		stmt.setString(11, r[9]);
+		stmt.setString(12, r[10]);
+		stmt.setString(12, r[11]);
+    	stmt.execute();
+		
+		stmt = conn.prepareStatement("INSERT INTO votato (codFiscale) VALUES (?)");
+		stmt.setString(1, r[0]);
+		stmt.execute();*/
+		
 		outputStream.write("ok".getBytes(), 0, "ok".length());
+	}
+	
+	public void inserisciVotante(String cf) throws IOException, SQLException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT codFiscale FROM votato WHERE codFiscale = ?");
+		stmt.setString(1, cf);
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			stmt = conn.prepareStatement("INSERT INTO votato (codFiscale) VALUES (?)");
+			stmt.setString(1, cf);
+			stmt.execute();
+		}
+		outputStream.write("ok".getBytes(), 0, "ok".length());
+	}
+	
+	public void votato(String codFisc, String tabella) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement("UPDATE votato SET " + tabella + " = 1 WHERE codFiscale = ?");
+		stmt.setString(1, codFisc);
+		stmt.execute();
 	}
 	
 	public void getCandidati() throws SQLException, IOException {
@@ -231,6 +266,7 @@ public class GestisciClient implements Runnable, Serializable{
 		try {
 			String[] v = s.split(",");
 			String nome_t = v[0].split("@")[0]+v[0].split("@")[1];
+			votato(v[1], nome_t);
 			PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS num FROM " + nome_t); 
 			ResultSet rs = stmt.executeQuery();
 			int num = 0;
@@ -260,8 +296,8 @@ public class GestisciClient implements Runnable, Serializable{
 				}
 			}
 			int j = 0;
-	    	if(v[1].equals("p")) {
-	    		for(int i = 2; i < v.length; i++) {
+	    	if(v[2].equals("p")) {
+	    		for(int i = 3; i < v.length; i++) {
 	    			stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND numero = ?");
 					stmt.setInt(1, Integer.parseInt(v[i].split("@")[0]));
 					stmt.setInt(2, j + 1);
@@ -271,7 +307,7 @@ public class GestisciClient implements Runnable, Serializable{
 				outputStream.write("ok".getBytes(), 0, "ok".length());
 				LogHandler.writeLog("Voto ricevuto");
 	    	}else {
-	    		for(int i = 2; i < v.length; i++) {
+	    		for(int i = 3; i < v.length; i++) {
     				stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND numero = ?");
     				stmt.setInt(1, Integer.parseInt(v[i].split("@")[0]));
     				stmt.setInt(2, j + 1);
@@ -321,23 +357,72 @@ public class GestisciClient implements Runnable, Serializable{
 		}
 	}
 	
+	
+	public ArrayList<Votazione> haVotato(String codFiscale, ArrayList<Votazione> ref, ArrayList<Votazione> vot) throws SQLException {
+		ArrayList<Votazione> votazione = new ArrayList<>();
+		if(ref == null && vot == null)
+			return null;
+		else {
+			if(vot == null) {
+				for(int i = 0; i < ref.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + ref.get(i).getNome() + ref.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(ref.get(i).getNome() + ref.get(i).getId()) == 0){
+							votazione.add(ref.get(i));
+						}
+					}
+				}
+			}else if (ref == null) {
+				for(int i = 0; i < vot.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + vot.get(i).getNome() + vot.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(vot.get(i).getNome() + vot.get(i).getId()) == 0){
+							votazione.add(vot.get(i));
+						}
+					}
+				}
+			}else {
+				for(int i = 0; i < ref.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + ref.get(i).getNome() + ref.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(ref.get(i).getNome() + ref.get(i).getId()) == 0){
+							votazione.add(ref.get(i));
+						}
+					}
+				}
+				for(int i = 0; i < vot.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + vot.get(i).getNome() + vot.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(vot.get(i).getNome() + vot.get(i).getId()) == 0){
+							votazione.add(vot.get(i));
+						}
+					}
+				}
+			}
+		}
+		if (votazione.size() == 0)
+			return null;
+		return votazione;
+	}
+	
 	//invia la lista delle votazioni attive al client per selezionare quale votare
-	public void getAttive() throws SQLException, IOException {
-		ArrayList<Votazione> ref = getReferendumAttivi();
-		ArrayList<Votazione> vot = getVotazioniAttive();
-		if(ref == null && vot == null) {
+	public void getAttive(String codFiscale) throws SQLException, IOException {
+		ArrayList<Votazione> vot = haVotato(codFiscale, getReferendumAttivi(), getVotazioniAttive());
+
+		if(vot == null) {
 			outputStream.write("no".getBytes(), 0, "no".length());
 		} else {
 			outputStream.write("ok".getBytes(), 0, "ok".length());
 			ObjectOutputStream oout = new ObjectOutputStream(outputStream);
-			if(vot == null) {
-				oout.writeObject(ref);
-			} else if(ref == null) {
-				oout.writeObject(vot);
-			} else {
-				vot.addAll(ref);
-				oout.writeObject(vot);
-			}
+			oout.writeObject(vot);
 		}		
 	}
 	
@@ -731,10 +816,14 @@ public class GestisciClient implements Runnable, Serializable{
 				if(risposta.equals("esc")) {
 					return;
 				} else {
-					int id = Integer.parseInt(risposta);
+					String[] s = risposta.split("@");
+					int id = Integer.parseInt(s[1]);
+					String tabella = s[0] + s[1];
 					stmt = conn.prepareStatement("UPDATE referendum  SET attivo = ? WHERE idReferendum = ?;");
 		    		stmt.setInt(1, 1);
 		    		stmt.setInt(2, id);
+			    	stmt.execute();
+			    	stmt = conn.prepareStatement("ALTER TABLE votato ADD " + tabella + " INT NOT NULL DEFAULT 0");
 			    	stmt.execute();
 			    	LogHandler.writeLog("Nuovo referendum avviato");
 			    	//Server.setVotazione(votazione);
@@ -778,6 +867,9 @@ public class GestisciClient implements Runnable, Serializable{
 							stmt.execute();
 					    	done = true;
 						}
+						
+						stmt = conn.prepareStatement("ALTER TABLE votato ADD " + nome_t + " INT NOT NULL DEFAULT 0");
+				    	stmt.execute();
 						
 				    	for(int i = 2; i < v.length; i++) {
 				    		stmt = conn.prepareStatement("INSERT INTO " + nome_t + " (id, tipo, nome) VALUES (?, ?, ?)");
@@ -848,24 +940,24 @@ public class GestisciClient implements Runnable, Serializable{
     	}
 	}
 	
-	public void inserisciRefVoto(String voto) throws IOException {
+	public void inserisciRefVoto(String voto) throws IOException, SQLException {
+		System.out.println(voto);
+		String v[] = voto.split(",");
+		votato(v[2], v[1] + v[0]);
 		try {
-			if(voto.equals("no")) {
-				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET no = no + ? WHERE attivo = ?");
-				stmt.setInt(1, 1);
-				stmt.setInt(2, 1);
+			if(v[3].equals("no")) {
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET no = no + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
 		    	stmt.execute();
 			}
-			else if(voto.equals("si")){
-				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET si = si + ? WHERE attivo = ?");
-				stmt.setInt(1, 1);
-				stmt.setInt(2, 1);
+			else if(v[3].equals("si")){
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET si = si + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
 		    	stmt.execute();
 			}
 			else{
-				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET sb = sb + ? WHERE attivo = ?");
-				stmt.setInt(1, 1);
-				stmt.setInt(2, 1);
+				PreparedStatement stmt = conn.prepareStatement("UPDATE referendum SET sb = sb + 1 WHERE idReferendum = ?");
+				stmt.setInt(1, Integer.parseInt(v[0]));
 		    	stmt.execute();
 			}
 			outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -937,7 +1029,7 @@ public class GestisciClient implements Runnable, Serializable{
 	}
 	
 	public void getDomanda(int id, String nome) throws SQLException, IOException {
-		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo FROM referendum WHERE idReferendum = ? AND nome = ?");
+		PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, testo, nome FROM referendum WHERE idReferendum = ? AND nome = ?");
 		stmt.setInt(1, id);
 		stmt.setString(2, nome);
 		ResultSet rs = stmt.executeQuery();
@@ -947,7 +1039,7 @@ public class GestisciClient implements Runnable, Serializable{
 			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
 			pubkey.writeObject(Server.getPublicKey());
 			//TODO mettere anche il nome nella classe referendum così si può mostrare anche quello durante la votazione
-			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("testo"));
+			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("nome"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(re);
 		}
@@ -984,10 +1076,11 @@ public class GestisciClient implements Runnable, Serializable{
 		try {
 			String[] voto = votazione.split(",");
 			String[] tabella = voto[0].split("@");
+			votato(voto[1], tabella[0]+tabella[1]);
 			PreparedStatement stmt = conn.prepareStatement("UPDATE " + tabella[0]+tabella[1] + " SET voto = voto + ? WHERE id = ? AND nome = ?");
 			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(voto[1].split("@")[0]));
-			stmt.setString(3, voto[1].split("@")[1]);
+			stmt.setInt(2, Integer.parseInt(voto[2].split("@")[0]));
+			stmt.setString(3, voto[2].split("@")[1]);
 			//stmt.setString(4, "partito");
 			stmt.execute();
 			outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -1002,13 +1095,14 @@ public class GestisciClient implements Runnable, Serializable{
 		try {
 			String[] v = s.split(",");
 			String nome_t = v[0].split("@")[0]+v[0].split("@")[1];
+			votato(v[1], nome_t);
 			PreparedStatement stmt = conn.prepareStatement("UPDATE "+ nome_t +" SET voto = voto + ? WHERE id = ? AND nome = ?");
 			stmt.setInt(1, 1);
-			stmt.setInt(2, Integer.parseInt(v[1].split("@")[0]));
-			stmt.setString(3, v[1].split("@")[1]);
+			stmt.setInt(2, Integer.parseInt(v[2].split("@")[0]));
+			stmt.setString(3, v[2].split("@")[1]);
 			//stmt.setString(4, "partito");
 	    	stmt.execute();
-			for(int i = 2; i < v.length; i++) {
+			for(int i = 3; i < v.length; i++) {
 				stmt = conn.prepareStatement("UPDATE " + nome_t + " SET voto = voto + ? WHERE id = ? AND nome = ?");
 				stmt.setInt(1, 1);
 				stmt.setInt(2, Integer.parseInt(v[i].split("@")[0]));

@@ -72,12 +72,18 @@ public class ControllerVC {
     	Cipher cipher = Cipher.getInstance("RSA");
     	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
     	out.write("vc".getBytes(), 0, "vc".length());
+    	String codfis = "";
+    	if(ControllerCL.getCodiceFiscale() != null)
+    		codfis = ControllerCL.getCodiceFiscale();
+    	else 
+    		codfis = ControllerLogin.getUser().getCodiceFiscale();
+    	final String cf = codfis;
         if (rb != null) {
     		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + rb.getText() + "?");
 			alert.showAndWait().ifPresent(response -> {
 			     if (response == ButtonType.OK) {
 			        try {
-			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + rb.getId()).getBytes());
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + cf + "," + rb.getId()).getBytes());
 				        DataOutputStream dos = new DataOutputStream(out);
 						dos.writeInt(cipherData.length);
 						dos.write(cipherData, 0, cipherData.length);
@@ -112,7 +118,7 @@ public class ControllerVC {
 			alert.showAndWait().ifPresent(response -> {
 			     if (response == ButtonType.OK) {
 			        try {
-			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + ",-1@schede bianche,").getBytes());
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + cf + ",-1@schede bianche,").getBytes());
 				        DataOutputStream dos = new DataOutputStream(out);
 						dos.writeInt(cipherData.length);
 						dos.write(cipherData, 0, cipherData.length);
@@ -155,7 +161,7 @@ public class ControllerVC {
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();

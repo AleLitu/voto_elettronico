@@ -73,12 +73,18 @@ public class ControllerVCP {
     	byte buffer[] = new byte[100];
     	boolean trovato = false;
     	out.write("vcp".getBytes(), 0, "vcp".length());
+    	String codfis = "";
+    	if(ControllerCL.getCodiceFiscale() != null)
+    		codfis = ControllerCL.getCodiceFiscale();
+    	else 
+    		codfis = ControllerLogin.getUser().getCodiceFiscale();
+    	final String cf = codfis;
         if (rb != null) {
     		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + rb.getText() + "?");
 			alert.showAndWait().ifPresent(response -> {
 			     if (response == ButtonType.OK) {
 			        try {
-			        	String s = ControllerAttive.getScelta() + "," + rb.getId();
+			        	String s = ControllerAttive.getScelta() + "," + cf + "," + rb.getId();
 			    		for(int i = 0; i < selected.size(); i++) {
 			    			if(selected.get(i).isSelected()) {
 			    				s += "," + selected.get(i).getId();
@@ -118,7 +124,7 @@ public class ControllerVCP {
 			alert.showAndWait().ifPresent(response -> {
 			     if (response == ButtonType.OK) {
 			        try {
-			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + ",-1@schede bianche,").getBytes());
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + cf + ",-1@schede bianche,").getBytes());
 				        DataOutputStream dos = new DataOutputStream(out);
 						dos.writeInt(cipherData.length);
 						dos.write(cipherData, 0, cipherData.length);
@@ -161,7 +167,7 @@ public class ControllerVCP {
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();

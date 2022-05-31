@@ -110,7 +110,7 @@ public class ControllerVO{
     @FXML
     void handleConferma(ActionEvent event) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
     	RadioButton rb = (RadioButton)group.getSelectedToggle();
-    	String s = "";
+    	String s = "", s1 = "";
     	if (rb != null) {
     		if(rb.getId().equals("p")){
 	    		int count = 1;
@@ -121,9 +121,11 @@ public class ControllerVO{
 	    				if(btnNumero[i].getText().equals(count + "")) {
 	    					if(j == 0) {
 	    						s = "p," + listp.get(i).getId() + "@" + listp.get(i).getNome();
+	    						s1 = listp.get(i).getId() + " " + listp.get(i).getNome() + " " + count + " ";
 	    						j++;
 	    					}else {
 	    						s += "," + listp.get(i).getId() + "@" + listp.get(i).getNome();
+	    						s1 += ", " + listp.get(i).getId() + " " + listp.get(i).getNome() + " " + count + " ";
 	    					}
 	    					count++;
 	    					i = -1;
@@ -139,9 +141,11 @@ public class ControllerVO{
         				if(btnNumero[i].getText().equals(count + "")) {
         					if(j == 0) {
 	    						s = "c," + listc.get(i).getId() + "@" +  listc.get(i).getNome();
+	    						s1 = listc.get(i).getId() + " " + listc.get(i).getNome() + " " + count + " ";
 	    						j++;
         					}else {
         						s += "," + listc.get(i).getId() + "@" + listc.get(i).getNome();
+        						s1 += ", " + listc.get(i).getId() + " " + listc.get(i).getNome() + " " + count + " ";
         					}
         					count++;
         					i = -1;
@@ -156,12 +160,18 @@ public class ControllerVO{
     	Cipher cipher = Cipher.getInstance("RSA");
     	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
     	out.write("vo".getBytes(), 0, "vo".length());
+    	String codfis = "";
+    	if(ControllerCL.getCodiceFiscale() != null)
+    		codfis = ControllerCL.getCodiceFiscale();
+    	else 
+    		codfis = ControllerLogin.getUser().getCodiceFiscale();
+    	final String cf = codfis;
         if (rb != null) {
-    		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + rb.getText() + "?");
+    		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + s1 + "?");
 			alert.showAndWait().ifPresent(response -> {
 			     if (response == ButtonType.OK) {
 			        try {			        	
-			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + a).getBytes());
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + cf + "," + a).getBytes());
 				        DataOutputStream dos = new DataOutputStream(out);
 						dos.writeInt(cipherData.length);
 						dos.write(cipherData, 0, cipherData.length);
@@ -239,7 +249,7 @@ public class ControllerVO{
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();

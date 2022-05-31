@@ -71,6 +71,12 @@ public class ControllerReferendumVoto{
         letti = inputStream.read(buffer);
 		ok = new String(buffer, 0, letti);
 		if(ok.equals("ok")) {
+			String codfis = "";
+        	if(ControllerCL.getCodiceFiscale() != null)
+        		codfis = ControllerCL.getCodiceFiscale();
+        	else 
+        		codfis = ControllerLogin.getUser().getCodiceFiscale();
+        	final String cf = codfis;
 			//outputStream.write(String.valueOf(ControllerLogin.getUser().getId()).getBytes(), 0, String.valueOf(ControllerLogin.getUser().getId()).length());
 			//if(ok.equals("ok")) {
 				//byte[] cipherData;
@@ -81,7 +87,7 @@ public class ControllerReferendumVoto{
 					alert.showAndWait().ifPresent(response -> {
 					     if (response == ButtonType.OK) {
 					        try {
-					        	byte[] cipherData = cipher.doFinal("sb".getBytes());
+					        	byte[] cipherData = cipher.doFinal((re.getId() + "," + re.getNome() + "," + cf + ",sb").getBytes());
 						        DataOutputStream dos = new DataOutputStream(outputStream);
 								dos.writeInt(cipherData.length);
 								dos.write(cipherData, 0, cipherData.length);
@@ -116,7 +122,7 @@ public class ControllerReferendumVoto{
 						alert.showAndWait().ifPresent(response -> {
 						     if (response == ButtonType.OK) {
 						        try {
-						        	byte[] cipherData = cipher.doFinal("si".getBytes());
+						        	byte[] cipherData = cipher.doFinal((re.getId() + "," + re.getNome() + "," + cf + ",si").getBytes());
 							        DataOutputStream dos = new DataOutputStream(outputStream);
 									dos.writeInt(cipherData.length);
 									dos.write(cipherData, 0, cipherData.length);
@@ -152,7 +158,7 @@ public class ControllerReferendumVoto{
 						alert.showAndWait().ifPresent(response -> {
 						     if (response == ButtonType.OK) {
 						        try {
-						        	byte[] cipherData = cipher.doFinal("no".getBytes());
+						        	byte[] cipherData = cipher.doFinal((re.getId() + "," + re.getNome() + "," + cf + ",no").getBytes());
 							        DataOutputStream dos = new DataOutputStream(outputStream);
 									dos.writeInt(cipherData.length);
 									dos.write(cipherData, 0, cipherData.length);
@@ -204,7 +210,7 @@ public class ControllerReferendumVoto{
     @FXML
     private void initialize() throws IOException, ClassNotFoundException {
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
         outputStream = so.getOutputStream();

@@ -91,7 +91,7 @@ public class ControllerAttive {
     @FXML
     void initialize() throws IOException, ClassNotFoundException {
     	if(ControllerLogin.getSocket() == null)
-    		so = ClientLocal.getSocket();
+    		so = ControllerCL.getSocket();
     	else
     		so = ControllerLogin.getSocket();
     	in = so.getInputStream();

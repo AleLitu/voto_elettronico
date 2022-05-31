@@ -120,18 +120,27 @@ public class ControllerLogin {
     				String risposta;
     				byte buffer[] = new byte[dim_buffer];
     				outputStream.write("attive".getBytes(), 0, "attive".length());
-    		        letti = inputStream.read(buffer);
+    				letti = inputStream.read(buffer);
     		        risposta = new String(buffer, 0, letti);
-    		        if(risposta.equals("no")) {
-    		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
-    		    		alert.show();
-    		    		so.close();
-    		        } else {
-    					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
-    			        actual.setScene(new Scene(root));
-    			        actual.setTitle("Scegli");
-    		        }
-    			}
+    		        if(risposta.equals("ok")) {
+	    				outputStream.write(user.getCodiceFiscale().getBytes(), 0, user.getCodiceFiscale().length());
+	    		        letti = inputStream.read(buffer);
+	    		        risposta = new String(buffer, 0, letti);
+	    		        if(risposta.equals("ok")) {
+	    		        	letti = inputStream.read(buffer);
+	        		        risposta = new String(buffer, 0, letti);
+		    		        if(risposta.equals("no")) {
+		    		        	Alert alert = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
+		    		    		alert.show();
+		    		    		so.close();
+		    		        } else {
+		    					Parent root = FXMLLoader.load(getClass().getResource("sceltaVotazione.fxml"));
+		    			        actual.setScene(new Scene(root));
+		    			        actual.setTitle("Scegli");
+		    		        }
+	    		        }
+    		        }  
+				 }
     		} catch(Exception e) {
     			System.out.println(e);
     		}
