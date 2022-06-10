@@ -112,7 +112,7 @@ public class ControllerLogin {
                 if(risposta.equals("ok")) {
 				    outputStream.write("a".getBytes(), 0, "a".length());
 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
-					User user = (User) oin.readObject();
+					user = (User) oin.readObject();
 					if(user != null) {
 	            		Node node = (Node) event.getSource();
 	            		Stage actual = (Stage) node.getScene().getWindow();

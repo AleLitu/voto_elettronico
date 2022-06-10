@@ -365,6 +365,7 @@ public class HandlerVotazione extends HandlerVotazioni{
 			}
 			rs.next();
 		}
+		//TODO controllare anche qua se ci entra o se dà problemi con il promo elemento che è scheda bianca
 		if(!tipo_vot.equals("categorico")) {
 			for(int j = 0; j < idp_max.size(); j++) {
 				idc_max.clear();
@@ -415,6 +416,7 @@ public class HandlerVotazione extends HandlerVotazioni{
 		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + nome_tab);
 		ResultSet rs = stmt.executeQuery();
 		rs.next();
+		rs.next();
 		stmt = conn.prepareStatement("SELECT tipo FROM terminate WHERE idTerminate = ? AND nome = ?");
 		stmt.setInt(1, v.getId());
 		stmt.setString(2, v.getNome());
@@ -443,6 +445,7 @@ public class HandlerVotazione extends HandlerVotazioni{
 		stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
 		stmt.execute();
 		if((tot_p / 2) < max_p) {
+			System.out.println("magg ass partito va bene");
 			if(!tipo_vot.equals("categorico")) {
 				for(int j = 0; j < idp_max.size(); j++) {
 					idc_max.clear();

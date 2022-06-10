@@ -21,7 +21,7 @@ public class LogHandler {
 		}
 	}
 	
-	public static void writeLog(String mes) throws IOException {
+	public synchronized static void writeLog(String mes) throws IOException {
 		FileWriter fw = new FileWriter(path, true);
 		BufferedWriter bw = new BufferedWriter(fw);
 		PrintWriter pw = new PrintWriter(bw);

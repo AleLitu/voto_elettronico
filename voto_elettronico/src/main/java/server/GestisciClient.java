@@ -23,6 +23,7 @@ import model.Candidato;
 import model.Partito;
 import model.Referendum;
 import model.Votazione;
+import server.handler.HandlerKeys;
 import server.handler.HandlerReferendum;
 import server.handler.HandlerVotazione;
 import server.handler.HandlerVotazioni;
@@ -72,12 +73,14 @@ public class GestisciClient implements Runnable, Serializable{
     	href = new HandlerReferendum(conn);
     	hvot = new HandlerVotazione(conn);
     	huser = new HandlerUser(conn);
+    	HandlerKeys keys = HandlerKeys.getInstance();
 		    	
 		while(true) {
 			try {
 				letti = inputStream.read(buffer);
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
+					System.out.println(scelta);
 					switch(scelta) {
 					case "registrazione":
 						/*outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -90,7 +93,7 @@ public class GestisciClient implements Runnable, Serializable{
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						cipher.init(Cipher.DECRYPT_MODE, keys.getPrivateKey());
 						String reg = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						System.out.println("reg: " + reg);
 						if(!reg.equals("err")) {
@@ -174,7 +177,7 @@ public class GestisciClient implements Runnable, Serializable{
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						cipher.init(Cipher.DECRYPT_MODE, keys.getPrivateKey());
 						String voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
 							if(href.inserisciVoto(voto)) {
@@ -279,14 +282,14 @@ public class GestisciClient implements Runnable, Serializable{
 							oout.writeObject(nome_t.replaceAll("\\d",""));
 							oout.flush();
 							ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
-							pubkey.writeObject(Server.getPublicKey());
+							pubkey.writeObject(keys.getPublicKey());
 							oout = new ObjectOutputStream(outputStream);
 							oout.writeObject(partiti);
 						} else {
 							Referendum re = href.getDomanda(Integer.parseInt(v[1]), v[0]);
 							if(re != null) {
 								ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
-								pubkey.writeObject(Server.getPublicKey());
+								pubkey.writeObject(keys.getPublicKey());
 								ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 								oos.writeObject(re);
 							}
@@ -298,7 +301,7 @@ public class GestisciClient implements Runnable, Serializable{
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						cipher.init(Cipher.DECRYPT_MODE, keys.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
 							if(hvot.inserisciVoto(voto+"€vc")) {
@@ -316,7 +319,7 @@ public class GestisciClient implements Runnable, Serializable{
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						cipher.init(Cipher.DECRYPT_MODE, keys.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
 							if(hvot.inserisciVoto(voto+"€vcp")) {
@@ -334,7 +337,7 @@ public class GestisciClient implements Runnable, Serializable{
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
 					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
+						cipher.init(Cipher.DECRYPT_MODE, keys.getPrivateKey());
 						voto = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						if(!voto.equals("err")) {
 							if(hvot.inserisciVoto(voto+"€vo")) {
@@ -607,7 +610,7 @@ public class GestisciClient implements Runnable, Serializable{
 			oout.writeObject(nome_t.replaceAll("\\d",""));
 			oout.flush();
 			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
-			pubkey.writeObject(Server.getPublicKey());
+			//pubkey.writeObject(keys.getPublicKey());
 			oout = new ObjectOutputStream(outputStream);
 			oout.writeObject(partiti);
 		} else {
@@ -1293,7 +1296,7 @@ public class GestisciClient implements Runnable, Serializable{
 			//TODO
 		} else {
 			ObjectOutputStream pubkey = new ObjectOutputStream(outputStream);
-			pubkey.writeObject(Server.getPublicKey());
+			//pubkey.writeObject(key.getPublicKey());
 			Referendum re = new Referendum(rs.getInt("idReferendum"), rs.getString("nome"), rs.getString("testo"));
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
 			oos.writeObject(re);

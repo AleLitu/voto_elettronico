@@ -17,10 +17,13 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import server.handler.HandlerKeys;
+
 
 public class Server{
 	private static PublicKey pubKey;
 	private static PrivateKey privKey;
+	private static HandlerKeys keys;
 	ServerSocket sSrv;
 	Socket toClient;
 	
@@ -28,18 +31,20 @@ public class Server{
 		try {
 			LogHandler.createLog();
 			LogHandler.writeLog("Server started");
-			KeyPair loadedKeyPair = LoadKeyPair("RSA");
-			pubKey = loadedKeyPair.getPublic();
-			privKey = loadedKeyPair.getPrivate();
+			keys = HandlerKeys.getInstance();
+			keys.LoadKeyPair("RSA");
+			//KeyPair loadedKeyPair = LoadKeyPair("RSA");
+			//pubKey = loadedKeyPair.getPublic();
+			//privKey = loadedKeyPair.getPrivate();
 			LogHandler.writeLog("Chiavi caricate correttamente");
 		}catch(FileNotFoundException e) {
-			GenerateKeys();
+			keys.GenerateKeys();
 		} catch (IOException e) {
 			LogHandler.writeLog("Errore nella lettura delle chiavi dai file");
 			return;
 		} catch(InvalidKeySpecException e) {
 			LogHandler.writeLog("Le chiavi hanno subito delle modifiche, verranno ricreate");
-			GenerateKeys();
+			keys.GenerateKeys();
 		} catch(Exception e) {
 			e.printStackTrace();
 			return;
@@ -104,7 +109,7 @@ public class Server{
 			e.printStackTrace();
 		}
 	}*/
-	
+	/*
 	protected static PublicKey getPublicKey() {
 		return pubKey;
 	}
@@ -170,5 +175,5 @@ public class Server{
 		PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
  
 		return new KeyPair(publicKey, privateKey);
-	}
+	}*/
 }
