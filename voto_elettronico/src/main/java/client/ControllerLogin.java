@@ -92,7 +92,7 @@ public class ControllerLogin {
     	lblThird.setText("0");
     	lblFourth.setText("1");
     	Alert alert;
-    	if(usr.equals("") && pwd.equals("")) {
+    	if((usr.equals("") && pwd.equals("")) || usr.equals("") || pwd.equals("")) {
     		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale e la password", ButtonType.CLOSE);
     		alert.show();
     	}else {
@@ -106,13 +106,14 @@ public class ControllerLogin {
     		letti = inputStream.read(buffer);
             risposta = new String(buffer, 0, letti);
             if(risposta.equals("ok")) {
-            	outputStream.write(usr.getBytes(), 0, usr.length());
+            	outputStream.write((usr + "," + pwd).getBytes(), 0, (usr + "," + pwd).length());
             	letti = inputStream.read(buffer);
                 risposta = new String(buffer, 0, letti);
                 if(risposta.equals("ok")) {
 				    outputStream.write("a".getBytes(), 0, "a".length());
 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
 					user = (User) oin.readObject();
+					System.out.println(user);
 					if(user != null) {
 	            		Node node = (Node) event.getSource();
 	            		Stage actual = (Stage) node.getScene().getWindow();
@@ -177,7 +178,7 @@ public class ControllerLogin {
     	try {
 			so = new Socket(address, SOCKET_PORT);
 			outputStream = so.getOutputStream();
-	        inputStream = so.getInputStream();
+			inputStream = so.getInputStream();
 			System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
 			return true;
 		} catch (IOException e) {
@@ -202,7 +203,7 @@ public class ControllerLogin {
         String n2=lblSecond.getText();
         String n3=lblThird.getText();
         String n4=lblFourth.getText();
-
+        System.out.println(n1 + " " + n2 + " " + n3 + " " + n4);
         int n1_int=isInteger(n1);
         int n2_int=isInteger(n2);
         int n3_int=isInteger(n3);

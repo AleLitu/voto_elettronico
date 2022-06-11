@@ -27,7 +27,7 @@ public class UserDaoImpl implements UserDao {
 		return r.toString();      
 	}
    
-	public User getUser(String utente) {
+	public User getUser(String utente, String password) {
 		if(utente.equals(""))
 			return null;
 		String[] s = utente.split("@");
@@ -47,8 +47,10 @@ public class UserDaoImpl implements UserDao {
 		String type = s[12];
 		User u = new User(codiceFiscale, cognome, nome, pass, sesso, anno, mese, giorno, paese, citta, comune, type);
 		u.setPassword(pass);
-		if(u.getPassword().equals(pass)) {
-			u.setType(s[12]);
+		if(password.equals("")) {
+			return u;
+		}
+		if(u.getPassword().equals(md5(password + salt) + ":" + salt)) {
 			return u;
 		}
 		return null;

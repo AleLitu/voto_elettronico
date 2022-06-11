@@ -109,7 +109,7 @@ public class Server{
 			e.printStackTrace();
 		}
 	}*/
-	/*
+	
 	protected static PublicKey getPublicKey() {
 		return pubKey;
 	}
@@ -175,5 +175,5 @@ public class Server{
 		PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
  
 		return new KeyPair(publicKey, privateKey);
-	}*/
+	}
 }

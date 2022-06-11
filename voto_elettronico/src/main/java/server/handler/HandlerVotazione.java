@@ -206,7 +206,6 @@ public class HandlerVotazione extends HandlerVotazioni{
 			if(rs.next()) {
 				num = rs.getInt("num");
 			}
-			System.out.println(num);
 			stmt = conn.prepareStatement("SELECT * FROM " + nome_t + "1"); 
 			rs = stmt.executeQuery();	
 			boolean b = false;
@@ -217,6 +216,13 @@ public class HandlerVotazione extends HandlerVotazioni{
 				stmt = conn.prepareStatement("SELECT * FROM " + nome_t); 
 				rs = stmt.executeQuery();
 				while(rs.next()) {
+					stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
+					stmt.setInt(1, -1);
+					stmt.setInt(2, 0);
+					stmt.setString(3, null);
+					stmt.setString(4, "schede bianche");
+					stmt.setInt(5, 0);
+					stmt.execute();
 					for(int i = 0; i < num; i++) {
 						stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
 						stmt.setInt(1, rs.getInt("id"));
@@ -238,7 +244,7 @@ public class HandlerVotazione extends HandlerVotazioni{
 			    	stmt.execute();
 				}
 				return true;
-	    	}else {
+	    	}else if(v[2].equals("c")){
 	    		for(int i = 3; i < v.length; i++) {
     				stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND numero = ?");
     				stmt.setInt(1, Integer.parseInt(v[i].split("@")[0]));
@@ -247,8 +253,13 @@ public class HandlerVotazione extends HandlerVotazioni{
     		    	stmt.execute();
 				}
 				return true;
+	    	}else {
+				stmt = conn.prepareStatement("UPDATE " + nome_t + "1" + " SET voto = voto + 1 WHERE id = ? AND nome = ?");
+				stmt.setInt(1, Integer.parseInt(v[2].split("@")[0]));
+				stmt.setString(2, v[2].split("@")[1]);
+		    	stmt.execute();
+		    	return true;
 	    	}
-			
 		}catch (Exception e) {
     		return false;
     	}
@@ -365,7 +376,6 @@ public class HandlerVotazione extends HandlerVotazioni{
 			}
 			rs.next();
 		}
-		//TODO controllare anche qua se ci entra o se dà problemi con il promo elemento che è scheda bianca
 		if(!tipo_vot.equals("categorico")) {
 			for(int j = 0; j < idp_max.size(); j++) {
 				idc_max.clear();
@@ -416,7 +426,6 @@ public class HandlerVotazione extends HandlerVotazioni{
 		PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + nome_tab);
 		ResultSet rs = stmt.executeQuery();
 		rs.next();
-		rs.next();
 		stmt = conn.prepareStatement("SELECT tipo FROM terminate WHERE idTerminate = ? AND nome = ?");
 		stmt.setInt(1, v.getId());
 		stmt.setString(2, v.getNome());
@@ -445,7 +454,6 @@ public class HandlerVotazione extends HandlerVotazioni{
 		stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
 		stmt.execute();
 		if((tot_p / 2) < max_p) {
-			System.out.println("magg ass partito va bene");
 			if(!tipo_vot.equals("categorico")) {
 				for(int j = 0; j < idp_max.size(); j++) {
 					idc_max.clear();

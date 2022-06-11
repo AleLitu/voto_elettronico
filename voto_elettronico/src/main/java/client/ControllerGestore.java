@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -23,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -96,11 +98,40 @@ public class ControllerGestore {
     
     @FXML
     void handleRegistra(ActionEvent event) throws IOException {
-    	Node node = (Node) event.getSource();
-		Stage actual = (Stage) node.getScene().getWindow();
-		Parent root = FXMLLoader.load(getClass().getResource("registrazione.fxml"));
-        actual.setScene(new Scene(root));
-        actual.setTitle("Avvia votazione");
+    	boolean ok = false;
+    	int dim_buffer = 100;
+		int letti;
+		String risposta;
+		byte buffer[] = new byte[dim_buffer];
+    	TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle("Codice Fiscale");
+		dialog.setHeaderText("Inserisci il codice fiscale");
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent() && !result.get().equals("")){
+    		out.write("codiceFiscale".getBytes(), 0, "codiceFiscale".length());
+    		letti = in.read(buffer);
+	        risposta = new String(buffer, 0, letti);
+	        if(risposta.equals("ok")) {
+	        	System.out.println("cod fiscale: " + result.get());
+	        	out.write(result.get().getBytes(), 0, result.get().length());
+	        	letti = in.read(buffer);
+		        risposta = new String(buffer, 0, letti);
+		        if(risposta.equals("ok")) {
+		        	Alert alert = new Alert(AlertType.WARNING, "Utente già esistente", ButtonType.CLOSE);
+	        		alert.show();
+		        }
+		        else {
+		        	Node node = (Node) event.getSource();
+		    		Stage actual = (Stage) node.getScene().getWindow();
+		    		Parent root = FXMLLoader.load(getClass().getResource("registrazione.fxml"));
+		            actual.setScene(new Scene(root));
+		            actual.setTitle("Registrazione");
+		        }
+	        }
+		} else {
+			Alert alert = new Alert(AlertType.WARNING, "Codice fiscale necessario", ButtonType.CLOSE);
+    		alert.show();
+		}
     }
 
     @FXML
@@ -203,7 +234,10 @@ public class ControllerGestore {
     
     @FXML
     public void initialize() {
+    	System.out.println("Gestore");
+    	System.out.println(ControllerLogin.getUser().getCognome() + " " + ControllerLogin.getUser().getNome());
     	lblNome.setText("Benvenuto, " + ControllerLogin.getUser().getCognome() + " " + ControllerLogin.getUser().getNome());
+    	System.out.println("Gestore2");
     }
 
 }

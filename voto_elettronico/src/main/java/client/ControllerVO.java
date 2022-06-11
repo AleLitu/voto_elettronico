@@ -166,6 +166,42 @@ public class ControllerVO{
     	else 
     		codfis = ControllerLogin.getUser().getCodiceFiscale();
     	final String cf = codfis;
+    	if(s1.equals("")) {
+        	Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
+			alert.showAndWait().ifPresent(response -> {
+			     if (response == ButtonType.OK) {
+			        try {
+			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + "," + cf + ",-1@schede bianche,").getBytes());
+				        DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+						int mes = in.read(buffer);
+						String r = new String(buffer, 0, mes);
+						System.out.println("vo r: "+r);
+						if(r.equals("ok"))
+							votato(event);
+						else {
+							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
+							return;
+						}
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
+						return;
+					}
+			     } else {
+					try {
+						byte[] cipherData = cipher.doFinal("err".getBytes());
+						DataOutputStream dos = new DataOutputStream(out);
+						dos.writeInt(cipherData.length);
+						dos.write(cipherData, 0, cipherData.length);
+				    	return;
+					} catch (Exception e) {
+						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
+						return;
+					}
+			     }
+			 });
+        }
         if (rb != null) {
     		Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare "  + s1 + "?");
 			alert.showAndWait().ifPresent(response -> {
@@ -201,40 +237,6 @@ public class ControllerVO{
 			     }
 			 });
     		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
-        } else if(voti == 0) {
-        	Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
-			alert.showAndWait().ifPresent(response -> {
-			     if (response == ButtonType.OK) {
-			        try {
-			        	byte[] cipherData = cipher.doFinal((ControllerAttive.getScelta() + ",-1@schede bianche,").getBytes());
-				        DataOutputStream dos = new DataOutputStream(out);
-						dos.writeInt(cipherData.length);
-						dos.write(cipherData, 0, cipherData.length);
-						int mes = in.read(buffer);
-						String r = new String(buffer, 0, mes);
-						if(r.equals("ok"))
-							votato(event);
-						else {
-							new Alert(AlertType.ERROR, "Errore nella registrazione del voto, riprovare", ButtonType.CLOSE).show();
-							return;
-						}
-					} catch (Exception e) {
-						new Alert(AlertType.ERROR, "Errore nell'invio del voto, riprovare", ButtonType.CLOSE).show();
-						return;
-					}
-			     } else {
-					try {
-						byte[] cipherData = cipher.doFinal("err".getBytes());
-						DataOutputStream dos = new DataOutputStream(out);
-						dos.writeInt(cipherData.length);
-						dos.write(cipherData, 0, cipherData.length);
-				    	return;
-					} catch (Exception e) {
-						new Alert(AlertType.ERROR, "Errore", ButtonType.CLOSE).show();
-						return;
-					}
-			     }
-			 });
         }
     }
     

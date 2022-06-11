@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.crypto.Cipher;
 
@@ -31,6 +32,7 @@ import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -60,6 +62,9 @@ public class ControllerRegistrazione{
     
     @FXML
     private Button btnIndietro;
+    
+    @FXML
+    private Label lblIndirizzo;
 
     @FXML
     private Label lblCitta;
@@ -145,6 +150,8 @@ public class ControllerRegistrazione{
     @FXML
     private MenuItem btnAnni[];
     
+    private boolean connected = false;
+    
     private int mesi = 12;
     private int anni = 120;
     private int giorni = 31;
@@ -166,14 +173,15 @@ public class ControllerRegistrazione{
     }
     
     public void connection (String address) throws IOException, ClassNotFoundException{
-    	so = new Socket(address, SOCKET_PORT);
-        outputStream = so.getOutputStream();
-        inputStream = so.getInputStream();
-        System.out.println("1");
-		ObjectInputStream keystream = new ObjectInputStream(inputStream);
-    	System.out.println("2.4");
-    	pubKey = (PublicKey) keystream.readObject();
-    	System.out.println("2.5");
+    	try {
+	    	if(connected == false) {
+	    		so = new Socket(address, SOCKET_PORT);
+	    		inputStream = so.getInputStream();
+	    		outputStream = so.getOutputStream();
+	    	}    		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
     }
     
@@ -336,7 +344,7 @@ public class ControllerRegistrazione{
     void handleRegistrazione(ActionEvent event) throws Exception {
     	String codiceFiscale = tfCF.getText();
     	String sesso = mbSesso.getText();
-    	lblFirst.setText("127");
+		lblFirst.setText("127");
     	lblSecond.setText("0");
     	lblThird.setText("0");
     	lblFourth.setText("1");
@@ -373,14 +381,16 @@ public class ControllerRegistrazione{
 					int letti;
 					String risposta;
 					byte buffer[] = new byte[dim_buffer];
+					System.out.println("re1");
 					outputStream.write("registrazione".getBytes(), 0, "registrazione".length());
+					//outputStream.write("registrazione".getBytes(), 0, "registrazione".length());
+					System.out.println("reg2");
 					letti = inputStream.read(buffer);
 			        risposta = new String(buffer, 0, letti);
 			        if(risposta.equals("ok")) {
 			        	System.out.println("2.2");
-			        	
 			        	System.out.println("3");
-			        	byte buffer1[] = new byte[100];
+			        	/*byte buffer1[] = new byte[100];
 			        	//byte[] cipherData = null;
 			        	Cipher cipher = Cipher.getInstance("RSA");
 			        	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
@@ -389,21 +399,31 @@ public class ControllerRegistrazione{
 						dos.writeInt(cipherData.length);
 						dos.write(cipherData, 0, cipherData.length);
 						int mes = inputStream.read(buffer1);
-						String r = new String(buffer1, 0, mes);
+						String r = new String(buffer1, 0, mes);*/
+			        	outputStream.write(user.toString().getBytes(), 0, user.toString().length());
+						letti = inputStream.read(buffer);
+				        String r = new String(buffer, 0, letti);
 						System.out.println("4 " + r);
 						if(r.equals("ok")) {
 							Alert alert = new Alert(AlertType.INFORMATION , "Registrato correttamente");
 							alert.showAndWait().ifPresent(response -> {
 								if (response == ButtonType.OK) {
 									try {
-										outputStream = so.getOutputStream();
-										outputStream.write("logout".getBytes(), 0, "logout".length());
-										Node node = (Node) event.getSource();
-				    					Stage actual = (Stage) node.getScene().getWindow();
-				    			    	Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
-				    			        actual.setScene(new Scene(root));
-				    			        actual.setTitle("Login");
-										return;
+										if(connected == false)
+											outputStream.write("logout".getBytes(), 0, "logout".length());
+										if(connected == true) {
+											Node node = (Node) event.getSource();
+					    					Stage actual = (Stage) node.getScene().getWindow();
+					    			    	Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+					    			        actual.setScene(new Scene(root));
+					    			        actual.setTitle("Gestore");
+										}else {
+											Node node = (Node) event.getSource();
+					    					Stage actual = (Stage) node.getScene().getWindow();
+					    			    	Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+					    			        actual.setScene(new Scene(root));
+					    			        actual.setTitle("Login");
+										}
 									} catch (Exception e) {
 										new Alert(AlertType.ERROR, "Errore nel ritorno alla pagina di login", ButtonType.CLOSE).show();
 										return;
@@ -423,6 +443,17 @@ public class ControllerRegistrazione{
     
     @FXML
     public void initialize() throws IOException {
+    	if(ControllerLogin.getSocket() != null) {
+    		lblIndirizzo.setVisible(false);
+        	lblFirst.setVisible(false);
+        	lblSecond.setVisible(false);
+        	lblThird.setVisible(false);
+        	lblFourth.setVisible(false);
+        	so = ControllerLogin.getSocket();
+        	inputStream = so.getInputStream();
+    		outputStream = so.getOutputStream();
+        	connected = true;
+    	}
     	btnAnni = new MenuItem[anni];
     	int a = 0, d = 0;
     	for(a = annoAttuale; d < anni; d++) {

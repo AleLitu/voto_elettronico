@@ -1,4 +1,4 @@
 package model;
 public interface UserDao {
-   public User getUser(String user);
+   public User getUser(String user, String password);
 }

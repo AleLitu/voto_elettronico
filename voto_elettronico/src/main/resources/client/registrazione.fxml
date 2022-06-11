@@ -25,7 +25,7 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label text="Indirizzo server">
+                  <Label fx:id="lblIndirizzo" text="Indirizzo server">
                      <HBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                      </HBox.margin>
@@ -218,7 +218,7 @@
                               <Insets bottom="10.0" left="125.0" right="10.0" top="10.0" />
                            </HBox.margin>
                         </Button>
-                        <Button fx:id="btnIndietro" mnemonicParsing="false" text="INDIETRO">
+                        <Button fx:id="btnIndietro" mnemonicParsing="false" onAction="#handleIndietro" text="INDIETRO">
                            <HBox.margin>
                               <Insets bottom="10.0" left="175.0" right="10.0" top="10.0" />
                            </HBox.margin>

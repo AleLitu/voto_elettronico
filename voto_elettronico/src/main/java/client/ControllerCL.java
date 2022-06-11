@@ -109,16 +109,18 @@ public class ControllerCL {
 								String risposta;
 								byte buffer[] = new byte[dim_buffer];
 								outputStream.write("login".getBytes(), 0, "login".length());
+								outputStream.write("login".getBytes(), 0, "login".length());
 								letti = inputStream.read(buffer);
-							    risposta = new String(buffer, 0, letti);
-				                if(risposta.equals("ok")) {
-									outputStream.write(codiceFiscale.getBytes(), 0, codiceFiscale.length());
+							    String risposta1 = new String(buffer, 0, letti);
+							    System.out.println(risposta1);
+				                if(risposta1.equals("ok")) {
+									outputStream.write((codiceFiscale + ", ").getBytes(), 0, (codiceFiscale + ", ").length());
 									letti = inputStream.read(buffer);
 								    risposta = new String(buffer, 0, letti);
 					                if(risposta.equals("ok")) {
-					                	 outputStream.write("a".getBytes(), 0, "a".length());
+					                	outputStream.write("a".getBytes(), 0, "a".length());
 					 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
-					 					User user = (User) oin.readObject();
+					 					user = (User) oin.readObject();
 					 					System.out.println(user);
 					                	if(user != null) {
 											outputStream.write("attive".getBytes(), 0, "attive".length());

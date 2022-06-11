@@ -15,6 +15,7 @@ public class HandlerUser{
 	}
 	
 	public void registrazione(String s) throws SQLException, IOException {
+		System.out.println("utente: " + s);
 		String[] r = s.split("@");
 		PreparedStatement stmt = conn.prepareStatement("INSERT INTO utenti VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 		stmt.setString(1, r[0]);
