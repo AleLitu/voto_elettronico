@@ -114,19 +114,19 @@ public class GestisciClient implements Runnable, Serializable{
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String cf = new String(buffer, 0, letti);
+						System.out.println(cf);
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						String[] s = cf.split(",");
 						String r = huser.login(s[0]);
 						letti = inputStream.read(buffer);
 						cf = new String(buffer, 0, letti);
+						System.out.println(cf);
 						if(!r.equals("")) {
 							UserDao userdao = new UserDaoImpl();
 		                	User user = userdao.getUser(r, s[1]);
 							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
 							oout.writeObject(user);
-						}
-						else
-						{
+						} else {
 							UserDao userdao = new UserDaoImpl();
 		                	User user = userdao.getUser("", s[1]);
 							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
@@ -145,6 +145,7 @@ public class GestisciClient implements Runnable, Serializable{
 						else
 							outputStream.write("ok".getBytes(), 0, "ok".length());
 						System.out.println("codiceFiscale2");
+						break;
 					case "votante":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);

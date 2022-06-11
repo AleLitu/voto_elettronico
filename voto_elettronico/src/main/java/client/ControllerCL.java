@@ -78,8 +78,10 @@ public class ControllerCL {
 			letti = inputStream.read(buffer);
 		    risposta = new String(buffer, 0, letti);
 		    if(risposta.equals("err")) {
+		    	System.out.println(risposta);
 		    	return false;
 		    }else {
+		    	System.out.println(risposta);
 		    	return true;
 		    }
 		}
@@ -102,26 +104,27 @@ public class ControllerCL {
 						if(!connection("127.0.0.1")) {
 							Alert alert1 = new Alert(AlertType.WARNING, "Connessione non riuscita", ButtonType.CLOSE);
 							alert1.show();
-						}else {
+						} else {
 							if(isOkCF(codiceFiscale)) {
 								int dim_buffer = 100;
 								int letti;
 								String risposta;
 								byte buffer[] = new byte[dim_buffer];
 								outputStream.write("login".getBytes(), 0, "login".length());
-								outputStream.write("login".getBytes(), 0, "login".length());
+								//outputStream.write("login".getBytes(), 0, "login".length());
 								letti = inputStream.read(buffer);
-							    String risposta1 = new String(buffer, 0, letti);
-							    System.out.println(risposta1);
-				                if(risposta1.equals("ok")) {
+							    risposta = new String(buffer, 0, letti);
+							    System.out.println(risposta);
+				                if(risposta.equals("ok")) {
 									outputStream.write((codiceFiscale + ", ").getBytes(), 0, (codiceFiscale + ", ").length());
 									letti = inputStream.read(buffer);
 								    risposta = new String(buffer, 0, letti);
-					                if(risposta.equals("ok")) {
+					                System.out.println(risposta);
+								    if(risposta.equals("ok")) {
 					                	outputStream.write("a".getBytes(), 0, "a".length());
 					 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
 					 					user = (User) oin.readObject();
-					 					System.out.println(user);
+					 					System.out.println(user + "fdshdh");
 					                	if(user != null) {
 											outputStream.write("attive".getBytes(), 0, "attive".length());
 											letti = inputStream.read(buffer);
@@ -145,7 +148,7 @@ public class ControllerCL {
 												        actual.setTitle("Scegli");
 											        }
 										        }
-										    }else if(risposta.equals("no")) {
+										    } else if(risposta.equals("no")) {
 										     	Alert alert1 = new Alert(AlertType.WARNING, "Non ci sono votazioni attive al momento", ButtonType.CLOSE);
 										 		alert1.show();
 										 		so.close();
@@ -157,17 +160,17 @@ public class ControllerCL {
 												actual.setScene(new Scene(root, 400, 500));
 												actual.show();
 										     }
-					                	}else {
+					                	} else {
 					                		Alert alert1 = new Alert(AlertType.WARNING, "Errore codice fiscale", ButtonType.CLOSE);
 								    		alert1.show();
 					                	}
-									}else {
+									} else {
 										Alert alert1 = new Alert(AlertType.WARNING, "Errore nell'inserimento nel database", ButtonType.CLOSE);
 							    		alert1.show();
 							    		so.close();
 									}	
 								}
-							}else {
+							} else {
 					     		Alert alert1 = new Alert(AlertType.WARNING, "Inserire il codice fiscale corretto", ButtonType.CLOSE);
 					    		alert1.show();
 					     	}
