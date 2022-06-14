@@ -1328,3 +1328,93 @@
 2022-06-11 11:58:22 --- Server started
 2022-06-11 11:58:22 --- Chiavi caricate correttamente
 2022-06-11 11:58:29 --- Client connesso: /127.0.0.1; porta: 55508
+2022-06-11 15:30:41 --- Server started
+2022-06-11 15:30:42 --- Chiavi caricate correttamente
+2022-06-11 15:30:51 --- Client connesso: /127.0.0.1; porta: 62766
+2022-06-11 15:33:09 --- Server started
+2022-06-11 15:33:09 --- Chiavi caricate correttamente
+2022-06-11 15:33:19 --- Client connesso: /127.0.0.1; porta: 62775
+2022-06-11 15:34:05 --- Server started
+2022-06-11 15:34:05 --- Chiavi caricate correttamente
+2022-06-11 15:34:13 --- Client connesso: /127.0.0.1; porta: 62782
+2022-06-11 15:37:49 --- Server started
+2022-06-11 15:37:49 --- Chiavi caricate correttamente
+2022-06-11 15:38:00 --- Client connesso: /127.0.0.1; porta: 62820
+2022-06-11 15:41:55 --- Server started
+2022-06-11 15:41:55 --- Chiavi caricate correttamente
+2022-06-11 15:42:02 --- Client connesso: /127.0.0.1; porta: 62832
+2022-06-11 15:43:00 --- Client connesso: /127.0.0.1; porta: 62835
+2022-06-11 15:43:13 --- Client connesso: /127.0.0.1; porta: 62844
+2022-06-11 15:43:14 --- Client disconnesso
+2022-06-11 16:01:50 --- Server started
+2022-06-11 16:01:50 --- Chiavi caricate correttamente
+2022-06-11 16:01:57 --- Client connesso: /127.0.0.1; porta: 62971
+2022-06-11 16:02:05 --- Client connesso: /127.0.0.1; porta: 62973
+2022-06-11 16:06:02 --- Server started
+2022-06-11 16:06:02 --- Chiavi caricate correttamente
+2022-06-11 16:06:15 --- Client connesso: /127.0.0.1; porta: 62985
+2022-06-11 16:07:19 --- Server started
+2022-06-11 16:07:19 --- Chiavi caricate correttamente
+2022-06-11 16:07:27 --- Client connesso: /127.0.0.1; porta: 62993
+2022-06-11 16:10:06 --- Server started
+2022-06-11 16:10:06 --- Chiavi caricate correttamente
+2022-06-11 16:10:14 --- Client connesso: /127.0.0.1; porta: 62998
+2022-06-11 16:12:45 --- Server started
+2022-06-11 16:12:45 --- Chiavi caricate correttamente
+2022-06-11 16:12:52 --- Client connesso: /127.0.0.1; porta: 63001
+2022-06-11 16:13:46 --- Server started
+2022-06-11 16:13:46 --- Chiavi caricate correttamente
+2022-06-11 16:13:53 --- Client connesso: /127.0.0.1; porta: 63003
+2022-06-11 16:16:49 --- Server started
+2022-06-11 16:16:49 --- Chiavi caricate correttamente
+2022-06-11 16:17:03 --- Client connesso: /127.0.0.1; porta: 63009
+2022-06-11 16:18:20 --- Server started
+2022-06-11 16:18:20 --- Chiavi caricate correttamente
+2022-06-11 16:18:43 --- Client connesso: /127.0.0.1; porta: 63012
+2022-06-11 16:19:14 --- Client connesso: /127.0.0.1; porta: 63014
+2022-06-11 16:21:06 --- Server started
+2022-06-11 16:21:06 --- Chiavi caricate correttamente
+2022-06-11 16:21:19 --- Client connesso: /127.0.0.1; porta: 63033
+2022-06-11 16:22:12 --- Server started
+2022-06-11 16:22:12 --- Chiavi caricate correttamente
+2022-06-11 16:22:19 --- Client connesso: /127.0.0.1; porta: 63035
+2022-06-11 16:23:06 --- Server started
+2022-06-11 16:23:06 --- Chiavi caricate correttamente
+2022-06-11 16:23:14 --- Client connesso: /127.0.0.1; porta: 63037
+2022-06-11 16:24:45 --- Server started
+2022-06-11 16:24:45 --- Chiavi caricate correttamente
+2022-06-11 16:24:52 --- Client connesso: /127.0.0.1; porta: 63042
+2022-06-11 16:26:06 --- Server started
+2022-06-11 16:26:06 --- Chiavi caricate correttamente
+2022-06-11 16:26:12 --- Client connesso: /127.0.0.1; porta: 63045
+2022-06-11 16:27:06 --- Server started
+2022-06-11 16:27:06 --- Chiavi caricate correttamente
+2022-06-11 16:27:13 --- Client connesso: /127.0.0.1; porta: 63048
+2022-06-11 16:31:26 --- Server started
+2022-06-11 16:31:26 --- Chiavi caricate correttamente
+2022-06-11 16:31:29 --- Client connesso: /127.0.0.1; porta: 63067
+2022-06-11 16:32:08 --- Server started
+2022-06-11 16:32:08 --- Chiavi caricate correttamente
+2022-06-11 16:32:16 --- Client connesso: /127.0.0.1; porta: 63073
+2022-06-11 16:32:39 --- Server started
+2022-06-11 16:32:39 --- Chiavi caricate correttamente
+2022-06-11 16:32:47 --- Client connesso: /127.0.0.1; porta: 63075
+2022-06-11 16:33:21 --- Server started
+2022-06-11 16:33:21 --- Chiavi caricate correttamente
+2022-06-11 16:33:28 --- Client connesso: /127.0.0.1; porta: 63078
+2022-06-11 16:34:18 --- Server started
+2022-06-11 16:34:18 --- Chiavi caricate correttamente
+2022-06-11 16:34:25 --- Client connesso: /127.0.0.1; porta: 63087
+2022-06-11 16:35:31 --- Server started
+2022-06-11 16:35:31 --- Chiavi caricate correttamente
+2022-06-11 16:35:37 --- Client connesso: /127.0.0.1; porta: 63100
+2022-06-14 18:30:33 --- Server started
+2022-06-14 18:30:34 --- Chiavi caricate correttamente
+2022-06-14 18:30:45 --- Client connesso: /127.0.0.1; porta: 57469
+2022-06-14 18:30:49 --- Client connesso: /127.0.0.1; porta: 57471
+2022-06-14 18:39:54 --- Server started
+2022-06-14 18:39:54 --- Chiavi caricate correttamente
+2022-06-14 18:39:54 --- Client disconnesso
+2022-06-14 18:40:02 --- Client connesso: /127.0.0.1; porta: 57482
+2022-06-14 18:40:24 --- Client connesso: /127.0.0.1; porta: 57501
+2022-06-14 18:40:26 --- Client disconnesso

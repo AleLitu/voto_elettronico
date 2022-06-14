@@ -172,7 +172,7 @@ public class User implements Serializable{
 	//@ requires counter >= a;
 	//@ ensures counter == \old(counter) - a;
 	//@ ensures \result == counter;
-	private static String md5(String data) {
+	public static String md5(String data) {
 		byte[] bdata = new byte[data.length()]; int i; byte[] hash;
 		for (i=0;i<data.length();i++) bdata[i]=(byte)(data.charAt(i)&0xff );
 		try {

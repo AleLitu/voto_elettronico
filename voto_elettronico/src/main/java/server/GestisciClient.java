@@ -44,7 +44,7 @@ public class GestisciClient implements Runnable, Serializable{
 	Cipher cipher;
 	private HandlerReferendum href;
 	private HandlerVotazione hvot;
-	private HandlerUser huser;
+	private UserDao userDao;
 	
 	public GestisciClient(Socket socket) {
 		try {
@@ -71,19 +71,16 @@ public class GestisciClient implements Runnable, Serializable{
     	}
     	href = new HandlerReferendum(conn);
     	hvot = new HandlerVotazione(conn);
-    	huser = new HandlerUser(conn);
+    	userDao = new UserDaoImpl();
+    	userDao.connection(conn);
 		    	
 		while(true) {
 			try {
-				System.out.println("letti1");
 				letti = inputStream.read(buffer);
-				System.out.println("letti2");
 				if(letti > 0) {
 					String scelta = new String(buffer, 0, letti);
-					System.out.println("scelta: " + scelta);
 					switch(scelta) {
 					case "registrazione":
-						System.out.println("reg1");
 						/*outputStream.write("ok".getBytes(), 0, "ok".length());
 						ObjectInputStream oin = new ObjectInputStream(inputStream);
 						ArrayList<User> us = (ArrayList<User>) oin.readObject();
@@ -97,30 +94,24 @@ public class GestisciClient implements Runnable, Serializable{
 						cipher.init(Cipher.DECRYPT_MODE, Server.getPrivateKey());
 						String reg = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
 						System.out.println("reg: " + reg);*/
-						System.out.println("reg2");
 						byte buffer1[] = new byte[150];
 						letti = inputStream.read(buffer1);
 						String reg = new String(buffer1, 0, letti);
-						System.out.println("registr: "+reg);
 						if(!reg.equals("err")) {
 							//registrazione(reg);
-							huser.registrazione(reg);
+							userDao.registrazione(reg);
 							outputStream.write("ok".getBytes(), 0, "ok".length());
 						}
-						System.out.println("reg3");
 						break;
 					case "login":
-						System.out.println("login1");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String cf = new String(buffer, 0, letti);
-						System.out.println(cf);
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						String[] s = cf.split(",");
-						String r = huser.login(s[0]);
+						String r = userDao.login(s[0]);
 						letti = inputStream.read(buffer);
 						cf = new String(buffer, 0, letti);
-						System.out.println(cf);
 						if(!r.equals("")) {
 							UserDao userdao = new UserDaoImpl();
 		                	User user = userdao.getUser(r, s[1]);
@@ -132,19 +123,16 @@ public class GestisciClient implements Runnable, Serializable{
 							ObjectOutputStream oout = new ObjectOutputStream(outputStream);
 							oout.writeObject(user);
 						}
-						System.out.println("login2");
 						break;
 					case "codiceFiscale":
-						System.out.println("codiceFiscale1");
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String codFiscale = new String(buffer, 0, letti);
 						//inserisciCF(codFiscale)
-						if(!huser.controllaCF(codFiscale))
+						if(!userDao.controllaCF(codFiscale))
 							outputStream.write("err".getBytes(), 0, "err".length());
 						else
 							outputStream.write("ok".getBytes(), 0, "ok".length());
-						System.out.println("codiceFiscale2");
 						break;
 					case "votante":
 						outputStream.write("ok".getBytes(), 0, "ok".length());

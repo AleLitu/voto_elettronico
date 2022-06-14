@@ -369,15 +369,20 @@ public class ControllerRegistrazione{
     		if(!maggiorenne(a, m, g)) {
     			Alert alert = new Alert(AlertType.WARNING, "Per potersi registrare bisogna essere maggiorenni!", ButtonType.CLOSE);
         		alert.show();
+    		}else if(!password.equals(confPassword)) {
+    			Alert alert = new Alert(AlertType.WARNING, "Password e conferma password diversi!", ButtonType.CLOSE);
+        		alert.show();
     		}else {
     			//char[] cf = creazione_cf(nome, cognome, paese, sesso.charAt(0), Integer.parseInt(giorno), Integer.parseInt(mese), Integer.parseInt(anno), codiceFiscale.toCharArray());
     			//if (!codiceFiscaleIsOk(codiceFiscale, cf)) {
     				//Alert alert = new Alert(AlertType.WARNING, "Codice Fiscale errato", ButtonType.CLOSE);
     				//alert.show();
 	    		//}else {
-	    			user = new User("JRRDNL00A09A326X", "Jorrioz", "Daniel", "dani", "M", 2000, 1, 9, "Italia", "Aosta", "Aosta", "elettore");
-	    			//user = new User(codiceFiscale, cognome, nome, password, sesso, Integer.parseInt(anno), Integer.parseInt(mese), Integer.parseInt(giorno), paese, citta, comune, "elettore");
-	    			int dim_buffer = 100;
+    				if(connected != true)
+    					user = new User(codiceFiscale, cognome, nome, password, sesso, Integer.parseInt(anno), Integer.parseInt(mese), Integer.parseInt(giorno), paese, citta, comune, "elettore");
+    				else
+    					user = new User(codiceFiscale, cognome, nome, "", sesso, Integer.parseInt(anno), Integer.parseInt(mese), Integer.parseInt(giorno), paese, citta, comune, "elettore");
+    				int dim_buffer = 100;
 					int letti;
 					String risposta;
 					byte buffer[] = new byte[dim_buffer];
@@ -449,6 +454,16 @@ public class ControllerRegistrazione{
         	lblSecond.setVisible(false);
         	lblThird.setVisible(false);
         	lblFourth.setVisible(false);
+        	lblPassword.setVisible(false);
+        	pfPassword.setVisible(false);
+        	lblFirst.setText("0");
+        	lblSecond.setText("0");
+        	lblThird.setText("0");
+        	lblFourth.setText("0");
+        	pfPassword.setText("a");
+        	lblConfPassword.setVisible(false);
+        	pfConfPassword.setVisible(false);
+        	pfConfPassword.setText("a");
         	so = ControllerLogin.getSocket();
         	inputStream = so.getInputStream();
     		outputStream = so.getOutputStream();

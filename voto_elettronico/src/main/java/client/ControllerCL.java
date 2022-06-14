@@ -42,6 +42,18 @@ public class ControllerCL {
 
     @FXML
     private Label lblMessage;
+    
+    @FXML
+    private TextField lblFirst;
+	
+    @FXML
+    private TextField lblSecond;
+    
+    @FXML
+    private TextField lblThird;
+    
+    @FXML
+    private TextField lblFourth;
 	
     public boolean connection (String address) throws IOException{
     	try {
@@ -78,19 +90,51 @@ public class ControllerCL {
 			letti = inputStream.read(buffer);
 		    risposta = new String(buffer, 0, letti);
 		    if(risposta.equals("err")) {
-		    	System.out.println(risposta);
 		    	return false;
 		    }else {
-		    	System.out.println(risposta);
 		    	return true;
 		    }
 		}
     	return false;
     }
     
+    public int isInteger(String input) {
+        try {
+            int n;
+            n=Integer.parseInt(input);
+            return n;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+    
+    protected boolean checkIntType() throws Exception {
+        String n1=lblFirst.getText();
+        String n2=lblSecond.getText();
+        String n3=lblThird.getText();
+        String n4=lblFourth.getText();
+        System.out.println(n1 + " " + n2 + " " + n3 + " " + n4);
+        int n1_int=isInteger(n1);
+        int n2_int=isInteger(n2);
+        int n3_int=isInteger(n3);
+        int n4_int=isInteger(n4);
+        if(((n1_int<0))||(n1_int>255)||((n2_int<0))||(n2_int>255)||((n3_int<0))||(n3_int>255)||((n4_int<0))||(n4_int>255)){
+        	Alert alert = new Alert(AlertType.WARNING, "Errore nell'indirizzo", ButtonType.CLOSE);
+    		alert.show();
+        	return false;
+        }else{
+            String indirizzo=n1+"."+n2+"."+n3+"."+n4;
+            return connection(indirizzo);
+        }
+    }
+    
     @FXML
     void handleSend(ActionEvent event) throws IOException {
     	codiceFiscale = lblCodiceFiscale.getText();
+    	lblFirst.setText("127");
+    	lblSecond.setText("0");
+    	lblThird.setText("0");
+    	lblFourth.setText("1");
     	Alert alert;
     	if(codiceFiscale.equals("")) {
      		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale", ButtonType.CLOSE);
@@ -101,7 +145,7 @@ public class ControllerCL {
     	    if (response == ButtonType.OK) {
     	    	{
     	    		try {
-						if(!connection("127.0.0.1")) {
+						if(!checkIntType()) {
 							Alert alert1 = new Alert(AlertType.WARNING, "Connessione non riuscita", ButtonType.CLOSE);
 							alert1.show();
 						} else {
@@ -114,17 +158,14 @@ public class ControllerCL {
 								//outputStream.write("login".getBytes(), 0, "login".length());
 								letti = inputStream.read(buffer);
 							    risposta = new String(buffer, 0, letti);
-							    System.out.println(risposta);
 				                if(risposta.equals("ok")) {
 									outputStream.write((codiceFiscale + ", ").getBytes(), 0, (codiceFiscale + ", ").length());
 									letti = inputStream.read(buffer);
 								    risposta = new String(buffer, 0, letti);
-					                System.out.println(risposta);
 								    if(risposta.equals("ok")) {
-					                	outputStream.write("a".getBytes(), 0, "a".length());
+								    	outputStream.write("a".getBytes(), 0, "a".length());
 					 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
 					 					user = (User) oin.readObject();
-					 					System.out.println(user + "fdshdh");
 					                	if(user != null) {
 											outputStream.write("attive".getBytes(), 0, "attive".length());
 											letti = inputStream.read(buffer);
