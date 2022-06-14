@@ -27,7 +27,6 @@ import server.handler.HandlerReferendum;
 import server.handler.HandlerVotazione;
 import server.handler.HandlerVotazioni;
 import model.User;
-import server.handler.HandlerUser;
 import model.UserDao;
 import model.UserDaoImpl;
 
