@@ -213,16 +213,16 @@ public class HandlerVotazione extends HandlerVotazioni{
 				b = true;
 			}
 			if(!b) {
+				stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
+				stmt.setInt(1, -1);
+				stmt.setInt(2, 0);
+				stmt.setString(3, null);
+				stmt.setString(4, "schede bianche");
+				stmt.setInt(5, 0);
+				stmt.execute();
 				stmt = conn.prepareStatement("SELECT * FROM " + nome_t); 
 				rs = stmt.executeQuery();
 				while(rs.next()) {
-					stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
-					stmt.setInt(1, -1);
-					stmt.setInt(2, 0);
-					stmt.setString(3, null);
-					stmt.setString(4, "schede bianche");
-					stmt.setInt(5, 0);
-					stmt.execute();
 					for(int i = 0; i < num; i++) {
 						stmt = conn.prepareStatement("INSERT INTO " + nome_t + "1" + " (id, numero, tipo, nome, voto) VALUES (?, ?, ?, ?, ?)");
 						stmt.setInt(1, rs.getInt("id"));
@@ -232,6 +232,7 @@ public class HandlerVotazione extends HandlerVotazioni{
 						stmt.setInt(5, 0);
 						stmt.execute();
 					}
+					
 				}
 			}
 			int j = 0;
@@ -453,7 +454,126 @@ public class HandlerVotazione extends HandlerVotazioni{
 		}
 		stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + " ADD vincitore INT NOT NULL DEFAULT 0");
 		stmt.execute();
-		if((tot_p / 2) < max_p) {
+		if (tipo_vot.equals("ordinale")) {
+			stmt = conn.prepareStatement("ALTER TABLE " + nome_tab + "1" + " ADD vincitore INT NOT NULL DEFAULT 0");
+			stmt.execute();
+			stmt = conn.prepareStatement("SELECT * FROM " + nome_tab + "1");
+			rs = stmt.executeQuery();
+			int vot_tot = 0;
+			ArrayList<Integer> numero = new ArrayList<>();
+			ArrayList<Integer> id = new ArrayList<>();
+			ArrayList<String> tipo = new ArrayList<>();
+			ArrayList<String> nome = new ArrayList<>();
+			ArrayList<Integer> voto = new ArrayList<>();
+			while(rs.next()) {
+				if(rs.getInt("id") != -1) {
+					numero.add(rs.getInt("numero"));
+					id.add(rs.getInt("id"));
+					tipo.add(rs.getString("tipo"));
+					nome.add(rs.getString("nome"));
+					voto.add(rs.getInt("voto"));
+					vot_tot += rs.getInt("voto");
+				}
+			}
+			
+			int num_max = 0;
+			for(int j = 0; j < numero.size(); j++) {
+				if(numero.get(j) > num_max)
+					num_max = numero.get(j);
+			}
+				
+			stmt = conn.prepareStatement("SELECT SUM(voto) As voto FROM " + nome_tab + "1" + " WHERE numero = 1");
+			rs = stmt.executeQuery();
+			if(rs.next()) {
+				vot_tot = rs.getInt("voto");
+			}
+			int min = 999999999;
+			ArrayList<Integer> pos_min = new ArrayList<>();
+			int pos_mini = 0;
+			int max = 0;
+			int pos_max = 0;
+			int num = 0;
+			int persone = num_max;
+			boolean tro = false, tro1 = false;
+			while(!tro) {
+				for(int j = 0; j < numero.size(); j++) {
+					if(numero.get(j) == 1) {
+						if(voto.get(j) > (vot_tot / 2)) {
+							stmt = conn.prepareStatement("UPDATE " + nome_tab + "1" + " SET vincitore = 1 WHERE numero = ? AND id = ?");
+							stmt.setInt(1, numero.get(j));
+							stmt.setInt(2, id.get(j));
+							stmt.execute();
+							tro = true;
+							break;
+						}
+						if(num == 0 && !tro) {
+							if(voto.get(j) != 0) {
+								if(voto.get(j) < min) {
+									min = voto.get(j);
+									System.out.println("pos min: "+j);
+									pos_mini = j;
+								}
+							}
+							if(voto.get(j) > max) {
+								max = voto.get(j);
+								pos_max = j;
+							}
+						}
+					}
+				}
+				pos_min.add(pos_mini);
+				if(!tro) {
+					int distribuzione = 0;
+					boolean zero = true;
+					for(int k = num; k < num_max; k++) {
+						distribuzione = voto.get(pos_mini + k);
+						if(distribuzione != 0) {
+							System.out.println("vera distr.: "+distribuzione);
+							zero = false;
+							num = k;
+							break;
+						}
+					}
+					if(zero) {
+						num = num_max;
+					}else {
+						distribuzione = distribuzione / (persone - 1);
+						for(int j = 0; j < numero.size(); j++) {
+							if(numero.get(j) == 1) {
+								boolean b = true;
+								for(int k = 0; k < pos_min.size(); k++) {
+									System.out.println(j + " " + pos_min.get(k));
+									if(j == pos_min.get(k)) {
+										b = false;
+										break;
+									}
+								}
+								for(int q = 0; q < numero.size(); q++)
+								if(b) {
+									voto.set(j, voto.get(j) + distribuzione);
+									if(voto.get(j) > (vot_tot / 2))
+										break;
+								}								
+							}
+						}
+						if(distribuzione % persone != 0)
+							voto.set(pos_max, voto.get(pos_max) + persone - 1);
+					}	
+					num++;
+					if(num > num_max) {
+						num = 0;
+						persone--;
+						for(int k = pos_mini; k < pos_mini + num_max; k++) {
+							numero.remove(pos_mini);
+							id.remove(pos_mini);
+							tipo.remove(pos_mini);
+							nome.remove(pos_mini);
+							voto.remove(pos_mini);
+						}
+					}
+				}
+			}
+		}else if((tot_p / 2) < max_p) {
 			if(!tipo_vot.equals("categorico")) {
 				for(int j = 0; j < idp_max.size(); j++) {
 					idc_max.clear();

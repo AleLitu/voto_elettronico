@@ -7,11 +7,9 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 
 public class User implements Serializable{
-	//private int id;
 	private String codiceFiscale;
 	private String cognome;
 	private String nome;
-	//private String username;
 	private String password;
 	private String sesso;
 	private int anno;
@@ -169,9 +167,6 @@ public class User implements Serializable{
 		return md5(passwd+salt)+":"+salt;
 	}
 
-	//@ requires counter >= a;
-	//@ ensures counter == \old(counter) - a;
-	//@ ensures \result == counter;
 	public static String md5(String data) {
 		byte[] bdata = new byte[data.length()]; int i; byte[] hash;
 		for (i=0;i<data.length();i++) bdata[i]=(byte)(data.charAt(i)&0xff );
@@ -191,6 +186,24 @@ public class User implements Serializable{
 	@Override
 	public String toString() {
 		return codiceFiscale + "@" + cognome + "@" + nome + "@" + password + "@" + sesso + "@" + anno + "@" + mese + "@" + giorno + "@" + paese + "@" + citta + "@" + comune + "@" + type;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		User usr = (User) obj;
+		if(!codiceFiscale.equals(usr.getCodiceFiscale())) return false;
+		if(!cognome.equals(usr.getCognome())) return false;
+		if(!nome.equals(usr.getNome())) return false;
+		if(!password.equals(usr.getPassword())) return false;
+		if(anno != usr.getAnno()) return false;
+		if(mese != usr.getMese()) return false;
+		if(giorno != usr.getGiorno()) return false;
+		if(!sesso.equals(usr.getSesso())) return false;
+		if(!paese.equals(usr.getPaese())) return false;
+		if(!citta.equals(usr.getCitta())) return false;
+		if(!comune.equals(usr.getComune())) return false;
+		if(!type.equals(usr.getType())) return false;
+		return true;
 	}
 
 	public boolean check(String passwd,String salt, String cpasswd) {

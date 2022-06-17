@@ -155,15 +155,14 @@ public class ControllerRegistrazione{
     private int mesi = 12;
     private int anni = 120;
     private int giorni = 31;
-    
-    LocalDate dataCorrente = LocalDate.now();
-    final int annoAttuale = dataCorrente.getYear();
-    final int meseAttuale = dataCorrente.getMonthValue();
-    final int giornoAttuale = dataCorrente.getDayOfMonth();
-    
+     
     private PublicKey pubKey;
     
-    private boolean maggiorenne(int a, int m, int g) {
+    public static boolean maggiorenne(int a, int m, int g) {
+    	LocalDate dataCorrente = LocalDate.now();
+        final int annoAttuale = dataCorrente.getYear();
+        final int meseAttuale = dataCorrente.getMonthValue();
+        final int giornoAttuale = dataCorrente.getDayOfMonth();
     	a = annoAttuale - a;
     	m = meseAttuale - m;
     	g = giornoAttuale - g;
@@ -185,7 +184,7 @@ public class ControllerRegistrazione{
     	System.out.println("Client connesso, Indirizzo: " + so.getInetAddress() + "; porta: "+ so.getPort());
     }
     
-    public int isInteger(String input) {
+    public static int isInteger(String input) {
         try {
             int n;
             n=Integer.parseInt(input);
@@ -216,7 +215,7 @@ public class ControllerRegistrazione{
         }
     }
     
-    public char[] creazione_cf(String nome, String cognome, String nazione_nascita, char sesso, int giorno, int mese, int anno, char[] cf1){
+    public static char[] creazione_cf(String nome, String cognome, String nazione_nascita, char sesso, int giorno, int mese, int anno, char[] cf1){
 		char[] cf = new char[16];
 		int count = 0;
 		cognome = cognome.toUpperCase();
@@ -322,7 +321,7 @@ public class ControllerRegistrazione{
 		return cf;
 	}
     
-    public boolean codiceFiscaleIsOk(String cf, char[] cfc) {
+    public static boolean codiceFiscaleIsOk(String cf, char[] cfc) {
     	char[]cft = cf.toCharArray();
     	for (int i = 0; i < cfc.length; i++) {
     		if (!String.valueOf(cft[i]).equals(String.valueOf(cfc[i])))
@@ -386,15 +385,11 @@ public class ControllerRegistrazione{
 					int letti;
 					String risposta;
 					byte buffer[] = new byte[dim_buffer];
-					System.out.println("re1");
 					outputStream.write("registrazione".getBytes(), 0, "registrazione".length());
 					//outputStream.write("registrazione".getBytes(), 0, "registrazione".length());
-					System.out.println("reg2");
 					letti = inputStream.read(buffer);
 			        risposta = new String(buffer, 0, letti);
 			        if(risposta.equals("ok")) {
-			        	System.out.println("2.2");
-			        	System.out.println("3");
 			        	/*byte buffer1[] = new byte[100];
 			        	//byte[] cipherData = null;
 			        	Cipher cipher = Cipher.getInstance("RSA");
@@ -408,7 +403,6 @@ public class ControllerRegistrazione{
 			        	outputStream.write(user.toString().getBytes(), 0, user.toString().length());
 						letti = inputStream.read(buffer);
 				        String r = new String(buffer, 0, letti);
-						System.out.println("4 " + r);
 						if(r.equals("ok")) {
 							Alert alert = new Alert(AlertType.INFORMATION , "Registrato correttamente");
 							alert.showAndWait().ifPresent(response -> {
