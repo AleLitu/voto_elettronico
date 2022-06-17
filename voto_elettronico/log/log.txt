@@ -1580,3 +1580,22 @@
 2022-06-17 11:23:17 --- Chiavi caricate correttamente
 2022-06-17 11:23:26 --- Client connesso: /127.0.0.1; porta: 64219
 2022-06-17 11:24:27 --- Client disconnesso
+2022-06-17 13:38:59 --- Server started
+2022-06-17 13:38:59 --- Chiavi caricate correttamente
+2022-06-17 13:39:04 --- Client connesso: /127.0.0.1; porta: 64596
+2022-06-17 13:39:26 --- Client connesso: /127.0.0.1; porta: 64598
+2022-06-17 13:39:31 --- Client connesso: /127.0.0.1; porta: 64600
+2022-06-17 13:39:41 --- Client connesso: /127.0.0.1; porta: 64602
+2022-06-17 13:39:43 --- Client disconnesso
+2022-06-17 13:40:50 --- Server started
+2022-06-17 13:40:50 --- Chiavi caricate correttamente
+2022-06-17 13:41:04 --- Client connesso: /127.0.0.1; porta: 64612
+2022-06-17 13:42:53 --- Nuova votazione avviata
+2022-06-17 13:43:04 --- Client connesso: /127.0.0.1; porta: 64619
+2022-06-17 13:43:15 --- Voto ricevuto
+2022-06-17 13:44:40 --- Client connesso: /127.0.0.1; porta: 64621
+2022-06-17 13:44:54 --- Voto ricevuto
+2022-06-17 13:47:03 --- Server started
+2022-06-17 13:47:03 --- Chiavi caricate correttamente
+2022-06-17 13:47:12 --- Client connesso: /127.0.0.1; porta: 64648
+2022-06-17 13:47:28 --- Voto ricevuto

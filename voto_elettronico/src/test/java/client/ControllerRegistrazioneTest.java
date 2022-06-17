@@ -8,8 +8,19 @@ class ControllerRegistrazioneTest {
 	
 	@Test
 	void testMaggiorenne() {
-		boolean expected;
-		expected = ControllerRegistrazione.maggiorenne(1999, 5, 19);
+		boolean expected, result;
+		
+		expected = true;
+		result = ControllerRegistrazione.maggiorenne(1999, 5, 19);
+		assertEquals(expected, result);
+		
+		expected = true;
+		result = ControllerRegistrazione.maggiorenne(2004, 3, 19);
+		assertEquals(expected, result);
+		
+		expected = false;
+		result = ControllerRegistrazione.maggiorenne(2004, 12, 19);
+		assertEquals(expected, result);
 	}
 
 	@Test
