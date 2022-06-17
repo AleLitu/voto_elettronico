@@ -158,6 +158,8 @@ public class ControllerRegistrazione{
      
     private PublicKey pubKey;
     
+    //@requires a > 0 && m > 0 && g > 0;
+    //@ensures (a > 18 || (a == 18 && (m > 0 || (m == 0 && g >= 0))));
     public static boolean maggiorenne(int a, int m, int g) {
     	LocalDate dataCorrente = LocalDate.now();
         final int annoAttuale = dataCorrente.getYear();
@@ -216,111 +218,116 @@ public class ControllerRegistrazione{
     }
     
     public static char[] creazione_cf(String nome, String cognome, String nazione_nascita, char sesso, int giorno, int mese, int anno, char[] cf1){
-		char[] cf = new char[16];
-		int count = 0;
-		cognome = cognome.toUpperCase();
-		for(int i = 0; i < cognome.length(); i++){
-			if(cognome.charAt(i) != 'A' && cognome.charAt(i) != 'E' && cognome.charAt(i) != 'I' && cognome.charAt(i) != 'O' && cognome.charAt(i) != 'U' && count < 3){
-				cf[count] = cognome.charAt(i);
-				count++;
-			}
-		}
-		if(count != 3){
+		try {	
+			char[] cf = new char[16];
+			int count = 0;
+			cognome = cognome.toUpperCase();
 			for(int i = 0; i < cognome.length(); i++){
-				if((cognome.charAt(i) == 'A' || cognome.charAt(i) == 'E' || cognome.charAt(i) == 'I' || cognome.charAt(i) == 'O' || cognome.charAt(i) == 'U') && count < 3){
+				if(cognome.charAt(i) != 'A' && cognome.charAt(i) != 'E' && cognome.charAt(i) != 'I' && cognome.charAt(i) != 'O' && cognome.charAt(i) != 'U' && count < 3){
 					cf[count] = cognome.charAt(i);
 					count++;
 				}
 			}
-		}
-		while(count < 3){
-			cf[count] = 'X';
-			count++;
-		}
-		nome = nome.toUpperCase();
-		int count_cons = 0, count_loop = 0;
-		for(int i = 0; i < nome.length(); i++){
-			if(nome.charAt(i) != 'A' && nome.charAt(i) != 'E' && nome.charAt(i) != 'I' && nome.charAt(i) != 'O' && nome.charAt(i) != 'U' && count < 6){
-				count_cons++;
-			}
-		}
-		for(int i = 0; i < nome.length(); i++){
-			if(nome.charAt(i) != 'A' && nome.charAt(i) != 'E' && nome.charAt(i) != 'I' && nome.charAt(i) != 'O' && nome.charAt(i) != 'U' && count < 6){
-				count_loop++;
-				if(count_cons >= 4 && count_loop == 2){}
-				else{
-					cf[count] = nome.charAt(i);
-					count++;
+			if(count != 3){
+				for(int i = 0; i < cognome.length(); i++){
+					if((cognome.charAt(i) == 'A' || cognome.charAt(i) == 'E' || cognome.charAt(i) == 'I' || cognome.charAt(i) == 'O' || cognome.charAt(i) == 'U') && count < 3){
+						cf[count] = cognome.charAt(i);
+						count++;
+					}
 				}
 			}
-		}
-		if(count != 6){
+			while(count < 3){
+				cf[count] = 'X';
+				count++;
+			}
+			nome = nome.toUpperCase();
+			int count_cons = 0, count_loop = 0;
 			for(int i = 0; i < nome.length(); i++){
-				if((nome.charAt(i) == 'A' || nome.charAt(i) == 'E' || nome.charAt(i) == 'I' || nome.charAt(i) == 'O' || nome.charAt(i) == 'U') && count < 6){
-					cf[count] = nome.charAt(i);
-					count++;
+				if(nome.charAt(i) != 'A' && nome.charAt(i) != 'E' && nome.charAt(i) != 'I' && nome.charAt(i) != 'O' && nome.charAt(i) != 'U' && count < 6){
+					count_cons++;
 				}
 			}
-		}
-		while(count < 6){
-			cf[count] = 'X';
-			count++;
-		}
-		String a = Integer.toString(anno);
-		char[] an = new char[4];
-		for(int i = 0; i < 4; i++){
-			an[i] = a.charAt(i);
-		}		
-		cf[6] = an[2];
-		cf[7] = an[3];
-		if(mese == 1)
-			cf[8] = 'A';
-		else if(mese == 2)
-			cf[8] = 'B';
-		else if(mese == 3)
-			cf[8] = 'C';
-		else if(mese == 4)
-			cf[8] = 'D';
-		else if(mese == 5)
-			cf[8] = 'E';
-		else if(mese == 6)
-			cf[8] = 'H';
-		else if(mese == 7)
-			cf[8] = 'L';
-		else if(mese == 8)
-			cf[8] = 'M';
-		else if(mese == 9)
-			cf[8] = 'P';
-		else if(mese == 10)
-			cf[8] = 'R';
-		else if(mese == 11)
-			cf[8] = 'S';
-		else if(mese == 12)
-			cf[8] = 'T';
-		if(sesso == 'F')
-			giorno += 40;
-		String g = Integer.toString(giorno);
-		if(giorno < 10)
-			g = "0" + g;
-		char[] gi = new char[4];
-		for(int i = 0; i < 2; i++){
-			gi[i] = g.charAt(i);
-		}
-		cf[9] = gi[0];
-		cf[10] = gi[1];
-		if ('A' <= cf1[11] && cf1[11] <= 'Z' && '0' <= cf1[12] && cf1[12] <= '9' && '0' <= cf1[13] && cf1[13] <= '9' && '0' <= cf1[14] && cf1[14] <= '9'){
-			cf[11] = cf1[11];
-			cf[12] = cf1[12];
-			cf[13] = cf1[13];
-			cf[14] = cf1[14];
-		}
-		if (!nazione_nascita.equals("Italia"))
-			cf[15] = 'Z';
-		else if('A' <= cf1[15] && cf1[15] <= 'Y')
-			cf[15] = cf1[15];
-		return cf;
+			for(int i = 0; i < nome.length(); i++){
+				if(nome.charAt(i) != 'A' && nome.charAt(i) != 'E' && nome.charAt(i) != 'I' && nome.charAt(i) != 'O' && nome.charAt(i) != 'U' && count < 6){
+					count_loop++;
+					if(count_cons >= 4 && count_loop == 2){}
+					else{
+						cf[count] = nome.charAt(i);
+						count++;
+					}
+				}
+			}
+			if(count != 6){
+				for(int i = 0; i < nome.length(); i++){
+					if((nome.charAt(i) == 'A' || nome.charAt(i) == 'E' || nome.charAt(i) == 'I' || nome.charAt(i) == 'O' || nome.charAt(i) == 'U') && count < 6){
+						cf[count] = nome.charAt(i);
+						count++;
+					}
+				}
+			}
+			while(count < 6){
+				cf[count] = 'X';
+				count++;
+			}
+			String a = Integer.toString(anno);
+			char[] an = new char[4];
+			for(int i = 0; i < 4; i++){
+				an[i] = a.charAt(i);
+			}		
+			cf[6] = an[2];
+			cf[7] = an[3];
+			if(mese == 1)
+				cf[8] = 'A';
+			else if(mese == 2)
+				cf[8] = 'B';
+			else if(mese == 3)
+				cf[8] = 'C';
+			else if(mese == 4)
+				cf[8] = 'D';
+			else if(mese == 5)
+				cf[8] = 'E';
+			else if(mese == 6)
+				cf[8] = 'H';
+			else if(mese == 7)
+				cf[8] = 'L';
+			else if(mese == 8)
+				cf[8] = 'M';
+			else if(mese == 9)
+				cf[8] = 'P';
+			else if(mese == 10)
+				cf[8] = 'R';
+			else if(mese == 11)
+				cf[8] = 'S';
+			else if(mese == 12)
+				cf[8] = 'T';
+			if(sesso == 'F')
+				giorno += 40;
+			String g = Integer.toString(giorno);
+			if(giorno < 10)
+				g = "0" + g;
+			char[] gi = new char[4];
+			for(int i = 0; i < 2; i++){
+				gi[i] = g.charAt(i);
+			}
+			cf[9] = gi[0];
+			cf[10] = gi[1];
+			if ('A' <= cf1[11] && cf1[11] <= 'Z' && '0' <= cf1[12] && cf1[12] <= '9' && '0' <= cf1[13] && cf1[13] <= '9' && '0' <= cf1[14] && cf1[14] <= '9'){
+				cf[11] = cf1[11];
+				cf[12] = cf1[12];
+				cf[13] = cf1[13];
+				cf[14] = cf1[14];
+			}
+			if (!nazione_nascita.equals("Italia"))
+				cf[15] = 'Z';
+			else if('A' <= cf1[15] && cf1[15] <= 'Y')
+				cf[15] = cf1[15];
+			return cf;
+    	}catch(Exception e) {
+    		return null;
+    	}
 	}
     
+    //@ensures (\forall int i; i>= 0 && i< cfc.length; cf.charArray[i] == cfc[i]);
     public static boolean codiceFiscaleIsOk(String cf, char[] cfc) {
     	char[]cft = cf.toCharArray();
     	for (int i = 0; i < cfc.length; i++) {
@@ -372,11 +379,11 @@ public class ControllerRegistrazione{
     			Alert alert = new Alert(AlertType.WARNING, "Password e conferma password diversi!", ButtonType.CLOSE);
         		alert.show();
     		}else {
-    			//char[] cf = creazione_cf(nome, cognome, paese, sesso.charAt(0), Integer.parseInt(giorno), Integer.parseInt(mese), Integer.parseInt(anno), codiceFiscale.toCharArray());
-    			//if (!codiceFiscaleIsOk(codiceFiscale, cf)) {
-    				//Alert alert = new Alert(AlertType.WARNING, "Codice Fiscale errato", ButtonType.CLOSE);
-    				//alert.show();
-	    		//}else {
+    			char[] cf = creazione_cf(nome, cognome, paese, sesso.charAt(0), Integer.parseInt(giorno), Integer.parseInt(mese), Integer.parseInt(anno), codiceFiscale.toCharArray());
+    			if (cf == null || !codiceFiscaleIsOk(codiceFiscale, cf)) {
+    				Alert alert = new Alert(AlertType.WARNING, "Codice Fiscale errato", ButtonType.CLOSE);
+    				alert.show();
+	    		}else {
     				if(connected != true)
     					user = new User(codiceFiscale, cognome, nome, password, sesso, Integer.parseInt(anno), Integer.parseInt(mese), Integer.parseInt(giorno), paese, citta, comune, "elettore");
     				else
@@ -434,7 +441,7 @@ public class ControllerRegistrazione{
 							return;
 						}
 			        }
-	    		 //}
+	    		 }
     		}
     	}
     }
@@ -463,6 +470,10 @@ public class ControllerRegistrazione{
     		outputStream = so.getOutputStream();
         	connected = true;
     	}
+    	LocalDate dataCorrente = LocalDate.now();
+    	final int annoAttuale = dataCorrente.getYear();
+        final int meseAttuale = dataCorrente.getMonthValue();
+        final int giornoAttuale = dataCorrente.getDayOfMonth();
     	btnAnni = new MenuItem[anni];
     	int a = 0, d = 0;
     	for(a = annoAttuale; d < anni; d++) {

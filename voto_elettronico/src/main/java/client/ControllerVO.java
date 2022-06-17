@@ -121,11 +121,11 @@ public class ControllerVO{
 	    				if(btnNumero[i].getText().equals(count + "")) {
 	    					if(j == 0) {
 	    						s = "p," + listp.get(i).getId() + "@" + listp.get(i).getNome();
-	    						s1 = listp.get(i).getId() + " " + listp.get(i).getNome() + " " + count + " ";
+	    						s1 = listp.get(i).getNome() + " " + count + " ";
 	    						j++;
 	    					}else {
 	    						s += "," + listp.get(i).getId() + "@" + listp.get(i).getNome();
-	    						s1 += ", " + listp.get(i).getId() + " " + listp.get(i).getNome() + " " + count + " ";
+	    						s1 += ", " + listp.get(i).getNome() + " " + count + " ";
 	    					}
 	    					count++;
 	    					i = -1;
