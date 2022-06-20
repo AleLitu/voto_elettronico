@@ -217,6 +217,7 @@ public class ControllerReferendumVoto{
         inputStream = so.getInputStream();
         ObjectInputStream keystream = new ObjectInputStream(inputStream);
         pubKey = (PublicKey) keystream.readObject();
+        System.out.println(pubKey);
         ois = new ObjectInputStream(inputStream);
     	re = (Referendum) ois.readObject();
     	lblReferendum.setText(re.getTesto());

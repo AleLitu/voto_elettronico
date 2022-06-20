@@ -17,7 +17,7 @@ public class ClientLocal extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("loginCL.fxml"));
         
         primaryStage.setTitle("Login");
-        primaryStage.setScene(new Scene(root, 450, 300));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

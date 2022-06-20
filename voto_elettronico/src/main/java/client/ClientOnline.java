@@ -15,9 +15,9 @@ public class ClientOnline extends Application {
     	//FXMLLoader fxmlLoader = new FXMLLoader(DaoPatternDemo.class.getResource("login.fxml"));
     	//System.out.println(User.create("12345"));
         Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
-        
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Login");
-        primaryStage.setScene(new Scene(root, 400, 500));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

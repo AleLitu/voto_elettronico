@@ -122,7 +122,7 @@ public class ControllerLogin {
 	            			if(user.getType().equals("gestore")) {
 	            				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
 	                            actual.setScene(new Scene(root));
-	                            actual.setTitle("Logged");
+	                            actual.setTitle("Home");
 	                            /*
 	                            actual.setOnCloseRequest(new EventHandler<WindowEvent>() {
 	                                @Override
