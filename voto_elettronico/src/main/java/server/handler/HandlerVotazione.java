@@ -627,4 +627,110 @@ public class HandlerVotazione extends HandlerVotazioni{
 		stmt.setString(3, tipo_vot);
 		stmt.execute();
 	}
+	
+	
+	
+	
+	public ArrayList<Votazione> haVotato(String codFiscale, ArrayList<Votazione> ref, ArrayList<Votazione> vot) throws SQLException {
+		ArrayList<Votazione> votazione = new ArrayList<>();
+		if(ref == null && vot == null)
+			return null;
+		else {
+			if(vot == null) {
+				for(int i = 0; i < ref.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + ref.get(i).getNome() + ref.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(ref.get(i).getNome() + ref.get(i).getId()) == 0){
+							votazione.add(ref.get(i));
+						}
+					}
+				}
+			}else if (ref == null) {
+				for(int i = 0; i < vot.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + vot.get(i).getNome() + vot.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(vot.get(i).getNome() + vot.get(i).getId()) == 0){
+							votazione.add(vot.get(i));
+						}
+					}
+				}
+			}else {
+				for(int i = 0; i < ref.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + ref.get(i).getNome() + ref.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(ref.get(i).getNome() + ref.get(i).getId()) == 0){
+							votazione.add(ref.get(i));
+						}
+					}
+				}
+				for(int i = 0; i < vot.size(); i++) {
+					PreparedStatement stmt = conn.prepareStatement("SELECT " + vot.get(i).getNome() + vot.get(i).getId() + " FROM votato WHERE codFiscale = ?");
+					stmt.setString(1, codFiscale);
+					ResultSet rs = stmt.executeQuery();
+					if(rs.next()) {
+						if(rs.getInt(vot.get(i).getNome() + vot.get(i).getId()) == 0){
+							votazione.add(vot.get(i));
+						}
+					}
+				}
+			}
+		}
+		if (votazione.size() == 0)
+			return null;
+		return votazione;
+	}
+	
+	//da mergiare con getDomanda()
+		public ArrayList<Votazione> getReferendumAttivi() throws SQLException{
+			PreparedStatement stmt = conn.prepareStatement("SELECT idReferendum, nome FROM referendum WHERE attivo = ?");
+			stmt.setInt(1, 1);
+			ResultSet rs = stmt.executeQuery();
+			ArrayList<Votazione> ref = new ArrayList<>();
+			if(!rs.next()) {
+				return null;
+			} else {
+				do {
+					ref.add(new Votazione(rs.getInt("idReferendum"), "referendum", rs.getString("nome")));
+				} while(rs.next());
+			}
+			return ref;
+		}
+		
+		public ArrayList<Votazione> getVotazioniAttive() throws SQLException{
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM attive");
+			ResultSet rs = stmt.executeQuery();
+			ArrayList<Votazione> vot = new ArrayList<>();
+			if(!rs.next()) {
+				return null;
+			} else {
+				do {
+					vot.add(new Votazione(rs.getInt("idAttive"), rs.getString("tipo"), rs.getString("nome")));
+				} while(rs.next());
+			}
+			return vot;
+		}
+	
+	//invia la lista delle votazioni attive al client per selezionare quale votare
+		public ArrayList<Votazione> getVotAttive(String codFiscale) throws SQLException, IOException {
+			ArrayList<Votazione> vot = haVotato(codFiscale, getReferendumAttivi(), getVotazioniAttive());
+			return vot;	
+		}
+	
+	public boolean inserisciVotante(String cf) throws IOException, SQLException {
+		PreparedStatement stmt = conn.prepareStatement("SELECT codFiscale FROM votato WHERE codFiscale = ?");
+		stmt.setString(1, cf);
+		ResultSet rs = stmt.executeQuery();
+		if(!rs.next()) {
+			stmt = conn.prepareStatement("INSERT INTO votato (codFiscale) VALUES (?)");
+			stmt.setString(1, cf);
+			stmt.execute();
+		}
+		return true;
+	}
 }

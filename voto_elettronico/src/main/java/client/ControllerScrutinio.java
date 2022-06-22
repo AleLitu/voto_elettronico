@@ -56,7 +56,7 @@ public class ControllerScrutinio {
     				for(int j = 0; j < righe.size(); j++) {
     					RadioButton rb = (RadioButton)gruppi.get(i).getSelectedToggle();
     					if(rb.getId().equals(righe.get(j).getChildren().get(0).getId())) {
-    	    				votazioni.add(new Votazione(Integer.parseInt(righe.get(j).getChildren().get(3).getId()), rb.getText(), righe.get(j).getChildren().get(0).getId()));
+    						votazioni.add(new Votazione(Integer.parseInt(righe.get(j).getChildren().get(righe.get(j).getChildren().size() - 1).getId()), rb.getText(), righe.get(j).getChildren().get(0).getId()));
     					}
     				}
     			}
@@ -99,6 +99,7 @@ public class ControllerScrutinio {
     	ArrayList<Votazione> list = (ArrayList<Votazione>) oin.readObject();
     	righe = new ArrayList<>();
 		gruppi = new ArrayList<>();
+		boolean ord = false;
     	for(int i = 0; i < list.size(); i++) {
     		ToggleGroup gruppo = new ToggleGroup();
     		Label ln = new Label(list.get(i).getNome() + " : ");
@@ -120,10 +121,13 @@ public class ControllerScrutinio {
         		rb2.setToggleGroup(gruppo);
     		} else {
     			rb1 = new RadioButton();
-        		rb1.setId(list.get(i).getNome());
-        		rb1.setText("Maggioranza");
-        		rb1.setPadding(new Insets(10));
-        		rb1.setToggleGroup(gruppo);
+    			if(!list.get(i).getTipo().equals("ordinale")) {
+    				ord = true;
+		    		rb1.setId(list.get(i).getNome());
+		    		rb1.setText("Maggioranza");
+		    		rb1.setPadding(new Insets(10));
+		    		rb1.setToggleGroup(gruppo);
+    			}
         		rb2 = new RadioButton();
         		rb2.setId(list.get(i).getNome());
         		rb2.setText("Maggioranza assoluta");
@@ -135,7 +139,10 @@ public class ControllerScrutinio {
     		lt.setId(Integer.toString(list.get(i).getId()));
     		lt.setText(list.get(i).getTipo());
     		lt.setVisible(false);
-    		righe.add(new HBox(ln, rb1, rb2, lt));
+    		if(ord)
+    			righe.add(new HBox(ln, rb1, rb2, lt));
+    		else
+    			righe.add(new HBox(ln, rb2, lt));
     	}
     	vbox.getChildren().clear();
     	vbox.getChildren().addAll(righe);

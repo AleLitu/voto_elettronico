@@ -31,7 +31,7 @@ import model.Votazione;
 public class ControllerLogin {
 	
 	private static User user;
-	private static Socket so;
+	private static Socket so = null;
     OutputStream outputStream;
     InputStream inputStream;
 	
@@ -66,8 +66,8 @@ public class ControllerLogin {
     
     public static User getUser() {
     	return user;
-    }
-    
+    }    
+
     public static Socket getSocket() {
     	return so;
     }
@@ -113,7 +113,6 @@ public class ControllerLogin {
 				    outputStream.write("a".getBytes(), 0, "a".length());
 				    ObjectInputStream oin = new ObjectInputStream(inputStream);
 					user = (User) oin.readObject();
-					System.out.println(user);
 					if(user != null) {
 	            		Node node = (Node) event.getSource();
 	            		Stage actual = (Stage) node.getScene().getWindow();

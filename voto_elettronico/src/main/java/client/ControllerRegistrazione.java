@@ -150,7 +150,7 @@ public class ControllerRegistrazione{
     @FXML
     private MenuItem btnAnni[];
     
-    private boolean connected = false;
+    private boolean connected;
     
     private int mesi = 12;
     private int anni = 120;
@@ -339,11 +339,20 @@ public class ControllerRegistrazione{
     
     @FXML
     void handleIndietro(ActionEvent event) throws Exception {
-    	Node node = (Node) event.getSource();
-		Stage actual = (Stage) node.getScene().getWindow();
-    	Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
-        actual.setScene(new Scene(root));
-        actual.setTitle("Login");
+    	System.out.println("conn "+connected);
+    	if(connected == true) {
+			Node node = (Node) event.getSource();
+			Stage actual = (Stage) node.getScene().getWindow();
+	    	Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
+	        actual.setScene(new Scene(root));
+	        actual.setTitle("Gestore");
+		}else {
+			Node node = (Node) event.getSource();
+			Stage actual = (Stage) node.getScene().getWindow();
+	    	Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+	        actual.setScene(new Scene(root));
+	        actual.setTitle("Login");
+		}
     }
 
     @FXML
@@ -449,6 +458,8 @@ public class ControllerRegistrazione{
     
     @FXML
     public void initialize() throws IOException {
+    	connected = false;
+    	System.out.println("socket: "+ControllerLogin.getSocket());
     	if(ControllerLogin.getSocket() != null) {
     		lblIndirizzo.setVisible(false);
         	lblFirst.setVisible(false);
@@ -468,6 +479,7 @@ public class ControllerRegistrazione{
         	so = ControllerLogin.getSocket();
         	inputStream = so.getInputStream();
     		outputStream = so.getOutputStream();
+    		System.out.println("conn == true");
         	connected = true;
     	}
     	LocalDate dataCorrente = LocalDate.now();

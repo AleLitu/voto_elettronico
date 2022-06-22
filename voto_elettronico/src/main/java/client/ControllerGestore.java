@@ -112,7 +112,6 @@ public class ControllerGestore {
     		letti = in.read(buffer);
 	        risposta = new String(buffer, 0, letti);
 	        if(risposta.equals("ok")) {
-	        	System.out.println("cod fiscale: " + result.get());
 	        	out.write(result.get().getBytes(), 0, result.get().length());
 	        	letti = in.read(buffer);
 		        risposta = new String(buffer, 0, letti);
@@ -234,10 +233,7 @@ public class ControllerGestore {
     
     @FXML
     public void initialize() {
-    	System.out.println("Gestore");
-    	System.out.println(ControllerLogin.getUser().getCognome() + " " + ControllerLogin.getUser().getNome());
     	lblNome.setText("Benvenuto, " + ControllerLogin.getUser().getCognome() + " " + ControllerLogin.getUser().getNome());
-    	System.out.println("Gestore2");
     }
 
 }
