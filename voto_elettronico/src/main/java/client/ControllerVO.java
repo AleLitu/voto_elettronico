@@ -156,7 +156,6 @@ public class ControllerVO{
     	}
     	final String a = s + ",";
     	byte buffer[] = new byte[100];
-    	//byte[] cipherData = null;
     	Cipher cipher = Cipher.getInstance("RSA");
     	cipher.init(Cipher.ENCRYPT_MODE, pubKey);
     	out.write("vo".getBytes(), 0, "vo".length());
@@ -236,7 +235,6 @@ public class ControllerVO{
 					}
 			     }
 			 });
-    		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
         }
     }
     
@@ -261,9 +259,7 @@ public class ControllerVO{
 		lblNome.setText(nome);
     	ObjectInputStream keystream = new ObjectInputStream(in);
     	pubKey = (PublicKey) keystream.readObject();
-    	
-    	//out.write("partiti".getBytes(), 0, "partiti".length());
-    	ObjectInputStream oin1 = new ObjectInputStream(in);
+       	ObjectInputStream oin1 = new ObjectInputStream(in);
         listp = (List<Partito>) oin1.readObject();
         int sizep = listp.size();
         listc = new ArrayList<Candidato>();

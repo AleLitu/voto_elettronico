@@ -112,7 +112,6 @@ public class ControllerVC {
 					}
 			     }
 			 });
-    		//out.write((ControllerAttive.getScelta() + "," + rb.getId()).getBytes(), 0, (ControllerAttive.getScelta() + "," + rb.getId()).length());
         } else {
         	Alert alert = new Alert(AlertType.CONFIRMATION, "Confermi di votare Scheda bianca?");
 			alert.showAndWait().ifPresent(response -> {
@@ -171,10 +170,8 @@ public class ControllerVC {
     	lblNome.setText(nome);
     	ObjectInputStream keystream = new ObjectInputStream(in);
         pubKey = (PublicKey) keystream.readObject();
-        //out.write("attive".getBytes(), 0, "attive".length());
     	ObjectInputStream oin1 = new ObjectInputStream(in);
     	list = (List<Partito>) oin1.readObject();
-    	//List<HBox> righe = new ArrayList<>();
     	groupPa = new ToggleGroup();
     	for(int i = 0; i < list.size(); i++) {
     		RadioButton rb = new RadioButton();
@@ -182,16 +179,8 @@ public class ControllerVC {
     		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
     		rb.setPadding(new Insets(10));
     		rb.setText(list.get(i).getNome());
-    		/*
-    		Label l = new Label(list.get(i).getNome());
-    		l.setWrapText(true);
-    		l.setPadding(new Insets(10));*/
     		vboxPa.getChildren().addAll(rb);
-    		//righe.add(new HBox(rb, l));
-    	}
-    	//vboxPa.getChildren().clear();
-    	//vboxPa.getChildren().addAll(righe);
-    	
+    	}    	
     	groupPa.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ob, Toggle o, Toggle n) {
                 RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
@@ -202,18 +191,11 @@ public class ControllerVC {
                 			List<HBox> righe = new ArrayList<>();
                 			vboxCa.getChildren().clear();
                 	    	for(int j = 0; j < candidati.size(); j++) {
-                	    		/*RadioButton rb1 = new RadioButton();
-                	    		rb1.setToggleGroup(groupPa);
-                	    		rb1.setId(Integer.toString(candidati.get(j).getId()));
-                	    		rb1.setPadding(new Insets(10));*/
                 	    		Label l = new Label(candidati.get(j).getNome());
                 	    		l.setWrapText(true);
                 	    		l.setPadding(new Insets(10));
                 	    		vboxCa.getChildren().addAll(l);
-                	    		//righe.add(new HBox(rb1, l));
                 	    	}
-                	    	//vboxCa.getChildren().clear();
-                	    	//vboxCa.getChildren().addAll(righe);
                 		}
                 	}
                 }

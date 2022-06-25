@@ -177,31 +177,18 @@ public class ControllerVCP {
     	lblNome.setText(nome);
     	ObjectInputStream keystream = new ObjectInputStream(in);
         pubKey = (PublicKey) keystream.readObject();
-        //out.write("partiti".getBytes(), 0, "partiti".length());
     	ObjectInputStream oin1 = new ObjectInputStream(in);
     	list = (List<Partito>) oin1.readObject();
     	List<HBox> righe = new ArrayList<>();
     	groupPa = new ToggleGroup();
     	for(int i = 0; i < list.size(); i++) {
-    		/*
-    		RadioButton rb = new RadioButton();
-    		rb.setToggleGroup(groupPa);
-    		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
-    		rb.setPadding(new Insets(10));
-    		Label l = new Label(list.get(i).getNome());
-    		l.setWrapText(true);
-    		l.setPadding(new Insets(10));
-    		righe.add(new HBox(rb, l));*/
     		RadioButton rb = new RadioButton();
     		rb.setToggleGroup(groupPa);
     		rb.setId(list.get(i).getId() + "@" + list.get(i).getNome());
     		rb.setPadding(new Insets(10));
     		rb.setText(list.get(i).getNome());
     		vboxPa.getChildren().addAll(rb);
-    	}
-    	//vboxPa.getChildren().clear();
-    	//vboxPa.getChildren().addAll(righe);
-    	
+    	}    	
     	groupPa.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
             public void changed(ObservableValue<? extends Toggle> ob, Toggle o, Toggle n) {
                 RadioButton rb = (RadioButton)groupPa.getSelectedToggle();
@@ -213,28 +200,13 @@ public class ControllerVCP {
                 			List<HBox> righe = new ArrayList<>();
             	    		vboxCa.getChildren().clear();
                 	    	for(int j = 0; j < candidati.size(); j++) {
-                	    		/*
-                	    		RadioButton rb1 = new RadioButton();
-                	    		rb1.setId(candidati.get(j).getId() + "@" + candidati.get(j).getNome());
-                	    		rb1.setPadding(new Insets(10));
-                	    		selected.add(rb1);
-                	    		Label l = new Label(candidati.get(j).getNome());
-                	    		l.setWrapText(true);
-                	    		l.setPadding(new Insets(10));
-                	    		righe.add(new HBox(rb1, l));*/
                 	    		RadioButton rb1 = new RadioButton();
                 	    		rb1.setId(candidati.get(j).getId() + "@" + candidati.get(j).getNome());
                 	    		rb1.setPadding(new Insets(10));
                 	    		rb1.setText(candidati.get(j).getNome());
                 	    		selected.add(rb1);
-                	    		/*
-                	    		Label l = new Label(list.get(i).getNome());
-                	    		l.setWrapText(true);
-                	    		l.setPadding(new Insets(10));*/
                 	    		vboxCa.getChildren().addAll(rb1);
                 	    	}
-                	    	//vboxCa.getChildren().clear();
-                	    	//vboxCa.getChildren().addAll(righe);
                 		}
                 	}
                 }

@@ -77,9 +77,6 @@ public class ControllerReferendumVoto{
         	else 
         		codfis = ControllerLogin.getUser().getCodiceFiscale();
         	final String cf = codfis;
-			//outputStream.write(String.valueOf(ControllerLogin.getUser().getId()).getBytes(), 0, String.valueOf(ControllerLogin.getUser().getId()).length());
-			//if(ok.equals("ok")) {
-				//byte[] cipherData;
 				Cipher cipher = Cipher.getInstance("RSA");
 		        cipher.init(Cipher.ENCRYPT_MODE, pubKey);
 				if(!radioNo.isSelected() && !radioSi.isSelected()) {
@@ -194,9 +191,6 @@ public class ControllerReferendumVoto{
 			}else{
 			   	System.out.println("Errore");
 			}
-		//}else{
-	   		//System.out.println("Errore");
-		//}
     }
     
     private void votato(ActionEvent event) throws IOException {

@@ -84,24 +84,11 @@ public class GestisciClient implements Runnable, Serializable{
 					String scelta = new String(buffer, 0, letti);
 					switch(scelta) {
 					case "registrazione":
-						/*outputStream.write("ok".getBytes(), 0, "ok".length());
-						ObjectInputStream oin = new ObjectInputStream(inputStream);
-						ArrayList<User> us = (ArrayList<User>) oin.readObject();
-				        outputStream.write("ok".getBytes(), 0, "ok".length());
-						registrazione(us);*/
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						/*dis = new DataInputStream(inputStream);
-					    letti = dis.readInt();
-					    cipherData = new byte[letti];
-					    dis.readFully(cipherData);
-						cipher.init(Cipher.DECRYPT_MODE, hk.getPrivateKey());
-						String reg = new String(cipher.doFinal(cipherData), StandardCharsets.UTF_8);
-						System.out.println("reg: " + reg);*/
 						byte buffer1[] = new byte[150];
 						letti = inputStream.read(buffer1);
 						String reg = new String(buffer1, 0, letti);
 						if(!reg.equals("err")) {
-							//registrazione(reg);
 							userDao.registrazione(reg);
 							outputStream.write("ok".getBytes(), 0, "ok".length());
 						}
@@ -130,7 +117,6 @@ public class GestisciClient implements Runnable, Serializable{
 						outputStream.write("ok".getBytes(), 0, "ok".length());
 						letti = inputStream.read(buffer);
 						String codFiscale = new String(buffer, 0, letti);
-						//inserisciCF(codFiscale)
 						if(!userDao.controllaCF(codFiscale))
 							outputStream.write("err".getBytes(), 0, "err".length());
 						else
@@ -153,8 +139,6 @@ public class GestisciClient implements Runnable, Serializable{
 							LogHandler.writeLog("Nuovo referendum creato");
 						else
 							LogHandler.writeLog("Errore creazione nuovo referendum");
-						//inserisciRef();
-						//outputStream.write("ok".getBytes(), 0, "ok".length());
 						break;
 					case "b":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -171,14 +155,9 @@ public class GestisciClient implements Runnable, Serializable{
 							outputStream.write("false".getBytes(), 0, "false".length());
 							LogHandler.writeLog("Errore nell'inserimento di uan nuova lista");
 						}
-						//inserisciPartito(partito, candidati);
 						break;
 					case "ref":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
-						//letti = inputStream.read(buffer);
-						//String id = new String(buffer, 0, letti);
-						//inserisciVotato(Integer.parseInt(id));
-						//outputStream.write("ok".getBytes(), 0, "ok".length());
 						dis = new DataInputStream(inputStream);
 					    letti = dis.readInt();
 					    cipherData = new byte[letti];
@@ -193,7 +172,6 @@ public class GestisciClient implements Runnable, Serializable{
 								outputStream.write("err".getBytes(), 0, "err".length());
 					    		LogHandler.writeLog("Errore inserimento voto");
 							}
-							//inserisciRefVoto(voto);
 						}
 						break;
 					case "avvio":
@@ -255,7 +233,6 @@ public class GestisciClient implements Runnable, Serializable{
 								}
 				    		}
 						}
-						//avviaVotazione(votazione);
 						break;
 					case "attive":
 						outputStream.write("ok".getBytes(), 0, "ok".length());
@@ -307,7 +284,6 @@ public class GestisciClient implements Runnable, Serializable{
 								oos.writeObject(re);
 							}
 						}
-						//getVotazione();
 						break;
 					case "vc":
 						dis = new DataInputStream(inputStream);
@@ -324,7 +300,6 @@ public class GestisciClient implements Runnable, Serializable{
 								outputStream.write("err".getBytes(), 0, "err".length());
 					    		LogHandler.writeLog("Errore inserimento voto");
 							}
-							//votoCategorico(voto);
 						}
 						break;
 					case "vcp":
@@ -342,7 +317,6 @@ public class GestisciClient implements Runnable, Serializable{
 								outputStream.write("err".getBytes(), 0, "err".length());
 					    		LogHandler.writeLog("Errore inserimento voto");
 							}
-							//votoCategoricoPreferenze(voto);
 						}
 						break;
 					case "vo":
@@ -360,7 +334,6 @@ public class GestisciClient implements Runnable, Serializable{
 								outputStream.write("err".getBytes(), 0, "err".length());
 					    		LogHandler.writeLog("Errore inserimento voto");
 							}
-							//votoOrdinale(voto);
 						}
 						break;	
 					case "scrutinio":
@@ -394,7 +367,6 @@ public class GestisciClient implements Runnable, Serializable{
 								LogHandler.writeLog("Votazione calcolata");
 							}
 						}
-						//getTerminate();
 						break;
 					case "calculated":
 						ArrayList<String> calcolate = HandlerVotazioni.getCalcolate();
@@ -412,7 +384,6 @@ public class GestisciClient implements Runnable, Serializable{
 								oout1.writeObject(messaggio);
 							}
 						}
-						//mostraRisultati();
 						break;
 					case "end":
 						ArrayList<Votazione> refAtt = href.getAttivi();
@@ -443,7 +414,6 @@ public class GestisciClient implements Runnable, Serializable{
 								}
 							}
 						}
-						//terminaVotazione();
 						break;
 					case "logout":
 						inputStream.close();

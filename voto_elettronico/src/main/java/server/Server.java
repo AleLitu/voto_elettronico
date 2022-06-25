@@ -33,9 +33,6 @@ public class Server{
 			LogHandler.writeLog("Server started");
 			keys = HandlerKeys.getInstance();
 			keys.LoadKeyPair("RSA");
-			//KeyPair loadedKeyPair = LoadKeyPair("RSA");
-			//pubKey = loadedKeyPair.getPublic();
-			//privKey = loadedKeyPair.getPrivate();
 			LogHandler.writeLog("Chiavi caricate correttamente");
 		}catch(FileNotFoundException e) {
 			keys.GenerateKeys();
@@ -51,7 +48,6 @@ public class Server{
 		}
 		try {			
 			sSrv = new ServerSocket(50000);
-			//System.out.println("Indirizzo: " + sSrv.getInetAddress() + "; porta: " + sSrv.getLocalPort());
 			while(true) {
 				toClient = sSrv.accept();
 				LogHandler.writeLog("Client connesso: " + toClient.getInetAddress() + "; porta: " + toClient.getPort());
@@ -74,8 +70,6 @@ public class Server{
 			sSrv.close();
 		LogHandler.writeLog("Server spento");
 	}
-	
-	
 	
 	protected static PublicKey getPublicKey() {
 		return pubKey;

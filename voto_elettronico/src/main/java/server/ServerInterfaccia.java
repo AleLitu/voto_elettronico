@@ -10,7 +10,7 @@ public class ServerInterfaccia extends Application {
 	
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("server.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/server/server.fxml"));
         primaryStage.setResizable(false);
         primaryStage.setTitle("Server");
         primaryStage.setScene(new Scene(root, 400, 500));

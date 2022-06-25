@@ -87,10 +87,6 @@ public class ControllerLogin {
     	String usr = lblCodiceFiscale.getText();
     	String pwd = lblPassword.getText();
     	String messaggio;
-    	lblFirst.setText("127");
-    	lblSecond.setText("0");
-    	lblThird.setText("0");
-    	lblFourth.setText("1");
     	Alert alert;
     	if((usr.equals("") && pwd.equals("")) || usr.equals("") || pwd.equals("")) {
     		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale e la password", ButtonType.CLOSE);
@@ -122,19 +118,6 @@ public class ControllerLogin {
 	            				Parent root = FXMLLoader.load(getClass().getResource("gestore.fxml"));
 	                            actual.setScene(new Scene(root));
 	                            actual.setTitle("Home");
-	                            /*
-	                            actual.setOnCloseRequest(new EventHandler<WindowEvent>() {
-	                                @Override
-	                                public void handle(WindowEvent e) {
-	        	            			try {
-	        								outputStream.write("logout".getBytes(), 0, "logout".length());
-	        								Platform.exit();
-	        		                         System.exit(0);
-	        							} catch (IOException e1) {
-	        								e1.printStackTrace();
-	        							}
-	                                }
-	                              });*/
 	            			} else {
 	            				outputStream.write("attive".getBytes(), 0, "attive".length());
 	            				letti = inputStream.read(buffer);

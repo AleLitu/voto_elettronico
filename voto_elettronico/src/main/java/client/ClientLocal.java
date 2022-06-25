@@ -12,8 +12,6 @@ public class ClientLocal extends Application {
 	
     @Override
     public void start(Stage primaryStage) throws Exception{
-    	//FXMLLoader fxmlLoader = new FXMLLoader(DaoPatternDemo.class.getResource("login.fxml"));
-    	//System.out.println(User.create("12345"));
         Parent root = FXMLLoader.load(getClass().getResource("loginCL.fxml"));
         
         primaryStage.setTitle("Login");

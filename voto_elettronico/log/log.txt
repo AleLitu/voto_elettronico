@@ -1712,3 +1712,12 @@
 2022-06-22 18:58:31 --- Votazione terminata
 2022-06-22 18:58:34 --- Votazione terminata
 2022-06-22 18:58:38 --- Votazione calcolata
+2022-06-25 09:11:52 --- Server started
+2022-06-25 09:11:52 --- Chiavi caricate correttamente
+2022-06-25 09:12:15 --- Client connesso: /127.0.0.1; porta: 49956
+2022-06-25 09:12:26 --- Client connesso: /127.0.0.1; porta: 49960
+2022-06-25 09:12:50 --- Nuova votazione avviata
+2022-06-25 09:21:27 --- Server started
+2022-06-25 09:21:27 --- Chiavi caricate correttamente
+2022-06-25 09:25:14 --- Client connesso: /127.0.0.1; porta: 49983
+2022-06-25 09:25:19 --- Client disconnesso

@@ -131,10 +131,6 @@ public class ControllerCL {
     @FXML
     void handleSend(ActionEvent event) throws IOException {
     	codiceFiscale = lblCodiceFiscale.getText();
-    	lblFirst.setText("127");
-    	lblSecond.setText("0");
-    	lblThird.setText("0");
-    	lblFourth.setText("1");
     	Alert alert;
     	if(codiceFiscale.equals("")) {
      		alert = new Alert(AlertType.WARNING, "Inserire il codice fiscale", ButtonType.CLOSE);
@@ -155,7 +151,6 @@ public class ControllerCL {
 								String risposta;
 								byte buffer[] = new byte[dim_buffer];
 								outputStream.write("login".getBytes(), 0, "login".length());
-								//outputStream.write("login".getBytes(), 0, "login".length());
 								letti = inputStream.read(buffer);
 							    risposta = new String(buffer, 0, letti);
 				                if(risposta.equals("ok")) {
@@ -217,7 +212,6 @@ public class ControllerCL {
 					     	}
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
     	     	}
